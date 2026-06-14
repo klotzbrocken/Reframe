@@ -22,16 +22,23 @@ export function PersonalBar({
   onItem,
   onDropUrl,
   onEdit,
-  onRemove
+  onRemove,
+  onMenuToggle
 }: {
   items: PersonalBarItem[]
   onItem?: (url: string) => void
   onDropUrl?: (url: string, title: string) => void
   onEdit?: (id: string) => void
   onRemove?: (id: string) => void
+  /** Notifies the host when the right-click menu opens/closes (to float chrome). */
+  onMenuToggle?: (open: boolean) => void
 }) {
   const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(null)
   const [dragOver, setDragOver] = useState(false)
+
+  // Let the host float the chrome above the page while the menu is open, so the
+  // menu (which drops into the content area) isn't hidden behind the page view.
+  useEffect(() => onMenuToggle?.(menu !== null), [menu, onMenuToggle])
 
   useEffect(() => {
     if (!menu) return
@@ -77,7 +84,11 @@ export function PersonalBar({
             it.user && it.id
               ? (e) => {
                   e.preventDefault()
-                  setMenu({ id: it.id as string, x: e.clientX, y: e.clientY })
+                  setMenu({
+                    id: it.id as string,
+                    x: Math.min(e.clientX, window.innerWidth - 150),
+                    y: e.clientY
+                  })
                 }
               : undefined
           }
