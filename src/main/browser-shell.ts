@@ -6,6 +6,7 @@ interface Tab {
   id: number
   view: WebContentsView
   retro: boolean
+  favicon: string | null
 }
 
 const DEFAULT_INSETS: ContentInsets = { top: 78, right: 0, bottom: 26, left: 0 }
@@ -45,7 +46,7 @@ export class BrowserShell {
       isLoading: wc.isLoadingMainFrame(),
       canGoBack: nav ? nav.canGoBack() : wc.canGoBack(),
       canGoForward: nav ? nav.canGoForward() : wc.canGoForward(),
-      favicon: null
+      favicon: tab.favicon
     }
   }
 
@@ -111,7 +112,7 @@ export class BrowserShell {
         sandbox: true
       }
     })
-    const tab: Tab = { id, view, retro: false }
+    const tab: Tab = { id, view, retro: false, favicon: null }
     this.tabs.set(id, tab)
     this.order.push(id)
     this.win.contentView.addChildView(view)
@@ -267,7 +268,12 @@ export class BrowserShell {
     const wc = tab.view.webContents
 
     wc.on('did-start-loading', () => {
+      tab.favicon = null // clear stale favicon while the next page loads
       this.emit({ type: 'load-start', id: tab.id })
+      this.push(tab)
+    })
+    wc.on('page-favicon-updated', (_e, favicons) => {
+      tab.favicon = favicons?.[0] ?? null
       this.push(tab)
     })
     wc.on('did-stop-loading', () => {

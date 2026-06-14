@@ -2,8 +2,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { AddressBar } from './components/AddressBar'
 import { MenuBar, type Menu, type MenuItem } from './components/MenuBar'
 import { NavButton } from './components/NavButton'
+import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
-import { PersonalBar } from './components/PersonalBar'
+import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
 import { SearchBox } from './components/SearchBox'
 import { SettingsDialog, type Settings } from './components/SettingsDialog'
 import { StatusBar } from './components/StatusBar'
@@ -11,7 +12,9 @@ import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
 import { TitleBar } from './components/TitleBar'
 import { WhatsNewDialog, WHATS_NEW_VERSION } from './components/WhatsNewDialog'
+import { DEFAULT_ENGINE_ID } from './shell/engines'
 import { useShell } from './shell/useShell'
+import { stripWaybackDisplay, unwrapWayback, waybackDisplay } from './shell/wayback'
 import { themeEngine } from './theme/loader'
 import {
   DEFAULT_LABELS,
@@ -31,6 +34,10 @@ export function App() {
     }
   }
   const [settings, setSettings] = useState<Settings>(loadSettings)
+  const saveSettings = (s: Settings): void => {
+    setSettings(s)
+    localStorage.setItem('reframe.settings', JSON.stringify(s))
+  }
   const [dialogOpen, setDialogOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
 
@@ -50,10 +57,12 @@ export function App() {
 
   const [addrHistory, setAddrHistory] = useState<string[]>([])
   const submitAddress = (input: string): void => {
-    // store the full "https://…" form for the dropdown; the engine re-normalizes
-    const shown = /^[a-z][a-z0-9+.-]*:\/\//i.test(input) ? input : 'https://' + input
+    // The field may show the friendly "1999://…" wayback form — turn it back
+    // into the real target before navigating (the engine re-wraps if Old Web is on).
+    const original = stripWaybackDisplay(input.trim())
+    const shown = /^[a-z][a-z0-9+.-]*:\/\//i.test(original) ? original : 'https://' + original
     setAddrHistory((h) => [shown, ...h.filter((x) => x !== shown)].slice(0, 10))
-    actions.navigate(input)
+    actions.navigate(original)
   }
 
   const waybackDate = settings.waybackYear
@@ -94,10 +103,42 @@ export function App() {
     }
   }, [state.tabs, state.activeId])
 
+  // --- user bookmarks on the personal/bookmark toolbar (drag & drop) ---
+  interface BarBookmark {
+    id: string
+    label: string
+    url: string
+    favicon?: string
+  }
+  const [barBookmarks, setBarBookmarks] = useState<BarBookmark[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('reframe.barBookmarks') || '[]') as BarBookmark[]
+    } catch {
+      return []
+    }
+  })
+  const [editBookmark, setEditBookmark] = useState<BarBookmark | null>(null)
+  useEffect(
+    () => localStorage.setItem('reframe.barBookmarks', JSON.stringify(barBookmarks)),
+    [barBookmarks]
+  )
+  const dropBarBookmark = (url: string, title: string): void => {
+    const at = state.tabs.find((t) => t.id === state.activeId)
+    const favicon = at && unwrapWayback(at.url) === url ? at.favicon ?? undefined : undefined
+    const id = crypto.randomUUID()
+    setBarBookmarks((b) => [...b, { id, label: title || url, url, favicon }])
+  }
+  const removeBarBookmark = (id: string): void =>
+    setBarBookmarks((b) => b.filter((x) => x.id !== id))
+  const saveBarBookmark = (d: BookmarkDraft): void =>
+    setBarBookmarks((b) => b.map((x) => (x.id === d.id ? { ...x, label: d.label, url: d.url } : x)))
+
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
-    window.oldweb.setChromeOnTop(panel !== null || dialogOpen || whatsNewOpen)
-  }, [panel, dialogOpen, whatsNewOpen])
+    window.oldweb.setChromeOnTop(
+      panel !== null || dialogOpen || whatsNewOpen || editBookmark !== null
+    )
+  }, [panel, dialogOpen, whatsNewOpen, editBookmark])
 
   const openPanel = (kind: 'bookmarks' | 'history', selector: string): void => {
     const r = document.querySelector(selector)?.getBoundingClientRect()
@@ -283,19 +324,33 @@ export function App() {
   const unified = layout.unifiedToolbar === true
   const addressBarEl = (
     <AddressBar
-      url={activeTab?.url ?? ''}
+      url={waybackDisplay(activeTab?.url ?? '', waybackDate.slice(0, 4))}
       label={labels.address}
       goLabel={labels.go}
       history={addrHistory}
+      favicon={layout.showFavicon ? activeTab?.favicon ?? null : null}
+      dragUrl={unwrapWayback(activeTab?.url ?? '')}
+      dragTitle={activeTab?.title}
       onSubmit={submitAddress}
       onBookmarks={() => openPanel('bookmarks', '.ow-loc-bookmarks')}
     />
   )
+  const barItems: PersonalBarItem[] = [
+    ...(manifest?.personalBar ?? []),
+    ...barBookmarks.map((b) => ({
+      label: b.label,
+      url: b.url,
+      favicon: b.favicon,
+      id: b.id,
+      user: true,
+      icon: 'doc'
+    }))
+  ]
   const searchBoxEl = (
     <SearchBox
-      onSearch={(q) =>
-        actions.navigate('https://www.google.com/search?q=' + encodeURIComponent(q))
-      }
+      engineId={settings.searchEngine || DEFAULT_ENGINE_ID}
+      onEngineChange={(id) => saveSettings({ ...settings, searchEngine: id })}
+      onSearch={(url) => actions.navigate(url)}
     />
   )
 
@@ -337,8 +392,14 @@ export function App() {
 
       {!unified && addressBarEl}
 
-      {manifest?.personalBar && manifest.personalBar.length > 0 && (
-        <PersonalBar items={manifest.personalBar} onItem={actions.navigate} />
+      {manifest?.personalBar && (
+        <PersonalBar
+          items={barItems}
+          onItem={actions.navigate}
+          onDropUrl={dropBarBookmark}
+          onEdit={(id) => setEditBookmark(barBookmarks.find((b) => b.id === id) ?? null)}
+          onRemove={removeBarBookmark}
+        />
       )}
 
       {layout.showTabs !== false && (layout.tabsPosition ?? 'top') === 'top' && tabStrip}
@@ -371,10 +432,7 @@ export function App() {
         <SettingsDialog
           settings={settings}
           themes={themes}
-          onSave={(s) => {
-            setSettings(s)
-            localStorage.setItem('reframe.settings', JSON.stringify(s))
-          }}
+          onSave={saveSettings}
           onClose={() => setDialogOpen(false)}
           onOpenExternal={(u) => window.oldweb.openExternal(u)}
         />
@@ -384,6 +442,15 @@ export function App() {
         <WhatsNewDialog
           onClose={() => setWhatsNewOpen(false)}
           onOpenExternal={(u) => window.oldweb.openExternal(u)}
+        />
+      )}
+
+      {editBookmark && (
+        <BookmarkEditDialog
+          draft={{ id: editBookmark.id, label: editBookmark.label, url: editBookmark.url }}
+          onSave={saveBarBookmark}
+          onRemove={removeBarBookmark}
+          onClose={() => setEditBookmark(null)}
         />
       )}
     </div>

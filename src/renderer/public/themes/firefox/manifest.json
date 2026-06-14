@@ -16,7 +16,8 @@
     "showStatusBar": true,
     "showMenuBar": true,
     "showTabs": false,
-    "unifiedToolbar": true
+    "unifiedToolbar": true,
+    "showFavicon": true
   },
   "throbber": { "kind": "image", "label": "Firefox" },
   "labels": {
