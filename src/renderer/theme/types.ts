@@ -1,0 +1,101 @@
+export interface ThemeSummary {
+  id: string
+  name: string
+  era: string
+}
+
+/** Toolbar entries. Known actions render as buttons; '|' is a separator. */
+export type ToolbarItem =
+  | 'back'
+  | 'forward'
+  | 'stop'
+  | 'refresh'
+  | 'home'
+  | 'search'
+  | 'favorites'
+  | 'history'
+  | 'mail'
+  | 'print'
+  | 'edit'
+  | 'netscape'
+  | 'security'
+  | 'shop'
+  | '|'
+
+export interface ThemeManifest {
+  id: string
+  name: string
+  era?: string
+  /** The exact toolbar button row for this theme, in order. */
+  toolbar?: ToolbarItem[]
+  /** The exact menu-bar labels for this theme, in order. */
+  menus?: string[]
+  /** Home / Search target for this theme (era-appropriate; archived if needed). */
+  homeUrl?: string
+  /** Optional personal / bookmark toolbar (Netscape-style quick links). */
+  personalBar?: { label: string; icon?: string; url?: string }[]
+  /** Wayback Machine timestamp for the "Old Web" toggle — YYYY, YYYYMM or
+   *  YYYYMMDD (theme era). Falls back to oldWebYear, then 2002. */
+  oldWebDate?: string
+  /** @deprecated use oldWebDate */
+  oldWebYear?: number
+  /** Layout hints the structural UI reads (visuals stay in theme.css). */
+  layout?: {
+    tabsPosition?: 'top' | 'bottom'
+    showStatusBar?: boolean
+    showMenuBar?: boolean
+    showTabs?: boolean
+  }
+  throbber?: {
+    /** 'css' = animated purely in theme.css; 'image' = animated background. */
+    kind?: 'css' | 'image'
+    label?: string
+  }
+  labels?: {
+    address?: string
+    go?: string
+    back?: string
+    forward?: string
+    stop?: string
+    reload?: string
+    home?: string
+    newTab?: string
+    search?: string
+    favorites?: string
+    history?: string
+    mail?: string
+    print?: string
+    edit?: string
+    netscape?: string
+    security?: string
+    shop?: string
+  }
+  /** Event name -> sound file (relative to the theme's sounds/ dir). */
+  sounds?: Record<string, string>
+  /** CSS custom properties applied to :root. */
+  vars?: Record<string, string>
+}
+
+export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
+  address: 'Address',
+  go: 'Go',
+  back: 'Back',
+  forward: 'Forward',
+  stop: 'Stop',
+  reload: 'Refresh',
+  home: 'Home',
+  newTab: 'New Tab',
+  search: 'Search',
+  favorites: 'Favorites',
+  history: 'History',
+  mail: 'Mail',
+  print: 'Print',
+  edit: 'Edit',
+  netscape: 'My Netscape',
+  security: 'Security',
+  shop: 'Shop'
+}
+
+export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']
+
+export const DEFAULT_MENUS: string[] = ['File', 'Edit', 'View', 'Favorites', 'Tools', 'Help']

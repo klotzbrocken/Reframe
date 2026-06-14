@@ -1,0 +1,624 @@
+/*
+ * Internet Explorer 5 on Windows 98 — pixel-faithful.
+ *
+ * Bevel recipes, palette, the MS Sans Serif bitmap font, scrollbar and control
+ * glyphs are taken from 98.css (MIT, https://github.com/jdan/98.css) and applied
+ * to Oldweb's structural .ow-* elements. All retro artwork here is original/CSS
+ * or from 98.css — no extracted vendor assets.
+ */
+
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    url('fonts/ms_sans_serif.woff2') format('woff2'),
+    url('fonts/ms_sans_serif.woff') format('woff');
+}
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-style: normal;
+  font-weight: 700;
+  src:
+    url('fonts/ms_sans_serif_bold.woff2') format('woff2'),
+    url('fonts/ms_sans_serif_bold.woff') format('woff');
+}
+
+:root {
+  /* Win98 bevels (4-layer inset box-shadows), exactly per 98.css */
+  --w98-raised: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+  --w98-pressed: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+  --w98-sunken: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf,
+    inset 2px 2px #0a0a0a;
+  --w98-window: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px #808080,
+    inset 2px 2px #fff;
+  --w98-status: inset -1px -1px #dfdfdf, inset 1px 1px #808080;
+  --w98-tab: inset -1px 0 #0a0a0a, inset 1px 1px #dfdfdf, inset -2px 0 #808080,
+    inset 2px 2px #fff;
+}
+
+body {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 11px;
+  color: #222;
+  background: #c0c0c0;
+}
+
+/* Outer window frame (raised) — a touch wider */
+.ow-root {
+  background: #c0c0c0;
+  box-shadow: var(--w98-window);
+  padding: 5px;
+}
+
+/* --- title bar (navy gradient + window controls) ------------------------- */
+.ow-titlebar {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  padding: 2px 2px 2px 3px;
+  height: 22px;
+  gap: 3px;
+}
+.ow-titlebar__icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #8fd3ff, #0a6fd0 62%, #033b78);
+  box-shadow: inset -1px -1px 1px rgba(0, 0, 0, 0.6);
+}
+.ow-titlebar__text {
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 0 4px;
+}
+.ow-titlebar__controls {
+  gap: 2px;
+}
+.ow-winbtn {
+  width: 16px;
+  height: 14px;
+  min-width: 16px;
+  padding: 0;
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  background-repeat: no-repeat;
+}
+.ow-winbtn:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+.ow-winbtn[data-control='minimize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 3px left 4px;
+}
+.ow-winbtn[data-control='maximize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='close'] {
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 3px left 4px;
+}
+
+/* --- menu bar ------------------------------------------------------------ */
+.ow-menubar {
+  background: #c0c0c0;
+  padding: 2px 4px 2px 11px;
+  gap: 0;
+  position: relative;
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
+}
+/* IE5 "grip" handle at the far left of the menu, tool and address bars */
+.ow-menubar::before,
+.ow-toolbar::before,
+.ow-addressbar::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: 4px;
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+}
+.ow-menu__label {
+  padding: 2px 7px;
+  line-height: 15px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: #4160c9;
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #c0c0c0;
+  padding: 2px;
+  border: 2px solid;
+  border-color: var(--ow-face-light) var(--ow-face-darker) var(--ow-face-darker)
+    var(--ow-face-light);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  font-size: 11px;
+}
+.ow-menu__heading {
+  padding: 4px 22px 2px 24px;
+  font-weight: 700;
+  color: #555;
+}
+.ow-menu__item {
+  padding: 3px 20px 3px 8px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #4160c9;
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: var(--ow-face-dark);
+}
+.ow-menu__sep {
+  height: 0;
+  margin: 3px 2px;
+  border-top: 1px solid var(--ow-face-dark);
+  border-bottom: 1px solid var(--ow-face-light);
+}
+.ow-menu__check {
+  width: 16px;
+}
+
+/* --- toolbar (flat buttons, raise on hover, press on click) -------------- */
+.ow-toolbar {
+  background: #c0c0c0;
+  padding: 3px 4px 3px 11px;
+  gap: 0;
+  position: relative;
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
+}
+.ow-btn {
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 48px;
+  padding: 4px 5px 3px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #222;
+}
+/* Back / Forward sit a little apart (their history split arrows) */
+.ow-btn[data-action='back'] {
+  margin-right: 12px;
+}
+.ow-btn:hover:not(:disabled) {
+  box-shadow: var(--w98-raised);
+}
+.ow-btn:active:not(:disabled) {
+  box-shadow: var(--w98-pressed);
+}
+.ow-btn__icon {
+  width: 24px;
+  height: 20px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+}
+/* Supplied IE5 icon set: grayscale at rest, full colour on mouse-over. */
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/gr_forward.png');
+  transform: scaleX(-1);
+}
+.ow-btn[data-action='back']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/forward.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/gr_forward.png');
+}
+.ow-btn[data-action='forward']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/forward.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/gr_stop.png');
+}
+.ow-btn[data-action='stop']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/gr_refresh.png');
+}
+.ow-btn[data-action='refresh']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/refresh.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/gr_home.png');
+}
+.ow-btn[data-action='home']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn[data-action='search'] .ow-btn__icon {
+  background-image: url('assets/gr_search.png');
+}
+.ow-btn[data-action='search']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/search.png');
+}
+.ow-btn[data-action='favorites'] .ow-btn__icon {
+  background-image: url('assets/gr_favorites.png');
+}
+.ow-btn[data-action='favorites']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/favorites.png');
+}
+.ow-btn[data-action='history'] .ow-btn__icon {
+  background-image: url('assets/gr_history.png');
+}
+.ow-btn[data-action='history']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/history.png');
+}
+.ow-btn[data-action='mail'] .ow-btn__icon {
+  background-image: url('assets/mail.svg');
+  filter: grayscale(1);
+}
+.ow-btn[data-action='mail']:hover:not(:disabled) .ow-btn__icon {
+  filter: none;
+}
+.ow-btn[data-action='print'] .ow-btn__icon {
+  background-image: url('assets/gr_print.png');
+}
+.ow-btn[data-action='print']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/print.png');
+}
+.ow-btn:disabled .ow-btn__icon {
+  opacity: 0.5;
+}
+.ow-btn__label {
+  font-size: 11px;
+}
+
+/* toolbar group separator — etched vertical line (Win98) */
+.ow-toolbar-sep {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 0;
+  margin: 3px 5px;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+}
+
+/* theme switcher + CRT toggle, in period style */
+.ow-theme-select {
+  font-family: inherit;
+  font-size: 11px;
+  height: 21px;
+  margin-right: 5px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #fff;
+  box-shadow: var(--w98-sunken);
+  padding: 2px 26px 2px 4px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 0H0v16h1V1h14V0z' fill='%23DFDFDF'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 1H1v14h1V2h12V1H2z' fill='%23fff'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 17H0v-1h15V0h1v17z' fill='%23000'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 1h-1v14H1v1h14V1z' fill='gray'/%3E%3Cpath fill='silver' d='M2 2h12v13H2z'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11 6H4v1h1v1h1v1h1v1h1V9h1V8h1V7h1V6z' fill='%23000'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: top 2px right 2px;
+}
+.ow-retro-toggle {
+  flex-direction: row;
+  min-width: 0;
+  padding: 3px 9px;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+}
+.ow-retro-toggle.is-on {
+  box-shadow: var(--w98-pressed);
+}
+
+/* --- address bar --------------------------------------------------------- */
+.ow-addressbar {
+  background: #c0c0c0;
+  padding: 3px 6px 5px 11px;
+  gap: 5px;
+  position: relative;
+}
+.ow-address-label {
+  color: #404040;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12.5px;
+}
+/* IE5: no page icon — the address bar is a combobox with a history dropdown */
+.ow-address-icon {
+  display: none;
+}
+.ow-address-combo {
+  height: 21px;
+  background: #fff;
+  box-shadow: var(--w98-sunken);
+}
+.ow-address-input {
+  padding: 2px 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+/* same supplied combobox-button image as Netscape (face + bevel + arrow) */
+.ow-address-dropdown {
+  display: inline-block;
+  width: 18px;
+  margin: 1px;
+  padding: 0;
+  background: url('assets/dropdown.png') center / cover no-repeat;
+  border: 0;
+  box-shadow: none;
+}
+.ow-address-dropdown:active {
+  transform: translate(1px, 1px);
+}
+.ow-address-list {
+  background: #fff;
+  border: 2px solid;
+  border-color: var(--ow-face-light) var(--ow-face-darker) var(--ow-face-darker)
+    var(--ow-face-light);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  font-size: 11px;
+}
+.ow-address-item {
+  padding: 2px 6px;
+}
+.ow-address-item:hover {
+  background: #4160c9;
+  color: #fff;
+}
+.ow-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  min-width: 0;
+  padding: 0 8px;
+  font-family: inherit;
+  font-size: 11px;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+.ow-go:hover {
+  border-color: var(--ow-face-light) var(--ow-face-darker) var(--ow-face-darker)
+    var(--ow-face-light);
+}
+.ow-go:active {
+  border-color: var(--ow-face-darker) var(--ow-face-light) var(--ow-face-light)
+    var(--ow-face-darker);
+}
+/* green "Go" arrow icon */
+.ow-go__icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4 8a4 4 0 1 1 1.2 2.9' fill='none' stroke='%231b7a2e' stroke-width='2'/%3E%3Cpath d='M3.2 11.4 4.5 7.7 8 9.1z' fill='%231b7a2e'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+/* "Links »" at the right of the location bar */
+.ow-loc-links {
+  display: inline-block;
+  color: #404040;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+/* --- tabs (Win98 tab strip) --------------------------------------------- */
+.ow-tabstrip {
+  background: #c0c0c0;
+  padding: 3px 4px 0 6px;
+  gap: 0;
+}
+.ow-tab {
+  background: #c0c0c0;
+  box-shadow: var(--w98-tab);
+  border-radius: 3px 3px 0 0;
+  padding: 4px 9px 5px;
+  margin-right: -1px;
+  position: relative;
+  top: 2px;
+  font-size: 11px;
+}
+.ow-tab.is-active {
+  top: 0;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  z-index: 5;
+}
+.ow-tab__spinner {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #8fd3ff, #06c 70%, #036);
+}
+.ow-tab__spinner:not(.is-active) {
+  display: none;
+}
+.ow-tab__spinner.is-active {
+  animation: ow-spin 0.8s linear infinite;
+}
+.ow-tab__close {
+  width: 15px;
+  height: 14px;
+  font-size: 11px;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+}
+.ow-tab__close:active {
+  box-shadow: var(--w98-pressed);
+}
+.ow-tab-new {
+  align-self: center;
+  width: 21px;
+  height: 19px;
+  margin-left: 5px;
+  font-size: 13px;
+  line-height: 1;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+}
+.ow-tab-new:active {
+  box-shadow: var(--w98-pressed);
+}
+
+/* --- spinning globe throbber (CSS-drawn, original artwork) --------------- */
+/* Supplied IE5/6 throbber: static first frame at rest, animated GIF on load. */
+/* IE5: the animated logo sits at the far right of the MENU bar, not the toolbar */
+.ow-toolbar .ow-throbber {
+  display: none;
+}
+.ow-menubar .ow-throbber {
+  display: block;
+  width: 38px;
+  height: 26px;
+  margin: -3px 0 -3px 8px;
+  background: #000 url('assets/throbber_idle.png') center / cover no-repeat;
+}
+.ow-menubar .ow-throbber.is-active {
+  background-image: url('assets/throbber.gif');
+}
+
+/* Back / Forward history dropdown affordance */
+.ow-btn[data-action='back'],
+.ow-btn[data-action='forward'] {
+  position: relative;
+}
+.ow-btn[data-action='back']::after,
+.ow-btn[data-action='forward']::after {
+  content: '▾';
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  font-size: 8px;
+  line-height: 1;
+  color: #404040;
+}
+.ow-btn[data-action='back']:disabled::after,
+.ow-btn[data-action='forward']:disabled::after {
+  color: #808080;
+}
+
+/* "more" overflow chevron at the right end of the toolbar */
+.ow-toolbar::after {
+  content: '»';
+  align-self: center;
+  margin: 0 2px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #404040;
+}
+@keyframes ow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- status bar ---------------------------------------------------------- */
+.ow-statusbar {
+  background: #c0c0c0;
+  padding: 2px 1px;
+  gap: 1px;
+}
+.ow-status-text,
+.ow-zone {
+  box-shadow: var(--w98-status);
+  padding: 3px 4px;
+  height: 20px;
+  line-height: 14px;
+}
+.ow-progress {
+  width: 140px;
+  height: 20px;
+  flex: 0 0 auto;
+  box-shadow: var(--w98-status);
+  padding: 3px;
+  overflow: hidden;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(90deg, #000080 0 14px, transparent 14px 16px);
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 100%;
+  animation: ow-marquee 0.7s linear infinite;
+}
+@keyframes ow-marquee {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 16px;
+  }
+}
+.ow-zone {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ow-zone__lock {
+  width: 10px;
+  height: 11px;
+  background: #e8c000;
+  border: 1px solid #8a6d00;
+  border-radius: 1px;
+  position: relative;
+}
+.ow-zone__lock::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 2px;
+  width: 4px;
+  height: 5px;
+  border: 1px solid #8a6d00;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+}
+
+/* --- Win98 scrollbars (98.css) ------------------------------------------- */
+::-webkit-scrollbar {
+  width: 16px;
+}
+::-webkit-scrollbar:horizontal {
+  height: 17px;
+}
+::-webkit-scrollbar-corner {
+  background: #dfdfdf;
+}
+::-webkit-scrollbar-track {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='2' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M1 0H0v1h1v1h1V1H1V0z' fill='silver'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 0H1v1H0v1h1V1h1V0z' fill='%23fff'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-thumb {
+  background-color: #dfdfdf;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+::-webkit-scrollbar-button:vertical:start {
+  height: 17px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 0H0v16h1V1h14V0z' fill='%23DFDFDF'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 1H1v14h1V2h12V1H2z' fill='%23fff'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 17H0v-1h15V0h1v17z' fill='%23000'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 1h-1v14H1v1h14V1z' fill='gray'/%3E%3Cpath fill='silver' d='M2 2h12v13H2z'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 6H7v1H6v1H5v1H4v1h7V9h-1V8H9V7H8V6z' fill='%23000'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:vertical:end {
+  height: 17px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 0H0v16h1V1h14V0z' fill='%23DFDFDF'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 1H1v14h1V2h12V1H2z' fill='%23fff'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 17H0v-1h15V0h1v17z' fill='%23000'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 1h-1v14H1v1h14V1z' fill='gray'/%3E%3Cpath fill='silver' d='M2 2h12v13H2z'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11 6H4v1h1v1h1v1h1v1h1V9h1V8h1V7h1V6z' fill='%23000'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:horizontal:start {
+  width: 16px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 0H0v16h1V1h14V0z' fill='%23DFDFDF'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 1H1v14h1V2h12V1H2z' fill='%23fff'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 17H0v-1h15V0h1v17z' fill='%23000'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 1h-1v14H1v1h14V1z' fill='gray'/%3E%3Cpath fill='silver' d='M2 2h12v13H2z'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9 4H8v1H7v1H6v1H5v1h1v1h1v1h1v1h1V4z' fill='%23000'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:horizontal:end {
+  width: 16px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 0H0v16h1V1h14V0z' fill='%23DFDFDF'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 1H1v14h1V2h12V1H2z' fill='%23fff'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M16 17H0v-1h15V0h1v17z' fill='%23000'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 1h-1v14H1v1h14V1z' fill='gray'/%3E%3Cpath fill='silver' d='M2 2h12v13H2z'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 4H6v7h1v-1h1V9h1V8h1V7H9V6H8V5H7V4z' fill='%23000'/%3E%3C/svg%3E");
+}

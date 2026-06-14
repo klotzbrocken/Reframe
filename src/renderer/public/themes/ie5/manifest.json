@@ -1,0 +1,60 @@
+{
+  "id": "ie5",
+  "name": "Internet Explorer 5",
+  "era": "1999 · Windows 98",
+  "toolbar": [
+    "back",
+    "forward",
+    "|",
+    "stop",
+    "refresh",
+    "home",
+    "|",
+    "search",
+    "favorites",
+    "history",
+    "|",
+    "mail",
+    "print"
+  ],
+  "homeUrl": "https://www.google.com",
+  "oldWebDate": "19990318",
+  "layout": {
+    "tabsPosition": "top",
+    "showStatusBar": true,
+    "showMenuBar": true,
+    "showTabs": false
+  },
+  "throbber": {
+    "kind": "css",
+    "label": "Working"
+  },
+  "labels": {
+    "address": "Address",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "newTab": "New",
+    "search": "Search",
+    "favorites": "Favorites",
+    "history": "History",
+    "mail": "Mail",
+    "print": "Print",
+    "edit": "Edit"
+  },
+  "sounds": {},
+  "vars": {
+    "--ow-face": "#d4d0c8",
+    "--ow-face-light": "#ffffff",
+    "--ow-face-dark": "#808080",
+    "--ow-face-darker": "#404040",
+    "--ow-field": "#ffffff",
+    "--ow-text": "#000000",
+    "--ow-highlight": "#4160c9",
+    "--ow-titlebar": "#0a246a",
+    "--ow-font": "'Pixelated MS Sans Serif', Arial, sans-serif"
+  }
+}

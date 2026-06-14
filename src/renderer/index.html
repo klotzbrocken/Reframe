@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- The chrome UI loads only our own bundled code. CSP is relaxed enough for
+         the Vite dev server (inline/eval/websocket HMR); web pages render in
+         separate sandboxed WebContentsViews and are unaffected by this. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://storage.ko-fi.com; media-src 'self'; font-src 'self'; connect-src 'self' ws: http: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    />
+    <title>Reframe</title>
+  </head>
+  <body data-theme="">
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
