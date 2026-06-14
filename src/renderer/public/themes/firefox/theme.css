@@ -300,25 +300,27 @@ body {
 }
 .ow-address-combo {
   height: 22px;
+  align-items: center;
   background: #fff;
   /* thin, light sunken edge — not the heavy 4-layer bevel */
   border: 1px solid;
   border-color: #a6a39a #ededea #ededea #a6a39a;
 }
-/* page favicon, inside the field on the left */
+/* The page favicon is painted as the input's own background so it is always
+   inside the field (a separate leading element rendered just outside the white
+   box). */
 .ow-address-favicon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin: 0 1px 0 3px;
-  flex: 0 0 auto;
-  background: url('assets/favicon.png') center / contain no-repeat;
+  display: none;
 }
 .ow-address-input {
-  padding: 0 3px;
+  padding: 0 3px 0 22px;
   font-size: 12px;
-  background: transparent;
+  border: 0;
+  background: url('assets/favicon.png') 4px center / 15px 15px no-repeat;
+  background-color: transparent;
   box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .ow-address-input:focus {
   outline: none;
