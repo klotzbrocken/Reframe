@@ -179,12 +179,15 @@ export function App() {
   // Show the theme's classic boot splash (its own frameless window) on switch —
   // skip the very first apply (the startup splash already covers launch).
   const firstThemeRef = useRef(true)
+  const themeSplashOn = settings.themeSplash !== false
+  const themeSplashRef = useRef(themeSplashOn)
+  themeSplashRef.current = themeSplashOn
   useEffect(() => {
     if (firstThemeRef.current) {
       firstThemeRef.current = false
       return
     }
-    window.oldweb.showThemeSplash(themeId)
+    if (themeSplashRef.current) window.oldweb.showThemeSplash(themeId)
   }, [themeId])
   useEffect(() => {
     actions.setOldWebDate(waybackDate)

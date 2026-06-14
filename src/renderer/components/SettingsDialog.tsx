@@ -6,6 +6,8 @@ export interface Settings {
   defaultTheme?: string
   waybackYear?: number
   searchEngine?: string
+  /** Show the period boot splash when switching themes (default true). */
+  themeSplash?: boolean
 }
 
 interface Props {
@@ -32,6 +34,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [theme, setTheme] = useState(settings.defaultTheme || 'ie5')
   const [year, setYear] = useState(settings.waybackYear || 0)
   const [engine, setEngine] = useState(settings.searchEngine || DEFAULT_ENGINE_ID)
+  const [splash, setSplash] = useState(settings.themeSplash !== false)
 
   return (
     <div className="ow-dialog-backdrop" onMouseDown={onClose}>
@@ -89,6 +92,11 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             </select>
           </label>
 
+          <label className="ow-field ow-field--check">
+            <input type="checkbox" checked={splash} onChange={(e) => setSplash(e.target.checked)} />
+            <span>Show theme splash screens on switch</span>
+          </label>
+
           <p className="ow-dialog__legal">{LEGAL}</p>
 
           <a
@@ -113,7 +121,8 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 home: home.trim() || undefined,
                 defaultTheme: theme,
                 waybackYear: year || undefined,
-                searchEngine: engine
+                searchEngine: engine,
+                themeSplash: splash
               })
               onClose()
             }}
