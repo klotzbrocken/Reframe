@@ -118,6 +118,7 @@ export function App() {
     }
   })
   const [editBookmark, setEditBookmark] = useState<BarBookmark | null>(null)
+  const [barMenuOpen, setBarMenuOpen] = useState(false)
   useEffect(
     () => localStorage.setItem('reframe.barBookmarks', JSON.stringify(barBookmarks)),
     [barBookmarks]
@@ -136,9 +137,9 @@ export function App() {
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
     window.oldweb.setChromeOnTop(
-      panel !== null || dialogOpen || whatsNewOpen || editBookmark !== null
+      panel !== null || dialogOpen || whatsNewOpen || editBookmark !== null || barMenuOpen
     )
-  }, [panel, dialogOpen, whatsNewOpen, editBookmark])
+  }, [panel, dialogOpen, whatsNewOpen, editBookmark, barMenuOpen])
 
   const openPanel = (kind: 'bookmarks' | 'history', selector: string): void => {
     const r = document.querySelector(selector)?.getBoundingClientRect()
@@ -176,19 +177,14 @@ export function App() {
   useEffect(() => {
     themeEngine.apply(themeId).then(setManifest).catch(() => setManifest(null))
   }, [themeId])
-  // Show the theme's classic boot splash (its own frameless window) on switch —
-  // skip the very first apply (the startup splash already covers launch).
-  const firstThemeRef = useRef(true)
-  const themeSplashOn = settings.themeSplash !== false
-  const themeSplashRef = useRef(themeSplashOn)
-  themeSplashRef.current = themeSplashOn
-  useEffect(() => {
-    if (firstThemeRef.current) {
-      firstThemeRef.current = false
-      return
-    }
-    if (themeSplashRef.current) window.oldweb.showThemeSplash(themeId)
-  }, [themeId])
+  // Switch theme on an explicit user choice. The boot splash is fired here (not
+  // in an effect) so it only shows on a real switch — never at startup, where
+  // the Reframe splash already runs and the main window must stay hidden.
+  const switchTheme = (id: string): void => {
+    if (id === themeId) return
+    if (settings.themeSplash !== false) window.oldweb.showThemeSplash(id)
+    setThemeId(id)
+  }
   useEffect(() => {
     actions.setOldWebDate(waybackDate)
   }, [waybackDate, actions])
@@ -305,7 +301,7 @@ export function App() {
               type: 'item',
               label: t.name,
               checked: t.id === themeId,
-              onSelect: () => setThemeId(t.id)
+              onSelect: () => switchTheme(t.id)
             })
           ),
           { type: 'sep' },
@@ -412,6 +408,7 @@ export function App() {
           onDropUrl={dropBarBookmark}
           onEdit={(id) => setEditBookmark(barBookmarks.find((b) => b.id === id) ?? null)}
           onRemove={removeBarBookmark}
+          onMenuToggle={setBarMenuOpen}
         />
       )}
 
