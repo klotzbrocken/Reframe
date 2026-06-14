@@ -301,20 +301,21 @@ body {
 .ow-address-combo {
   height: 22px;
   background: #fff;
+  /* thin, light sunken edge — not the heavy 4-layer bevel */
   border: 1px solid;
-  border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
+  border-color: #a6a39a #ededea #ededea #a6a39a;
 }
-/* page favicon inside the field */
+/* page favicon, inside the field on the left */
 .ow-address-favicon {
   display: inline-block;
-  width: 15px;
-  height: 15px;
-  margin: 0 2px 0 3px;
+  width: 16px;
+  height: 16px;
+  margin: 0 1px 0 3px;
   flex: 0 0 auto;
-  background: url('assets/website.png') center / contain no-repeat;
+  background: url('assets/favicon.png') center / contain no-repeat;
 }
 .ow-address-input {
-  padding: 0 2px;
+  padding: 0 3px;
   font-size: 12px;
   background: transparent;
   box-shadow: none;
@@ -322,19 +323,17 @@ body {
 .ow-address-input:focus {
   outline: none;
 }
+/* recent-addresses dropdown button, inside the field on the right (IE/Netscape
+   combobox style — the supplied bevelled arrow image, not a bare caret) */
 .ow-address-dropdown {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin: 1px;
+  padding: 0;
+  flex: 0 0 auto;
   border: 0;
-  border-left: 1px solid #d4d0c8;
-  background: transparent;
-  color: #555;
-  font-size: 9px;
-}
-.ow-address-dropdown::before {
-  content: '▾';
+  background: url('assets/dropdown.png') center / cover no-repeat;
 }
 .ow-address-dropdown:active {
   transform: translate(1px, 1px);
