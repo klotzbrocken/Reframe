@@ -7,7 +7,6 @@ import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
 import { SearchBox } from './components/SearchBox'
 import { SettingsDialog, type Settings } from './components/SettingsDialog'
-import { StartupSplash, ThemeSplash } from './components/SplashScreen'
 import { StatusBar } from './components/StatusBar'
 import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
@@ -26,12 +25,6 @@ import {
   type ToolbarItem
 } from './theme/types'
 
-// Classic boot splashes shown for a moment when switching to these themes.
-const THEME_SPLASH: Record<string, string> = {
-  ie5: '/splash/ie5.png',
-  netscape: '/splash/netscape.png'
-}
-
 export function App() {
   const loadSettings = (): Settings => {
     try {
@@ -47,8 +40,6 @@ export function App() {
   }
   const [dialogOpen, setDialogOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
-  const [showStartup, setShowStartup] = useState(true)
-  const [themeSplash, setThemeSplash] = useState<string | null>(null)
 
   // Show the What's New dialog once per version (after an update bumps it).
   useEffect(() => {
@@ -145,14 +136,9 @@ export function App() {
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
     window.oldweb.setChromeOnTop(
-      panel !== null ||
-        dialogOpen ||
-        whatsNewOpen ||
-        editBookmark !== null ||
-        showStartup ||
-        themeSplash !== null
+      panel !== null || dialogOpen || whatsNewOpen || editBookmark !== null
     )
-  }, [panel, dialogOpen, whatsNewOpen, editBookmark, showStartup, themeSplash])
+  }, [panel, dialogOpen, whatsNewOpen, editBookmark])
 
   const openPanel = (kind: 'bookmarks' | 'history', selector: string): void => {
     const r = document.querySelector(selector)?.getBoundingClientRect()
@@ -190,19 +176,15 @@ export function App() {
   useEffect(() => {
     themeEngine.apply(themeId).then(setManifest).catch(() => setManifest(null))
   }, [themeId])
-  // Show the theme's classic boot splash for a couple of seconds on switch
-  // (skip the very first apply — the startup splash already covers launch).
+  // Show the theme's classic boot splash (its own frameless window) on switch —
+  // skip the very first apply (the startup splash already covers launch).
   const firstThemeRef = useRef(true)
   useEffect(() => {
     if (firstThemeRef.current) {
       firstThemeRef.current = false
       return
     }
-    const img = THEME_SPLASH[themeId]
-    if (!img) return
-    setThemeSplash(img)
-    const t = setTimeout(() => setThemeSplash(null), 2500)
-    return () => clearTimeout(t)
+    window.oldweb.showThemeSplash(themeId)
   }, [themeId])
   useEffect(() => {
     actions.setOldWebDate(waybackDate)
@@ -482,15 +464,6 @@ export function App() {
         />
       )}
 
-      {themeSplash && <ThemeSplash image={themeSplash} />}
-
-      {showStartup && (
-        <StartupSplash
-          seconds={8}
-          onClose={() => setShowStartup(false)}
-          onOpenExternal={(u) => window.oldweb.openExternal(u)}
-        />
-      )}
     </div>
   )
 }

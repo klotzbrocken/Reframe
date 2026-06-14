@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      img {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        object-fit: fill;
+        border-radius: 6px;
+        box-shadow: 0 14px 44px rgba(0, 0, 0, 0.45);
+      }
+    </style>
+  </head>
+  <body>
+    <img id="img" alt="" />
+    <script>
+      const img = new URLSearchParams(location.search).get('img')
+      if (img) document.getElementById('img').src = img
+    </script>
+  </body>
+</html>

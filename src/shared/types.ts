@@ -62,6 +62,10 @@ export interface OldwebAPI {
   setAppIcon(themeId: string): Promise<void>
   /** Open a URL in the user's default system browser. */
   openExternal(url: string): Promise<void>
+  /** From the startup splash window: dismiss it and reveal the main window. */
+  splashDone(): void
+  /** Ask the main process to show a theme's boot splash window on switch. */
+  showThemeSplash(themeId: string): void
   /** Subscribe to commands from the native app menu / page context menu. */
   onMenuCommand(handler: (cmd: MenuCommand) => void): () => void
   /** Get the current full state (used on UI startup). */
