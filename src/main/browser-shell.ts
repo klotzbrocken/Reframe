@@ -23,6 +23,7 @@ export class BrowserShell {
   private activeId: number | null = null
   private nextId = 1
   private insets: ContentInsets = { ...DEFAULT_INSETS }
+  private chromeOnTop = false
 
   constructor(
     private win: BaseWindow,
@@ -154,6 +155,9 @@ export class BrowserShell {
     for (const [tid, t] of this.tabs) t.view.setVisible(tid === id)
     // Raise the active view above the chrome view (chrome stays at index 0).
     this.win.contentView.addChildView(tab.view)
+    // …unless the chrome is meant to float on top (open menu, dialog, splash):
+    // keep it above the freshly-raised page.
+    if (this.chromeOnTop) this.win.contentView.addChildView(this.chromeView)
     this.activeId = id
     this.layoutActiveTab()
     this.emit({ type: 'tab-activated', id })
@@ -243,6 +247,7 @@ export class BrowserShell {
    * active page on top.
    */
   setChromeOnTop(onTop: boolean): void {
+    this.chromeOnTop = onTop
     if (onTop) {
       this.win.contentView.addChildView(this.chromeView)
     } else if (this.activeId != null) {
