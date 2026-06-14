@@ -4,6 +4,7 @@ import { MenuBar, type Menu, type MenuItem } from './components/MenuBar'
 import { NavButton } from './components/NavButton'
 import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar } from './components/PersonalBar'
+import { SearchBox } from './components/SearchBox'
 import { SettingsDialog, type Settings } from './components/SettingsDialog'
 import { StatusBar } from './components/StatusBar'
 import { TabStrip } from './components/TabStrip'
@@ -277,6 +278,27 @@ export function App() {
 
   const titleText = (activeTab?.title ? `${activeTab.title} - ` : '') + 'Reframe'
 
+  // Firefox-era layout: the address field + search box sit on the nav-button
+  // row itself, and the throbber lives in the menu bar (not the toolbar).
+  const unified = layout.unifiedToolbar === true
+  const addressBarEl = (
+    <AddressBar
+      url={activeTab?.url ?? ''}
+      label={labels.address}
+      goLabel={labels.go}
+      history={addrHistory}
+      onSubmit={submitAddress}
+      onBookmarks={() => openPanel('bookmarks', '.ow-loc-bookmarks')}
+    />
+  )
+  const searchBoxEl = (
+    <SearchBox
+      onSearch={(q) =>
+        actions.navigate('https://www.google.com/search?q=' + encodeURIComponent(q))
+      }
+    />
+  )
+
   return (
     <div className="ow-root">
       <TitleBar title={titleText} maximized={state.maximized} />
@@ -285,7 +307,7 @@ export function App() {
         <MenuBar model={menuModel} right={<Throbber active={loading} />} />
       )}
 
-      <div className="ow-toolbar">
+      <div className={'ow-toolbar' + (unified ? ' ow-toolbar--unified' : '')}>
         {toolbarItems.map((item, i) =>
           item === '|' ? (
             <span key={`sep-${i}`} className="ow-toolbar-sep" aria-hidden />
@@ -300,19 +322,20 @@ export function App() {
           )
         )}
 
-        <div className="ow-toolbar__spacer" />
-
-        <Throbber active={loading} />
+        {unified ? (
+          <>
+            {addressBarEl}
+            {searchBoxEl}
+          </>
+        ) : (
+          <>
+            <div className="ow-toolbar__spacer" />
+            <Throbber active={loading} />
+          </>
+        )}
       </div>
 
-      <AddressBar
-        url={activeTab?.url ?? ''}
-        label={labels.address}
-        goLabel={labels.go}
-        history={addrHistory}
-        onSubmit={submitAddress}
-        onBookmarks={() => openPanel('bookmarks', '.ow-loc-bookmarks')}
-      />
+      {!unified && addressBarEl}
 
       {manifest?.personalBar && manifest.personalBar.length > 0 && (
         <PersonalBar items={manifest.personalBar} onItem={actions.navigate} />

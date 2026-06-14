@@ -15,7 +15,8 @@
     "tabsPosition": "top",
     "showStatusBar": true,
     "showMenuBar": true,
-    "showTabs": true
+    "showTabs": true,
+    "unifiedToolbar": true
   },
   "throbber": { "kind": "image", "label": "Firefox" },
   "labels": {

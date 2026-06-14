@@ -1,11 +1,11 @@
 /*
  * Firefox 1.0 (2004) — the classic Luna-era cross-platform chrome.
  *
- * Built to a high-fidelity early-2000s browser spec: #d4d0c8 chrome face, a blue
- * gradient title bar, single-pixel bevels that raise on hover and sink on press,
- * a bookmarks toolbar and a striped status progress bar. Toolbar nav icons are
- * the supplied design-handoff artwork; the brand mark in the menu bar uses the
- * provided Firefox icon. Original/period artwork only — no extracted vendor UI.
+ * Reconstructed to a high-fidelity early-2000s browser spec: #d4d0c8 face, a blue
+ * gradient title bar, a single unified navigation row (icons + address + search),
+ * an 8-dot ring throbber in the menu bar, a bookmarks toolbar and a striped
+ * status progress bar. Toolbar nav icons are the supplied design-handoff artwork.
+ * Original/period artwork only — no extracted vendor UI, no third-party logos.
  */
 
 body {
@@ -16,7 +16,6 @@ body {
   background: #d4d0c8;
 }
 
-/* Outer window face */
 .ow-root {
   background: #d4d0c8;
 }
@@ -129,36 +128,80 @@ body {
   width: 16px;
 }
 
-/* brand mark in the menu bar (the supplied Firefox icon), like IE's globe /
-   Netscape's N. Idle static; gentle pulse while a page loads. */
+/* --- 8-dot ring throbber, top-right of the menu bar ---------------------- */
 .ow-toolbar .ow-throbber {
   display: none;
 }
 .ow-menubar__right {
-  padding-right: 4px;
+  padding-right: 6px;
 }
 .ow-menubar .ow-throbber {
   display: block;
+  position: relative;
   width: 18px;
   height: 18px;
-  background: url('assets/firefox.png') center / 18px 18px no-repeat;
 }
-.ow-menubar .ow-throbber.is-active {
-  animation: ow-fox-pulse 0.7s ease-in-out infinite;
+.ow-throbber__dot {
+  position: absolute;
+  width: 3.6px;
+  height: 3.6px;
+  border-radius: 50%;
+  background: #8e8e8e;
 }
-@keyframes ow-fox-pulse {
-  0%,
-  100% {
+.ow-throbber.is-active .ow-throbber__dot {
+  background: #383838;
+  animation: ow-dotfade 0.72s linear infinite;
+}
+.ow-throbber__dot:nth-child(1) {
+  left: 7.2px;
+  top: 1.2px;
+  animation-delay: 0s;
+}
+.ow-throbber__dot:nth-child(2) {
+  left: 11.44px;
+  top: 2.96px;
+  animation-delay: -0.09s;
+}
+.ow-throbber__dot:nth-child(3) {
+  left: 13.2px;
+  top: 7.2px;
+  animation-delay: -0.18s;
+}
+.ow-throbber__dot:nth-child(4) {
+  left: 11.44px;
+  top: 11.44px;
+  animation-delay: -0.27s;
+}
+.ow-throbber__dot:nth-child(5) {
+  left: 7.2px;
+  top: 13.2px;
+  animation-delay: -0.36s;
+}
+.ow-throbber__dot:nth-child(6) {
+  left: 2.96px;
+  top: 11.44px;
+  animation-delay: -0.45s;
+}
+.ow-throbber__dot:nth-child(7) {
+  left: 1.2px;
+  top: 7.2px;
+  animation-delay: -0.54s;
+}
+.ow-throbber__dot:nth-child(8) {
+  left: 2.96px;
+  top: 2.96px;
+  animation-delay: -0.63s;
+}
+@keyframes ow-dotfade {
+  0% {
     opacity: 1;
-    transform: scale(1);
   }
-  50% {
-    opacity: 0.5;
-    transform: scale(0.86);
+  100% {
+    opacity: 0.16;
   }
 }
 
-/* --- toolbar (flat icons; raise on hover, sink on press) ----------------- */
+/* --- unified navigation row (icons + address + search) ------------------- */
 .ow-toolbar {
   background: #d4d0c8;
   height: 38px;
@@ -167,15 +210,16 @@ body {
   border-bottom: 1px solid #b5b0a4;
 }
 .ow-btn {
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
-  gap: 1px;
+  gap: 0;
   min-width: 0;
-  padding: 2px 6px;
+  height: 30px;
+  padding: 0 5px;
   background: transparent;
   border: 1px solid transparent;
   box-shadow: none;
-  color: #000;
+  color: #2f5c96;
 }
 .ow-btn:hover:not(:disabled) {
   border-color: #fff #808080 #808080 #fff;
@@ -189,12 +233,16 @@ body {
   opacity: 0.32;
   filter: grayscale(1);
 }
+/* icons only — no text labels in this era */
+.ow-btn__label {
+  display: none;
+}
 .ow-btn__icon {
   width: 24px;
-  height: 23px;
+  height: 24px;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 22px 22px;
+  background-size: 23px 23px;
 }
 .ow-btn[data-action='back'] .ow-btn__icon {
   background-image: url('assets/back.png');
@@ -211,40 +259,44 @@ body {
 .ow-btn[data-action='home'] .ow-btn__icon {
   background-image: url('assets/home.png');
 }
-.ow-btn__label {
-  font-size: 11px;
+/* back/forward carry a small history dropdown caret */
+.ow-btn[data-action='back']::after,
+.ow-btn[data-action='forward']::after {
+  content: '▾';
+  margin-left: 3px;
+  font-size: 8px;
+  line-height: 1;
+  color: #2f5c96;
+}
+.ow-btn[data-action='back']:disabled::after,
+.ow-btn[data-action='forward']:disabled::after {
+  color: #555;
 }
 
-/* vertical divider between tool groups */
+/* divider between tool groups */
 .ow-toolbar-sep {
   flex: 0 0 auto;
-  align-self: stretch;
-  width: 0;
-  margin: 7px 4px;
+  align-self: center;
+  width: 2px;
+  height: 24px;
+  margin: 0 3px;
   border-left: 1px solid #aaa699;
   border-right: 1px solid #fff;
 }
 
-/* --- address bar --------------------------------------------------------- */
-.ow-addressbar {
-  background: #d4d0c8;
-  height: 30px;
-  padding: 0 6px;
-  gap: 5px;
-  border-bottom: 1px solid #b5b0a4;
+/* the AddressBar form becomes a transparent, flexible segment of the row */
+.ow-toolbar .ow-addressbar {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  margin-left: 4px;
+  gap: 0;
+  background: transparent;
+  border: none;
 }
-/* Firefox 1.0 had no "Address:" caption */
 .ow-address-label {
   display: none;
-}
-/* page favicon inside the field */
-.ow-address-icon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin: 0 2px 0 4px;
-  flex: 0 0 auto;
-  background: url('assets/website.png') center / contain no-repeat;
 }
 .ow-address-combo {
   height: 22px;
@@ -252,8 +304,17 @@ body {
   border: 1px solid;
   border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
 }
+/* page favicon inside the field */
+.ow-address-favicon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin: 0 2px 0 3px;
+  flex: 0 0 auto;
+  background: url('assets/website.png') center / contain no-repeat;
+}
 .ow-address-input {
-  padding: 2px 4px;
+  padding: 0 2px;
   font-size: 12px;
   background: transparent;
   box-shadow: none;
@@ -267,8 +328,9 @@ body {
   justify-content: center;
   width: 16px;
   border: 0;
+  border-left: 1px solid #d4d0c8;
   background: transparent;
-  color: #444;
+  color: #555;
   font-size: 9px;
 }
 .ow-address-dropdown::before {
@@ -290,15 +352,16 @@ body {
   background: #0a246a;
   color: #fff;
 }
-/* borderless green "Go" control (icon + text) */
+/* borderless green "Go" control */
 .ow-go {
   display: inline-flex;
   align-items: center;
   gap: 3px;
   height: 22px;
   min-width: 0;
+  margin-left: 3px;
   padding: 0 6px 0 4px;
-  font-size: 12px;
+  font-size: 11px;
   color: #1f7a33;
   background: transparent;
   border: 0;
@@ -315,6 +378,81 @@ body {
   width: 18px;
   height: 18px;
   background: url('assets/go.png') center / contain no-repeat;
+}
+
+/* --- toolbar search box -------------------------------------------------- */
+.ow-searchbox {
+  position: relative;
+  width: 178px;
+  height: 22px;
+  margin-left: 5px;
+  background: #fff;
+  border: 1px solid;
+  border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
+}
+.ow-searchbox__engine {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 5px;
+  flex: none;
+  border-right: 1px solid #e3e0d8;
+  cursor: default;
+}
+.ow-searchbox__engine:hover {
+  background: #eef2fb;
+}
+.ow-searchbox__monogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  background: #4a76d6;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 10px;
+}
+.ow-searchbox__caret {
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #555;
+}
+.ow-searchbox__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  color: #000;
+  height: 20px;
+  padding: 0 4px;
+}
+.ow-searchbox__go {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 20px;
+  flex: none;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+.ow-searchbox__go:hover {
+  background: #eef2fb;
+}
+.ow-searchbox__glass {
+  width: 13px;
+  height: 13px;
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg width='13' height='13' viewBox='0 0 16 16' fill='none' stroke='%23e8722b' stroke-width='1.7' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6.6' cy='6.6' r='4.2'/%3E%3Cpath d='M9.8 9.8 L14 14' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 
 /* --- bookmarks toolbar --------------------------------------------------- */
@@ -374,13 +512,20 @@ body {
   width: 12px;
   height: 12px;
   flex: 0 0 auto;
-  background: url('assets/firefox.png') center / contain no-repeat;
+  border: 2px solid #b9b4a6;
+  border-top-color: #2f5c96;
+  border-radius: 50%;
 }
 .ow-tab__spinner:not(.is-active) {
   display: none;
 }
 .ow-tab__spinner.is-active {
-  animation: ow-fox-pulse 0.7s ease-in-out infinite;
+  animation: ow-spin 0.7s linear infinite;
+}
+@keyframes ow-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .ow-tab__close {
   width: 14px;
@@ -442,11 +587,7 @@ body {
   display: block;
   height: 100%;
   width: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    #2a6fe0 0 6px,
-    #4d8af0 6px 8px
-  );
+  background: repeating-linear-gradient(90deg, #2a6fe0 0 6px, #4d8af0 6px 8px);
 }
 .ow-progress.is-active .ow-progress__bar {
   width: 100%;
