@@ -1,6 +1,7 @@
 import {
   app,
   BaseWindow,
+  BrowserWindow,
   WebContentsView,
   ipcMain,
   nativeImage,
@@ -23,6 +24,71 @@ const HOME_URL = 'https://www.myretromac.app'
 
 // The current window's shell. IPC handlers (registered once) resolve this.
 let shell: BrowserShell | null = null
+let mainWindow: BaseWindow | null = null
+let splashWin: BrowserWindow | null = null
+
+const PRELOAD = () => join(__dirname, '../preload/index.mjs')
+
+/** URL of a static page in the renderer (dev server or packaged file). */
+function pageUrl(file: string): string {
+  const base = process.env['ELECTRON_RENDERER_URL']
+  return base ? `${base}/${file}` : `file://${join(__dirname, '../renderer/', file)}`
+}
+
+// Period boot splashes shown (as their own frameless, transparent windows) when
+// switching to these themes — sized to each image's aspect ratio.
+const THEME_SPLASH: Record<string, { img: string; w: number; h: number }> = {
+  ie5: { img: 'splash/ie5.png', w: 540, h: 322 },
+  netscape: { img: 'splash/netscape.png', w: 500, h: 375 }
+}
+
+function newSplashWindow(w: number, h: number): BrowserWindow {
+  return new BrowserWindow({
+    width: w,
+    height: h,
+    useContentSize: true,
+    center: true,
+    frame: false,
+    transparent: true,
+    backgroundColor: '#00000000',
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    hasShadow: false,
+    webPreferences: { preload: PRELOAD(), contextIsolation: true, sandbox: false }
+  })
+}
+
+let startupFinished = false
+
+/** The Reframe startup splash — shown before the app window, on its own. */
+function showStartupSplash(): void {
+  splashWin = newSplashWindow(460, 345)
+  splashWin.loadURL(pageUrl('startup.html'))
+}
+
+function finishStartup(): void {
+  if (startupFinished) return
+  startupFinished = true
+  if (splashWin && !splashWin.isDestroyed()) splashWin.close()
+  splashWin = null
+  mainWindow?.show()
+}
+
+/** A theme's boot splash — its own frameless window, auto-closed after a beat. */
+function showThemeSplash(themeId: string): void {
+  const s = THEME_SPLASH[themeId]
+  if (!s) return
+  const win = newSplashWindow(s.w, s.h)
+  win.loadURL(pageUrl(`splash.html?img=${encodeURIComponent(s.img)}`))
+  setTimeout(() => {
+    if (!win.isDestroyed()) win.close()
+  }, 2500)
+}
 
 // Reframe app / dock icon. We load a PNG rather than the .icns: nativeImage
 // parses PNG reliably at runtime (some .icns variants come back empty), and a
@@ -150,8 +216,11 @@ function createWindow(): void {
     frame: false,
     // Square corners — macOS rounds frameless windows by default, which would
     // clip the title-bar icon and window controls in the corners.
-    roundedCorners: false
+    roundedCorners: false,
+    // Hidden until the startup splash finishes (it shows on its own first).
+    show: false
   })
+  mainWindow = win
 
   // The chrome UI (toolbar/tabs/statusbar) lives in its own WebContentsView that
   // fills the whole window. Page views are stacked on top in the content region.
@@ -202,8 +271,14 @@ app.whenReady().then(() => {
   setupAutoUpdate()
   ipcMain.handle('app:setIcon', () => {})
   ipcMain.handle('app:openExternal', (_e, url: string) => electronShell.openExternal(url))
+  // Splash control (from the splash windows + the renderer on theme switch).
+  ipcMain.on('splash:done', () => finishStartup())
+  ipcMain.on('splash:theme', (_e, themeId: string) => showThemeSplash(themeId))
   registerIpc(() => shell)
   createWindow()
+  showStartupSplash()
+  // Fallback: never leave the app hidden if the splash window dies early.
+  setTimeout(finishStartup, 10000)
   app.on('activate', () => {
     if (BaseWindow.getAllWindows().length === 0) createWindow()
   })

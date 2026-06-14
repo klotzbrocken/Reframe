@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: https:; style-src 'unsafe-inline'; script-src 'unsafe-inline'"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: transparent;
+        overflow: hidden;
+        -webkit-user-select: none;
+        user-select: none;
+        font-family: Tahoma, 'Segoe UI', sans-serif;
+      }
+      .splash {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45);
+      }
+      .splash > img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 30px 16px 12px;
+        color: #e7ecf6;
+        background: linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(4, 8, 16, 0.82) 38%);
+      }
+      .notice {
+        margin: 0 0 8px;
+        font-size: 10.5px;
+        line-height: 1.4;
+      }
+      .notice b {
+        color: #fff;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .links {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .links a {
+        color: #9cc4ff;
+        font-size: 12px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .links a:hover {
+        text-decoration: underline;
+      }
+      .links img {
+        display: block;
+      }
+      .go {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .count {
+        font-size: 11px;
+        color: #aeb8cc;
+      }
+      button {
+        font: inherit;
+        font-size: 12px;
+        padding: 5px 14px;
+        cursor: pointer;
+        color: #fff;
+        background: #2a4d86;
+        border: 1px solid #5f81b3;
+        border-radius: 3px;
+      }
+      button:hover {
+        background: #335ea0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="splash">
+      <img src="splash/reframe.png" alt="Reframe" />
+      <div class="overlay">
+        <p class="notice">
+          <b>Not for real use.</b> Copyright for all logos &amp; designs belongs to Microsoft,
+          Apple, Netscape and other respective owners. A non-commercial fan homage.
+        </p>
+        <div class="row">
+          <div class="links">
+            <a id="gh" href="#">GitHub ↗</a>
+            <a id="kofi" href="#"
+              ><img src="https://storage.ko-fi.com/cdn/kofi2.png?v=6" height="28" alt="Buy me a coffee"
+            /></a>
+          </div>
+          <div class="go">
+            <span class="count" id="count">Starting in 8s…</span>
+            <button id="enter">Enter now →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const api = window.oldweb || {}
+      let left = 8
+      const countEl = document.getElementById('count')
+      const done = () => api.splashDone && api.splashDone()
+      const tick = () => {
+        countEl.textContent = 'Starting in ' + left + 's…'
+        if (left <= 0) return done()
+        left--
+        setTimeout(tick, 1000)
+      }
+      tick()
+      document.getElementById('enter').onclick = done
+      document.getElementById('gh').onclick = (e) => {
+        e.preventDefault()
+        api.openExternal && api.openExternal('https://github.com/klotzbrocken/Reframe')
+      }
+      document.getElementById('kofi').onclick = (e) => {
+        e.preventDefault()
+        api.openExternal && api.openExternal('https://ko-fi.com/N4N11K1NC')
+      }
+    </script>
+  </body>
+</html>

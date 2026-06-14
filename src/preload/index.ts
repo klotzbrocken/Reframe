@@ -18,6 +18,8 @@ const api: OldwebAPI = {
   setChromeOnTop: (onTop) => ipcRenderer.invoke('shell:setChromeOnTop', onTop),
   setAppIcon: (themeId) => ipcRenderer.invoke('app:setIcon', themeId),
   openExternal: (url) => ipcRenderer.invoke('app:openExternal', url),
+  splashDone: () => ipcRenderer.send('splash:done'),
+  showThemeSplash: (themeId) => ipcRenderer.send('splash:theme', themeId),
   onMenuCommand: (handler) => {
     const listener = (_e: unknown, cmd: import('../shared/types').MenuCommand): void => handler(cmd)
     ipcRenderer.on('menu-command', listener)
