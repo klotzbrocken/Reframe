@@ -6,7 +6,7 @@ Reframe is a modern Chromium browser dressed in the chrome of the browsers we
 grew up with. It renders the real, present-day web with the actual Chromium
 engine — then wraps every page in a pixel-faithful, fully skinnable retro browser
 shell. Flip a theme at runtime and the same live website sits inside Internet
-Explorer 5, Netscape Communicator 4.8, or classic Aqua Safari.
+Explorer 5, Netscape Communicator 4.7, or classic Aqua Safari.
 
 It's a love letter to an era of the web, built as an open-source fun project.
 
@@ -45,7 +45,7 @@ is needed for this historical homage.
   scrollbar / control recipes and the font are from
   [98.css](https://github.com/jdan/98.css) (MIT); the spinning globe throbber is
   original CSS. No extracted Microsoft assets.
-- **Netscape Communicator 4.8 theme** — reconstructed to a period-accurate spec:
+- **Netscape Communicator 4.7 theme** — reconstructed to a period-accurate spec:
   the right colors, single-pixel Win9x bevels, Tahoma chrome type, the classic
   toolbar order and the rotating **N** throbber.
 - **Aqua Safari theme** — early-2000s Mac OS X brushed-metal / Aqua chrome.
