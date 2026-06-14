@@ -1,7 +1,7 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '0.2.0'
+export const WHATS_NEW_VERSION = '1.0.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
