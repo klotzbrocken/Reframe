@@ -9,6 +9,7 @@ import { StatusBar } from './components/StatusBar'
 import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
 import { TitleBar } from './components/TitleBar'
+import { WhatsNewDialog, WHATS_NEW_VERSION } from './components/WhatsNewDialog'
 import { useShell } from './shell/useShell'
 import { themeEngine } from './theme/loader'
 import {
@@ -30,6 +31,15 @@ export function App() {
   }
   const [settings, setSettings] = useState<Settings>(loadSettings)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false)
+
+  // Show the What's New dialog once per version (after an update bumps it).
+  useEffect(() => {
+    if (localStorage.getItem('reframe.whatsnew.version') !== WHATS_NEW_VERSION) {
+      setWhatsNewOpen(true)
+      localStorage.setItem('reframe.whatsnew.version', WHATS_NEW_VERSION)
+    }
+  }, [])
 
   const [themes, setThemes] = useState<ThemeSummary[]>([])
   const [themeId, setThemeId] = useState(() => loadSettings().defaultTheme || 'ie5')
@@ -85,8 +95,8 @@ export function App() {
 
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
-    window.oldweb.setChromeOnTop(panel !== null || dialogOpen)
-  }, [panel, dialogOpen])
+    window.oldweb.setChromeOnTop(panel !== null || dialogOpen || whatsNewOpen)
+  }, [panel, dialogOpen, whatsNewOpen])
 
   const openPanel = (kind: 'bookmarks' | 'history', selector: string): void => {
     const r = document.querySelector(selector)?.getBoundingClientRect()
@@ -107,6 +117,7 @@ export function App() {
   useEffect(() => {
     return window.oldweb.onMenuCommand((m) => {
       if (m.cmd === 'about' || m.cmd === 'settings') setDialogOpen(true)
+      else if (m.cmd === 'whats-new') setWhatsNewOpen(true)
       else if (m.cmd === 'add-bookmark') addBookmarkEntry(m.title, m.url)
       else if (m.cmd === 'reload-wayback') {
         window.oldweb.navigate(m.id, `https://web.archive.org/web/${waybackRef.current}if_/${m.url}`)
@@ -342,6 +353,13 @@ export function App() {
             localStorage.setItem('reframe.settings', JSON.stringify(s))
           }}
           onClose={() => setDialogOpen(false)}
+          onOpenExternal={(u) => window.oldweb.openExternal(u)}
+        />
+      )}
+
+      {whatsNewOpen && (
+        <WhatsNewDialog
+          onClose={() => setWhatsNewOpen(false)}
           onOpenExternal={(u) => window.oldweb.openExternal(u)}
         />
       )}

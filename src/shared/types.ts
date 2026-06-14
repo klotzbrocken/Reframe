@@ -36,6 +36,7 @@ export type ShellEvent =
 export type MenuCommand =
   | { cmd: 'about' }
   | { cmd: 'settings' }
+  | { cmd: 'whats-new' }
   | { cmd: 'add-bookmark'; title: string; url: string }
   | { cmd: 'reload-wayback'; id: number; url: string }
 

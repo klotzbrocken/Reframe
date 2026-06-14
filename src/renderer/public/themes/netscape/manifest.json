@@ -17,6 +17,7 @@
   "menus": ["File", "Edit", "View", "Go", "Communicator", "Help"],
   "personalBar": [
     { "label": "Instant Message", "icon": "man", "url": "https://www.aol.com" },
+    { "label": "Weather", "icon": "doc", "url": "https://weather.com/retro/" },
     { "label": "WebMail", "icon": "doc", "url": "https://mail.google.com" },
     { "label": "Radio", "icon": "doc", "url": "https://tunein.com" },
     { "label": "People", "icon": "doc", "url": "https://www.whitepages.com" },

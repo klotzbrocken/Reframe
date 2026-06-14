@@ -389,6 +389,37 @@ body,
   align-self: flex-start;
   cursor: pointer;
 }
+.ow-whatsnew {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ow-whatsnew li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 14px;
+  position: relative;
+}
+.ow-whatsnew li::before {
+  content: '›';
+  position: absolute;
+  left: 2px;
+  top: 0;
+  color: #1a4ea8;
+  font-weight: bold;
+}
+.ow-whatsnew b {
+  font-size: 13px;
+}
+.ow-whatsnew span {
+  font-size: 12px;
+  color: #444;
+  line-height: 1.4;
+}
 .ow-dialog__buttons {
   display: flex;
   justify-content: flex-end;
