@@ -33,7 +33,13 @@ export class ThemeEngine {
 
   async apply(id: string): Promise<ThemeManifest> {
     const base = `/themes/${id}`
-    const manifest = (await (await fetch(`${base}/manifest.json`)).json()) as ThemeManifest
+    // Cache-buster: re-pointing a <link> to the same href serves the cached
+    // stylesheet, so an edited theme.css (or re-applying the same theme) would
+    // show nothing new. A per-apply token forces a fresh fetch every time.
+    const bust = `?v=${Date.now()}`
+    const manifest = (await (
+      await fetch(`${base}/manifest.json${bust}`, { cache: 'no-store' })
+    ).json()) as ThemeManifest
 
     // 1. apply CSS variables from the manifest FIRST, so the swapped stylesheet
     //    (which references them) has them available immediately.
@@ -58,7 +64,7 @@ export class ThemeEngine {
       link.rel = 'stylesheet'
       document.head.appendChild(link)
     }
-    link.href = `${base}/theme.css`
+    link.href = `${base}/theme.css${bust}`
 
     // 3. tag the document so theme.css can scope rules and pick a cursor/font
     document.body.dataset.theme = id
