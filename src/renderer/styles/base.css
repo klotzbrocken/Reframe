@@ -1,0 +1,404 @@
+/*
+ * Structural, theme-NEUTRAL stylesheet. It defines layout (flex, sizing, what
+ * stacks where) but no colors, fonts, borders or imagery. Every visual decision
+ * lives in a theme's theme.css, which overrides these rules. Keep it that way:
+ * if you're tempted to put a color here, it belongs in a theme instead.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: sans-serif;
+  font-size: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ow-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+/* The content area must be see-through down to the page view, so the chrome can
+   float above the page (open popups) without blanking it. Each theme's bars
+   keep their own opaque background; only the body/root fill is removed. */
+body,
+.ow-root,
+.ow-content {
+  background: transparent !important;
+}
+
+/* Regions ----------------------------------------------------------------- */
+
+.ow-titlebar {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  /* draggable window region; controls opt out with no-drag */
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+.ow-titlebar__text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ow-titlebar__controls {
+  display: flex;
+  flex: 0 0 auto;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.ow-winbtn {
+  cursor: pointer;
+  font: inherit;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.ow-menubar {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  padding: 2px 8px;
+}
+
+/* Menu dropdowns (structure only; themes paint them) */
+.ow-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.ow-menu__label {
+  cursor: default;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+.ow-menu__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  min-width: 180px;
+}
+.ow-menubar__right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+/* throbber in the menu bar is opt-in per theme (IE5 puts it there) */
+.ow-menubar .ow-throbber {
+  display: none;
+}
+.ow-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  cursor: default;
+}
+.ow-menu__item.is-disabled {
+  cursor: default;
+}
+.ow-menu__check {
+  flex: 0 0 auto;
+  width: 14px;
+  text-align: center;
+}
+.ow-menu__text {
+  flex: 1 1 auto;
+}
+
+/* Location-bar extras are opt-in per theme */
+.ow-loc-bookmarks,
+.ow-loc-proxy,
+.ow-loc-related,
+.ow-address-icon,
+.ow-loc-links,
+.ow-go__icon {
+  display: none;
+}
+
+/* Personal / bookmark toolbar (opt-in per theme via manifest.personalBar) */
+.ow-personalbar {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+.ow-pbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+  font: inherit;
+  white-space: nowrap;
+}
+
+.ow-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  padding: 3px 6px;
+}
+
+.ow-toolbar__spacer {
+  flex: 1 1 auto;
+}
+
+.ow-addressbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 3px 6px;
+}
+
+.ow-address-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: inherit;
+}
+
+/* Address combobox (field + recent-addresses dropdown) */
+.ow-address-combo {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+.ow-address-dropdown {
+  display: none;
+  flex: 0 0 auto;
+  cursor: pointer;
+  font: inherit;
+}
+.ow-address-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.ow-address-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+.ow-tabstrip {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex: 0 0 auto;
+  padding: 0 6px;
+  overflow-x: auto;
+}
+
+.ow-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 200px;
+  min-width: 80px;
+  cursor: default;
+  overflow: hidden;
+}
+
+.ow-tab__title {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ow-tab__close,
+.ow-tab-new {
+  flex: 0 0 auto;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+}
+
+/* The content area is just a placeholder: the engine positions the page's
+   WebContentsView to cover exactly this box. It must keep its size in layout. */
+.ow-content {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ow-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding: 2px 6px;
+}
+
+.ow-status-text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.ow-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.ow-throbber {
+  flex: 0 0 auto;
+}
+
+/* Bookmarks / History dropdown panel */
+.ow-panel {
+  position: fixed;
+  z-index: 2000;
+  min-width: 220px;
+  max-width: 340px;
+  max-height: 340px;
+  overflow-y: auto;
+  background: #fff;
+  color: #000;
+  border: 1px solid #6f6f6f;
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.35);
+  font-size: 12px;
+}
+.ow-panel__add,
+.ow-panel__item,
+.ow-panel__empty {
+  padding: 4px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.ow-panel__add {
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+.ow-panel__item:hover,
+.ow-panel__add:hover {
+  background: #1a4ea8;
+  color: #fff;
+}
+.ow-panel__empty {
+  color: #888;
+  font-style: italic;
+}
+
+/* Global settings / about dialog */
+.ow-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ow-dialog {
+  width: 470px;
+  max-width: 92vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #f0f0f0;
+  color: #111;
+  border: 1px solid #555;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.5);
+  font-family: Tahoma, 'Segoe UI', sans-serif;
+  font-size: 13px;
+}
+.ow-dialog__title {
+  padding: 7px 14px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(90deg, #000080, #1084d0);
+}
+.ow-dialog__body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ow-dialog__about {
+  margin: 0;
+}
+.ow-dialog__about a,
+.ow-dialog__legal a {
+  color: #1a4ea8;
+  cursor: pointer;
+}
+.ow-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ow-field > span {
+  font-weight: 600;
+  font-size: 12px;
+}
+.ow-field input,
+.ow-field select {
+  font: inherit;
+  padding: 4px 6px;
+  border: 1px solid #999;
+  background: #fff;
+}
+.ow-dialog__legal {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+}
+.ow-kofi {
+  align-self: flex-start;
+  cursor: pointer;
+}
+.ow-dialog__buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #ccc;
+  background: #e6e6e6;
+}
+.ow-dialog__buttons button {
+  font: inherit;
+  padding: 4px 16px;
+  cursor: pointer;
+}

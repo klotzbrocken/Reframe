@@ -1,0 +1,499 @@
+/*
+ * Netscape Communicator 4.8 — built strictly to the supplied package spec
+ * (README.md design system) using the package's original icon/throbber assets.
+ * Colors, single-pixel Win9x bevels, Tahoma chrome type, bar heights, flat
+ * buttons (raised on hover, sunken + translate(1px,1px) on press), navy menu
+ * highlight and the static/animated "N" throbber all follow the spec values.
+ */
+
+body {
+  font-family: var(--ns-font);
+  font-size: 11px;
+  color: #000;
+  background: var(--ns-face);
+}
+
+.ow-root {
+  background: var(--ns-face);
+  border-top: 1px solid var(--ns-light);
+  border-left: 1px solid var(--ns-light);
+  border-right: 1px solid var(--ns-shadow);
+  border-bottom: 1px solid var(--ns-shadow);
+}
+
+/* --- title bar (Win9x navy gradient + controls) -------------------------- */
+.ow-titlebar {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  padding: 3px 5px 3px 4px;
+  height: 25px;
+  gap: 4px;
+}
+.ow-titlebar__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: #04060f url('assets/about_N.png') center / contain no-repeat;
+}
+.ow-titlebar__text {
+  color: #fff;
+  font-weight: 700;
+  padding: 0 4px;
+}
+.ow-titlebar__controls {
+  gap: 2px;
+}
+.ow-winbtn {
+  width: 16px;
+  height: 14px;
+  min-width: 16px;
+  padding: 0;
+  background: var(--ns-face);
+  border-top: 1px solid var(--ns-light);
+  border-left: 1px solid var(--ns-light);
+  border-right: 1px solid var(--ns-shadow);
+  border-bottom: 1px solid var(--ns-shadow);
+  background-repeat: no-repeat;
+}
+.ow-winbtn:active {
+  border-color: var(--ns-shadow) var(--ns-light) var(--ns-light) var(--ns-shadow);
+}
+.ow-winbtn[data-control='minimize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 3px left 4px;
+}
+.ow-winbtn[data-control='maximize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='close'] {
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 3px left 4px;
+}
+
+/* --- menu bar (18px, navy hover) ----------------------------------------- */
+.ow-menubar {
+  background: var(--ns-face);
+  height: 22px;
+  padding: 2px 5px;
+  gap: 0;
+  border-bottom: 1px solid var(--ns-divider);
+  box-shadow: 0 1px 0 var(--ns-light);
+}
+.ow-menu__label {
+  padding: 2px 8px;
+  line-height: 14px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--ns-navy);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: var(--ns-face);
+  padding: 1px;
+  border: 1px solid var(--ns-dark);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  font-size: 11px;
+}
+.ow-menu__heading {
+  padding: 4px 22px 2px 8px;
+  font-weight: 700;
+  color: #555;
+}
+.ow-menu__item {
+  padding: 3px 20px 3px 6px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--ns-navy);
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: var(--ns-disabled);
+}
+.ow-menu__sep {
+  height: 0;
+  margin: 2px 1px;
+  border-top: 1px solid var(--ns-shadow);
+  border-bottom: 1px solid var(--ns-light);
+}
+
+/* location-bar extras (Bookmarks · proxy · What's Related) */
+.ow-loc-bookmarks,
+.ow-loc-related {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+  padding: 0 6px;
+  font-family: inherit;
+  font-size: 11px;
+  background: var(--ns-face);
+  border: 1px solid;
+  border-color: var(--ns-light) var(--ns-shadow) var(--ns-shadow) var(--ns-light);
+}
+.ow-loc-bookmarks:active,
+.ow-loc-related:active {
+  border-color: var(--ns-shadow) var(--ns-light) var(--ns-light) var(--ns-shadow);
+}
+.ow-loc-bookmarks__icon {
+  width: 24px;
+  height: 16px;
+  background: url('assets/bookmarks.png') center / contain no-repeat;
+}
+.ow-loc-related__icon {
+  width: 22px;
+  height: 15px;
+  background: url('assets/whats_related.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.ow-loc-proxy {
+  display: inline-block;
+  width: 17px;
+  height: 16px;
+  background: url('assets/location.png') center / contain no-repeat;
+}
+
+/* --- navigation toolbar (46px: 31px icon + label, flat→raised→sunken) ---- */
+.ow-toolbar {
+  background: var(--ns-face);
+  height: 46px;
+  padding: 2px 4px 2px 15px;
+  gap: 0;
+  align-items: stretch;
+  position: relative;
+}
+/* Netscape toolbar "grip" — the vertical grab handle at the far left of each
+   toolbar row (raised tab filled with the classic embossed dotted texture). */
+.ow-toolbar::before,
+.ow-addressbar::before,
+.ow-personalbar::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: 8px;
+  background-color: var(--ns-face);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='3' height='3'%3E%3Crect width='1' height='1' fill='%23ffffff'/%3E%3Crect width='1' height='1' x='1' y='1' fill='%23808080'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 3px 3px;
+  border: 1px solid;
+  border-color: var(--ns-light) var(--ns-shadow) var(--ns-shadow) var(--ns-light);
+}
+.ow-btn {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  min-width: 46px;
+  padding: 1px 2px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #000;
+}
+.ow-btn:hover:not(:disabled) {
+  border-color: var(--ns-light) var(--ns-shadow) var(--ns-shadow) var(--ns-light);
+}
+.ow-btn:active:not(:disabled) {
+  border-color: var(--ns-shadow) var(--ns-light) var(--ns-light) var(--ns-shadow);
+}
+.ow-btn:active:not(:disabled) .ow-btn__icon,
+.ow-btn:active:not(:disabled) .ow-btn__label {
+  transform: translate(1px, 1px);
+}
+.ow-btn:disabled {
+  color: var(--ns-disabled);
+}
+.ow-btn__icon {
+  width: 44px;
+  height: 31px;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+.ow-btn__label {
+  font-size: 11px;
+  line-height: 11px;
+}
+
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/tb_back_on.png');
+}
+.ow-btn[data-action='back']:disabled .ow-btn__icon {
+  background-image: url('assets/tb_back.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/tb_forward_on.png');
+}
+.ow-btn[data-action='forward']:disabled .ow-btn__icon {
+  background-image: url('assets/tb_forward.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/tb_reload.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/tb_home.png');
+}
+.ow-btn[data-action='search'] .ow-btn__icon {
+  background-image: url('assets/tb_search.png');
+}
+.ow-btn[data-action='netscape'] .ow-btn__icon {
+  background-image: url('assets/tb_netscape.png');
+}
+.ow-btn[data-action='print'] .ow-btn__icon {
+  background-image: url('assets/tb_print.png');
+}
+.ow-btn[data-action='security'] .ow-btn__icon {
+  background-image: url('assets/tb_security.png');
+}
+.ow-btn[data-action='shop'] .ow-btn__icon {
+  background-image: url('assets/tb_shop.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/tb_stop.png');
+}
+
+/* the theme switcher + CRT toggle pushed to the throbber's left */
+.ow-theme-select {
+  font-family: inherit;
+  font-size: 11px;
+  height: 20px;
+  margin-right: 5px;
+  background: var(--ns-field);
+  border-top: 1px solid var(--ns-shadow);
+  border-left: 1px solid var(--ns-shadow);
+  border-right: 1px solid var(--ns-light);
+  border-bottom: 1px solid var(--ns-light);
+}
+.ow-retro-toggle {
+  flex-direction: row;
+  min-width: 0;
+  padding: 3px 8px;
+  border: 1px solid;
+  border-color: var(--ns-light) var(--ns-shadow) var(--ns-shadow) var(--ns-light);
+}
+.ow-retro-toggle.is-on {
+  border-color: var(--ns-shadow) var(--ns-light) var(--ns-light) var(--ns-shadow);
+}
+
+/* --- animated "N" throbber (30x30, #04060f) ------------------------------ */
+.ow-throbber {
+  width: 30px;
+  height: 30px;
+  margin-left: 6px;
+  align-self: center;
+  background: #04060f url('assets/throbber_N.png') center / contain no-repeat;
+  border-top: 1px solid var(--ns-shadow);
+  border-left: 1px solid var(--ns-shadow);
+  border-right: 1px solid var(--ns-light);
+  border-bottom: 1px solid var(--ns-light);
+}
+.ow-throbber.is-active {
+  background-image: url('assets/throbber_anim.gif');
+}
+
+/* --- location toolbar (21px): "Location:" + white field + Go ------------- */
+.ow-addressbar {
+  background: var(--ns-face);
+  height: 21px;
+  padding: 1px 6px 1px 15px;
+  gap: 5px;
+  border-top: 1px solid var(--ns-divider);
+  box-shadow: inset 0 1px 0 var(--ns-light);
+  position: relative;
+}
+.ow-address-label {
+  color: #000;
+}
+/* combobox: white field + recent-addresses dropdown */
+.ow-address-combo {
+  height: 18px;
+  background: var(--ns-field);
+  border-top: 1px solid var(--ns-shadow);
+  border-left: 1px solid var(--ns-shadow);
+  border-right: 1px solid var(--ns-light);
+  border-bottom: 1px solid var(--ns-light);
+}
+.ow-address-input {
+  padding: 1px 4px;
+  font-family: inherit;
+  font-size: 11px;
+  background: transparent;
+  border: 0;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+/* the whole button is the supplied image (face + bevel + arrow) — no extra
+   border, identical in IE5 and Netscape */
+.ow-address-dropdown {
+  display: inline-block;
+  width: 18px;
+  flex: 0 0 auto;
+  padding: 0;
+  background: url('assets/dropdown.png') center / cover no-repeat;
+  border: 0;
+}
+.ow-address-dropdown:active {
+  transform: translate(1px, 1px);
+}
+/* the recent-addresses list: as wide as the field, as tall as its entries,
+   white background, same typography as the address input */
+.ow-address-list {
+  background: var(--ns-field);
+  border: 1px solid var(--ns-dark);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  font-family: inherit;
+  font-size: 11px;
+}
+.ow-address-item {
+  padding: 2px 6px;
+}
+.ow-address-item:hover {
+  background: var(--ns-navy);
+  color: #fff;
+}
+.ow-go {
+  height: 18px;
+  min-width: 0;
+  padding: 0 9px;
+  font-family: inherit;
+  font-size: 11px;
+  background: var(--ns-face);
+  border: 1px solid;
+  border-color: var(--ns-light) var(--ns-shadow) var(--ns-shadow) var(--ns-light);
+}
+.ow-go:active {
+  border-color: var(--ns-shadow) var(--ns-light) var(--ns-light) var(--ns-shadow);
+}
+
+/* --- status bar (20px): padlock · text · striped navy bar · component bar */
+/* --- personal / bookmark toolbar (21px, grip + quick-link buttons) ------- */
+.ow-personalbar {
+  background: var(--ns-face);
+  height: 21px;
+  padding: 1px 6px 1px 15px;
+  gap: 2px;
+  border-top: 1px solid var(--ns-divider);
+  box-shadow: inset 0 1px 0 var(--ns-light);
+  position: relative;
+}
+/* the grip spans (nearly) the full row, so it's at least as tall as the
+   quick-link buttons sitting next to it */
+.ow-personalbar::before {
+  top: 2px;
+  bottom: 2px;
+}
+.ow-pbar-btn {
+  height: 16px;
+  padding: 0 6px 0 3px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #000;
+  background: var(--ns-face);
+  border: 1px solid transparent;
+}
+.ow-pbar-btn:hover {
+  border-color: var(--ns-light) var(--ns-shadow) var(--ns-shadow) var(--ns-light);
+}
+.ow-pbar-btn:active {
+  border-color: var(--ns-shadow) var(--ns-light) var(--ns-light) var(--ns-shadow);
+}
+.ow-pbar-btn__icon {
+  width: 20px;
+  height: 15px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+.ow-pbar-btn[data-icon='man'] .ow-pbar-btn__icon {
+  background-image: url('assets/pbar_man.png');
+}
+.ow-pbar-btn[data-icon='doc'] .ow-pbar-btn__icon {
+  background-image: url('assets/pbar_doc.png');
+}
+
+.ow-statusbar {
+  background: var(--ns-face);
+  height: 20px;
+  padding: 1px 3px;
+  gap: 4px;
+  border-top: 1px solid var(--ns-light);
+}
+.ow-status-text {
+  height: 16px;
+  line-height: 14px;
+  padding: 1px 4px 1px 22px;
+  background: var(--ns-face) url('assets/status_padlock.png') 3px center no-repeat;
+  border-top: 1px solid var(--ns-shadow);
+  border-left: 1px solid var(--ns-shadow);
+  border-right: 1px solid var(--ns-light);
+  border-bottom: 1px solid var(--ns-light);
+}
+.ow-progress {
+  width: 120px;
+  height: 16px;
+  flex: 0 0 auto;
+  padding: 2px;
+  border-top: 1px solid var(--ns-shadow);
+  border-left: 1px solid var(--ns-shadow);
+  border-right: 1px solid var(--ns-light);
+  border-bottom: 1px solid var(--ns-light);
+  overflow: hidden;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #000080 0 6px,
+    #0a0aa0 6px 10px
+  );
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 100%;
+  animation: ns-marquee 0.7s linear infinite;
+}
+@keyframes ns-marquee {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 10px;
+  }
+}
+.ow-zone {
+  width: 156px;
+  flex: 0 0 auto;
+  text-indent: -9999px;
+  background: var(--ns-face) url('assets/status_components.png') right center no-repeat;
+  border-top: 1px solid var(--ns-shadow);
+  border-left: 1px solid var(--ns-shadow);
+  border-right: 1px solid var(--ns-light);
+  border-bottom: 1px solid var(--ns-light);
+}
+.ow-zone__lock {
+  display: none;
+}
+
+/* --- Win9x scrollbars (lighter face per spec) ---------------------------- */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+::-webkit-scrollbar-track {
+  background: #d4d0c8;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ns-face);
+  border-top: 1px solid var(--ns-light);
+  border-left: 1px solid var(--ns-light);
+  border-right: 1px solid var(--ns-shadow);
+  border-bottom: 1px solid var(--ns-shadow);
+}

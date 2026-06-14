@@ -1,0 +1,43 @@
+{
+  "name": "reframe",
+  "version": "0.1.0",
+  "description": "Reframe — today's web, yesterday's look. A modern Chromium browser wrapped in pixel-faithful retro chrome (IE5, Netscape, Aqua Safari).",
+  "author": "Maik Klotz",
+  "license": "MIT",
+  "main": "out/main/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "package": "electron-vite build && electron-builder --mac"
+  },
+  "build": {
+    "appId": "app.myretromac.reframe",
+    "productName": "Reframe",
+    "directories": { "output": "dist" },
+    "files": ["out/**/*"],
+    "extraResources": ["resources/**/*"],
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.utilities",
+      "target": "dmg"
+    }
+  },
+  "dependencies": {
+    "98.css": "^0.1.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  }
+}

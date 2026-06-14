@@ -1,0 +1,60 @@
+{
+  "id": "netscape",
+  "name": "Netscape Communicator 4.8",
+  "era": "1999 · Windows 9x",
+  "toolbar": [
+    "back",
+    "forward",
+    "refresh",
+    "home",
+    "search",
+    "netscape",
+    "print",
+    "security",
+    "shop",
+    "stop"
+  ],
+  "menus": ["File", "Edit", "View", "Go", "Communicator", "Help"],
+  "personalBar": [
+    { "label": "Instant Message", "icon": "man", "url": "https://www.aol.com" },
+    { "label": "WebMail", "icon": "doc", "url": "https://mail.google.com" },
+    { "label": "Radio", "icon": "doc", "url": "https://tunein.com" },
+    { "label": "People", "icon": "doc", "url": "https://www.whitepages.com" },
+    { "label": "Yellow Pages", "icon": "doc", "url": "https://www.yellowpages.com" },
+    { "label": "Download", "icon": "doc", "url": "https://download.cnet.com" },
+    { "label": "Channels", "icon": "doc", "url": "https://www.youtube.com" }
+  ],
+  "homeUrl": "https://www.google.com",
+  "oldWebDate": "200208",
+  "layout": {
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": false
+  },
+  "throbber": { "kind": "image", "label": "Netscape" },
+  "labels": {
+    "address": "Location:",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "home": "Home",
+    "search": "Search",
+    "print": "Print",
+    "security": "Security",
+    "shop": "Shop",
+    "netscape": "My Netscape",
+    "newTab": "New"
+  },
+  "vars": {
+    "--ns-face": "#e9e9e9",
+    "--ns-light": "#ffffff",
+    "--ns-shadow": "#808080",
+    "--ns-dark": "#404040",
+    "--ns-divider": "#9a9a9a",
+    "--ns-field": "#ffffff",
+    "--ns-navy": "#000080",
+    "--ns-disabled": "#9a9a9a",
+    "--ns-font": "Tahoma, Geneva, 'MS Sans Serif', sans-serif"
+  }
+}
