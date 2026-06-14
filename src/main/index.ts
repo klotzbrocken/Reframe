@@ -7,10 +7,12 @@ import {
   nativeImage,
   Menu,
   dialog,
+  protocol,
+  net,
   shell as electronShell
 } from 'electron'
 import { join } from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import { dirname } from 'path'
 import electronUpdater from 'electron-updater'
 import { BrowserShell } from './browser-shell'
@@ -19,6 +21,18 @@ import { registerIpc } from './ipc'
 const { autoUpdater } = electronUpdater
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+
+// In the packaged app the renderer is served from this custom scheme instead of
+// file://, so absolute URLs (`/themes/…`, `/splash/…`) and fetch() resolve
+// against the renderer root — exactly like the Vite dev server. Under plain
+// file:// they would point at the filesystem root and fetch is blocked, which is
+// why the bundled themes failed to load. Must be registered before app ready.
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'app',
+    privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true }
+  }
+])
 
 const HOME_URL = 'https://www.myretromac.app'
 
@@ -29,10 +43,24 @@ let splashWin: BrowserWindow | null = null
 
 const PRELOAD = () => join(__dirname, '../preload/index.mjs')
 
-/** URL of a static page in the renderer (dev server or packaged file). */
+/** URL of a static page in the renderer (dev server, or the app:// scheme). */
 function pageUrl(file: string): string {
   const base = process.env['ELECTRON_RENDERER_URL']
-  return base ? `${base}/${file}` : `file://${join(__dirname, '../renderer/', file)}`
+  return base ? `${base}/${file}` : `app://bundle/${file}`
+}
+
+const RENDERER_DIR = join(__dirname, '../renderer')
+
+/** Serve the bundled renderer (out/renderer) over app://bundle/<path>. */
+function registerAppProtocol(): void {
+  protocol.handle('app', (req) => {
+    const { pathname } = new URL(req.url)
+    const rel = pathname === '/' ? '/index.html' : decodeURIComponent(pathname)
+    const file = join(RENDERER_DIR, rel)
+    // Guard against path traversal outside the renderer dir.
+    if (!file.startsWith(RENDERER_DIR)) return new Response('Forbidden', { status: 403 })
+    return net.fetch(pathToFileURL(file).toString())
+  })
 }
 
 // Period boot splashes shown (as their own frameless, transparent windows) when
@@ -291,11 +319,7 @@ function createWindow(): void {
   layout()
   win.on('resize', layout)
 
-  if (process.env['ELECTRON_RENDERER_URL']) {
-    chromeView.webContents.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    chromeView.webContents.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  chromeView.webContents.loadURL(pageUrl('index.html'))
 
   chromeView.webContents.once('did-finish-load', () => {
     if (activeShell.tabCount() === 0) activeShell.createTab(HOME_URL)
@@ -307,6 +331,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  registerAppProtocol()
   setDockIcon()
   buildAppMenu()
   setupAutoUpdate()
