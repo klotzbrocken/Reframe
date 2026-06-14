@@ -1,0 +1,37 @@
+{
+  "id": "safari",
+  "name": "Safari 1.0",
+  "era": "2003 · Mac OS X",
+  "toolbar": ["back", "forward", "refresh", "home"],
+  "menus": ["View", "Help"],
+  "personalBar": [
+    { "label": "Apple", "url": "https://www.apple.com" },
+    { "label": "Mac", "url": "https://www.apple.com/mac/" },
+    { "label": "Amazon", "url": "https://www.amazon.com" },
+    { "label": "eBay", "url": "https://www.ebay.com" },
+    { "label": "Yahoo!", "url": "https://www.yahoo.com" },
+    { "label": "News", "url": "https://news.google.com" }
+  ],
+  "homeUrl": "https://www.google.com",
+  "oldWebDate": "20030623",
+  "layout": {
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": false
+  },
+  "labels": {
+    "address": "",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "home": "Home"
+  },
+  "vars": {
+    "--sf-metal": "#cfcfcf",
+    "--sf-line": "#9a9a9a",
+    "--sf-text": "#222222",
+    "--sf-field": "#ffffff",
+    "--sf-accent": "#3b6ea5"
+  }
+}
