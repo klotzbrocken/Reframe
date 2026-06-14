@@ -13,12 +13,12 @@ body {
   background: var(--ns-face);
 }
 
+/* Outer window frame — same raised Win98 bevel + 5px inset as the IE theme. */
 .ow-root {
   background: var(--ns-face);
-  border-top: 1px solid var(--ns-light);
-  border-left: 1px solid var(--ns-light);
-  border-right: 1px solid var(--ns-shadow);
-  border-bottom: 1px solid var(--ns-shadow);
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px #808080,
+    inset 2px 2px #ffffff;
+  padding: 5px;
 }
 
 /* --- title bar (Win9x navy gradient + controls) -------------------------- */
@@ -319,11 +319,29 @@ body {
   border-bottom: 1px solid var(--ns-light);
 }
 .ow-address-input {
-  padding: 1px 4px;
+  padding: 1px 4px 1px 19px;
   font-family: inherit;
   font-size: 11px;
-  background: transparent;
+  /* page favicon at the left of the field (dummy by default; the live favicon
+     overrides the image inline when the page provides one) */
+  background: url('assets/favicon.png') 3px center / 13px 13px no-repeat;
+  background-color: transparent;
   border: 0;
+}
+/* transparent drag handle over the favicon, for dropping onto the bookmark bar */
+.ow-address-favicon {
+  display: block;
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 17px;
+  z-index: 2;
+  background: transparent;
+  cursor: grab;
+}
+.ow-address-favicon:active {
+  cursor: grabbing;
 }
 .ow-address-input:focus {
   outline: none;

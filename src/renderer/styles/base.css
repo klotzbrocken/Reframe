@@ -333,6 +333,32 @@ body,
   font-style: italic;
 }
 
+/* Bookmark-bar drag&drop + right-click context menu */
+.ow-personalbar.is-dragover {
+  outline: 1px dashed #1a4ea8;
+  outline-offset: -2px;
+}
+.ow-ctxmenu {
+  position: fixed;
+  z-index: 2500;
+  min-width: 132px;
+  padding: 2px 0;
+  background: #fff;
+  color: #000;
+  border: 1px solid #6f6f6f;
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.35);
+  font-size: 12px;
+}
+.ow-ctxmenu__item {
+  padding: 4px 14px;
+  white-space: nowrap;
+  cursor: default;
+}
+.ow-ctxmenu__item:hover {
+  background: #1a4ea8;
+  color: #fff;
+}
+
 /* Global settings / about dialog */
 .ow-dialog-backdrop {
   position: fixed;

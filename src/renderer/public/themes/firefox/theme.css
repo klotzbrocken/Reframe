@@ -16,8 +16,12 @@ body {
   background: #d4d0c8;
 }
 
+/* Outer window frame — same raised Win98 bevel + 5px inset as the IE theme. */
 .ow-root {
   background: #d4d0c8;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px #808080,
+    inset 2px 2px #ffffff;
+  padding: 5px;
 }
 
 /* --- title bar (blue gradient + window controls) ------------------------- */
@@ -299,18 +303,29 @@ body {
   display: none;
 }
 .ow-address-combo {
-  height: 22px;
+  height: 25px;
   align-items: center;
   background: #fff;
   /* thin, light sunken edge — not the heavy 4-layer bevel */
   border: 1px solid;
   border-color: #a6a39a #ededea #ededea #a6a39a;
 }
-/* The page favicon is painted as the input's own background so it is always
-   inside the field (a separate leading element rendered just outside the white
-   box). */
+/* The favicon image is painted as the input's own background (always inside the
+   field). This element is a transparent overlay on top of it that serves as the
+   drag handle for dropping the page onto the bookmark bar. */
 .ow-address-favicon {
-  display: none;
+  display: block;
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 21px;
+  z-index: 2;
+  background: transparent;
+  cursor: grab;
+}
+.ow-address-favicon:active {
+  cursor: grabbing;
 }
 .ow-address-input {
   padding: 0 3px 0 22px;
@@ -385,20 +400,23 @@ body {
 .ow-searchbox {
   position: relative;
   width: 178px;
-  height: 22px;
+  height: 25px;
   margin-left: 5px;
   background: #fff;
   border: 1px solid;
-  border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
+  border-color: #a6a39a #ededea #ededea #a6a39a;
 }
+/* engine picker button (no magnifier — Firefox 1.0 submits on Enter) */
 .ow-searchbox__engine {
   display: flex;
   align-items: center;
   gap: 3px;
-  height: 20px;
+  height: 100%;
   padding: 0 5px;
   flex: none;
+  border: 0;
   border-right: 1px solid #e3e0d8;
+  background: transparent;
   cursor: default;
 }
 .ow-searchbox__engine:hover {
@@ -432,28 +450,36 @@ body {
   background: transparent;
   font-size: 12px;
   color: #000;
-  height: 20px;
-  padding: 0 4px;
+  height: 100%;
+  padding: 0 6px;
 }
-.ow-searchbox__go {
+/* engine dropdown */
+.ow-searchbox__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 1px 0 0;
+  padding: 2px;
+  list-style: none;
+  width: 188px;
+  z-index: 60;
+  background: #f1efe9;
+  border: 1px solid #5a5a5a;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.28);
+}
+.ow-searchbox__option {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 20px;
-  flex: none;
-  border: 0;
-  background: transparent;
+  gap: 8px;
+  padding: 5px 9px;
+  font-size: 11px;
+  white-space: nowrap;
   cursor: default;
 }
-.ow-searchbox__go:hover {
-  background: #eef2fb;
-}
-.ow-searchbox__glass {
-  width: 13px;
-  height: 13px;
-  background: url("data:image/svg+xml;charset=utf-8,%3Csvg width='13' height='13' viewBox='0 0 16 16' fill='none' stroke='%23e8722b' stroke-width='1.7' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6.6' cy='6.6' r='4.2'/%3E%3Cpath d='M9.8 9.8 L14 14' stroke-linecap='round'/%3E%3C/svg%3E")
-    center / contain no-repeat;
+.ow-searchbox__option:hover,
+.ow-searchbox__option.is-active {
+  background: #0a246a;
+  color: #fff;
 }
 
 /* --- bookmarks toolbar --------------------------------------------------- */

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ShellEvent, TabState } from '../../shared/types'
+import { unwrapWayback, wrapWayback } from './wayback'
 
 export interface ShellState {
   tabs: TabState[]
@@ -38,9 +39,11 @@ export function useShell(onLoadStart?: () => void): {
   const oldWebRef = useRef(false)
   const oldWebDateRef = useRef('2002')
   const activeRef = useRef<number | null>(null)
+  const currentUrlRef = useRef('')
   const loadStartRef = useRef(onLoadStart)
   loadStartRef.current = onLoadStart
   activeRef.current = state.activeId
+  currentUrlRef.current = state.tabs.find((t) => t.id === state.activeId)?.url ?? ''
   oldWebRef.current = oldWeb
 
   useEffect(() => {
@@ -70,11 +73,8 @@ export function useShell(onLoadStart?: () => void): {
       const id = activeRef.current
       if (id == null) return
       // "Old Web": route every address through the Wayback Machine at the
-      // theme's era date. The `if_` modifier returns the archived page WITHOUT
-      // the Wayback navigation banner (same trick used for embeds).
-      const target = oldWebRef.current
-        ? `https://web.archive.org/web/${oldWebDateRef.current}if_/${input}`
-        : input
+      // theme's era date (banner-free `if_` snapshot). Off: load it as-is.
+      const target = oldWebRef.current ? wrapWayback(input, oldWebDateRef.current) : input
       window.oldweb.navigate(id, target)
     },
     back: () => activeRef.current != null && window.oldweb.goBack(activeRef.current),
@@ -91,7 +91,20 @@ export function useShell(onLoadStart?: () => void): {
         return next
       })
     },
-    toggleOldWeb: () => setOldWeb((p) => !p),
+    toggleOldWeb: () => {
+      const id = activeRef.current
+      setOldWeb((prev) => {
+        const next = !prev
+        // Reload whatever is open through (or out of) the Wayback Machine, so
+        // toggling immediately time-travels the current page.
+        if (id != null && currentUrlRef.current) {
+          const original = unwrapWayback(currentUrlRef.current)
+          const target = next ? wrapWayback(original, oldWebDateRef.current) : original
+          window.oldweb.navigate(id, target)
+        }
+        return next
+      })
+    },
     setOldWebDate: (date: string) => {
       oldWebDateRef.current = date
     }

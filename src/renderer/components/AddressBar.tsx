@@ -5,11 +5,26 @@ interface Props {
   label: string
   goLabel: string
   history?: string[]
+  /** Real page favicon URL; when set, themes that show it use it over the dummy. */
+  favicon?: string | null
+  /** Real page URL to use as the drag payload when dragging the favicon. */
+  dragUrl?: string
+  dragTitle?: string
   onSubmit: (input: string) => void
   onBookmarks?: () => void
 }
 
-export function AddressBar({ url, label, goLabel, history = [], onSubmit, onBookmarks }: Props) {
+export function AddressBar({
+  url,
+  label,
+  goLabel,
+  history = [],
+  favicon,
+  dragUrl,
+  dragTitle,
+  onSubmit,
+  onBookmarks
+}: Props) {
   const [value, setValue] = useState(url)
   const [focused, setFocused] = useState(false)
   const [listOpen, setListOpen] = useState(false)
@@ -69,11 +84,27 @@ export function AddressBar({ url, label, goLabel, history = [], onSubmit, onBook
 
       {/* Combobox: the address field plus a recent-addresses dropdown. */}
       <div className="ow-address-combo" ref={comboRef}>
-        {/* page favicon inside the field; hidden by default, shown per theme. */}
-        <span className="ow-address-favicon" aria-hidden />
+        {/* Page favicon; hidden by default, shown per theme. Doubles as the
+            drag handle for adding the current page to the bookmark bar. */}
+        <span
+          className="ow-address-favicon"
+          draggable={!!dragUrl}
+          onDragStart={
+            dragUrl
+              ? (e) => {
+                  e.dataTransfer.setData('text/uri-list', dragUrl)
+                  e.dataTransfer.setData('text/plain', dragUrl)
+                  e.dataTransfer.setData('application/x-reframe-title', dragTitle ?? dragUrl)
+                  e.dataTransfer.effectAllowed = 'copy'
+                }
+              : undefined
+          }
+          aria-hidden
+        />
         <input
           ref={inputRef}
           className="ow-address-input"
+          style={favicon ? { backgroundImage: `url("${favicon}")` } : undefined}
           value={value}
           spellCheck={false}
           onChange={(e) => setValue(e.target.value)}

@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { DEFAULT_ENGINE_ID, SEARCH_ENGINES } from '../shell/engines'
 
 export interface Settings {
   home?: string
   defaultTheme?: string
   waybackYear?: number
+  searchEngine?: string
 }
 
 interface Props {
@@ -29,6 +31,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [home, setHome] = useState(settings.home || SITE)
   const [theme, setTheme] = useState(settings.defaultTheme || 'ie5')
   const [year, setYear] = useState(settings.waybackYear || 0)
+  const [engine, setEngine] = useState(settings.searchEngine || DEFAULT_ENGINE_ID)
 
   return (
     <div className="ow-dialog-backdrop" onMouseDown={onClose}>
@@ -75,6 +78,17 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             </select>
           </label>
 
+          <label className="ow-field">
+            <span>Default search engine</span>
+            <select value={engine} onChange={(e) => setEngine(e.target.value)}>
+              {SEARCH_ENGINES.map((en) => (
+                <option key={en.id} value={en.id}>
+                  {en.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <p className="ow-dialog__legal">{LEGAL}</p>
 
           <a
@@ -98,7 +112,8 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               onSave({
                 home: home.trim() || undefined,
                 defaultTheme: theme,
-                waybackYear: year || undefined
+                waybackYear: year || undefined,
+                searchEngine: engine
               })
               onClose()
             }}

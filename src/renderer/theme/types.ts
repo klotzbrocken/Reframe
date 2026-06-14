@@ -48,6 +48,8 @@ export interface ThemeManifest {
     /** Put the address field (and a search box) on the nav-button row itself,
      *  instead of on its own line below — the Firefox 1.0 / early-2000s layout. */
     unifiedToolbar?: boolean
+    /** Show the live page favicon in the address field (over the dummy icon). */
+    showFavicon?: boolean
   }
   throbber?: {
     /** 'css' = animated purely in theme.css; 'image' = animated background. */
