@@ -131,9 +131,21 @@ body,
 .ow-loc-proxy,
 .ow-loc-related,
 .ow-address-icon,
+.ow-address-favicon,
 .ow-loc-links,
 .ow-go__icon {
   display: none;
+}
+
+/* Toolbar search box (opt-in per theme; rendered only for unified toolbars) */
+.ow-searchbox {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.ow-searchbox__input {
+  min-width: 0;
+  font: inherit;
 }
 
 /* Personal / bookmark toolbar (opt-in per theme via manifest.personalBar) */

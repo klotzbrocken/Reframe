@@ -45,6 +45,9 @@ export interface ThemeManifest {
     showStatusBar?: boolean
     showMenuBar?: boolean
     showTabs?: boolean
+    /** Put the address field (and a search box) on the nav-button row itself,
+     *  instead of on its own line below — the Firefox 1.0 / early-2000s layout. */
+    unifiedToolbar?: boolean
   }
   throbber?: {
     /** 'css' = animated purely in theme.css; 'image' = animated background. */

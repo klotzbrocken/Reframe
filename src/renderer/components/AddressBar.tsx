@@ -69,6 +69,8 @@ export function AddressBar({ url, label, goLabel, history = [], onSubmit, onBook
 
       {/* Combobox: the address field plus a recent-addresses dropdown. */}
       <div className="ow-address-combo" ref={comboRef}>
+        {/* page favicon inside the field; hidden by default, shown per theme. */}
+        <span className="ow-address-favicon" aria-hidden />
         <input
           ref={inputRef}
           className="ow-address-input"
