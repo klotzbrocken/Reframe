@@ -417,6 +417,22 @@ body,
   border: 1px solid #999;
   background: #fff;
 }
+.ow-field--check {
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+}
+.ow-field--check input {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.ow-field--check > span {
+  font-weight: 600;
+  font-size: 12px;
+}
 .ow-dialog__legal {
   margin: 2px 0 0;
   font-size: 11px;
