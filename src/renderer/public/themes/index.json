@@ -1,5 +1,6 @@
 [
   { "id": "ie5", "name": "Internet Explorer 5", "era": "1999 · Windows 98" },
   { "id": "netscape", "name": "Netscape Communicator 4.8", "era": "1999 · Windows 9x" },
-  { "id": "safari", "name": "Safari 1.0", "era": "2003 · Mac OS X" }
+  { "id": "safari", "name": "Safari 1.0", "era": "2003 · Mac OS X" },
+  { "id": "firefox", "name": "Firefox 1.0", "era": "2004 · cross-platform" }
 ]

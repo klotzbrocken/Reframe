@@ -1,0 +1,489 @@
+/*
+ * Firefox 1.0 (2004) — the classic Luna-era cross-platform chrome.
+ *
+ * Built to a high-fidelity early-2000s browser spec: #d4d0c8 chrome face, a blue
+ * gradient title bar, single-pixel bevels that raise on hover and sink on press,
+ * a bookmarks toolbar and a striped status progress bar. Toolbar nav icons are
+ * the supplied design-handoff artwork; the brand mark in the menu bar uses the
+ * provided Firefox icon. Original/period artwork only — no extracted vendor UI.
+ */
+
+body {
+  font-family: Tahoma, 'Segoe UI', Verdana, sans-serif;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #000;
+  background: #d4d0c8;
+}
+
+/* Outer window face */
+.ow-root {
+  background: #d4d0c8;
+}
+
+/* --- title bar (blue gradient + window controls) ------------------------- */
+.ow-titlebar {
+  background: linear-gradient(#2a6fe0, #0b3aa0);
+  border-bottom: 1px solid #062a7a;
+  height: 28px;
+  padding: 0 4px 0 7px;
+  gap: 6px;
+}
+.ow-titlebar__icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  background: url('assets/firefox.png') center / contain no-repeat;
+}
+.ow-titlebar__text {
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+.ow-titlebar__controls {
+  gap: 3px;
+}
+.ow-winbtn {
+  width: 21px;
+  height: 18px;
+  min-width: 21px;
+  padding: 0;
+  background-color: #d4d0c8;
+  border: 1px solid;
+  border-color: #fff #404040 #404040 #fff;
+  background-repeat: no-repeat;
+}
+.ow-winbtn:active {
+  border-color: #404040 #fff #fff #404040;
+}
+.ow-winbtn[data-control='minimize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 4px left 6px;
+}
+.ow-winbtn[data-control='maximize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 4px left 6px;
+}
+.ow-winbtn[data-control='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E");
+  background-position: top 4px left 6px;
+}
+.ow-winbtn[data-control='close'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: center;
+}
+.ow-winbtn[data-control='close']:hover {
+  background-color: #e25c5c;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23fff'/%3E%3C/svg%3E");
+}
+
+/* --- menu bar ------------------------------------------------------------ */
+.ow-menubar {
+  background: #d4d0c8;
+  height: 22px;
+  padding: 0 4px;
+  gap: 0;
+  position: relative;
+  z-index: 50;
+  border-bottom: 1px solid #b5b0a4;
+}
+.ow-menu__label {
+  padding: 3px 8px;
+  line-height: 15px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: #0a246a;
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #f1efe9;
+  padding: 2px;
+  border: 1px solid #5a5a5a;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.28);
+  font-size: 11px;
+}
+.ow-menu__heading {
+  padding: 4px 22px 2px 24px;
+  font-weight: 700;
+  color: #555;
+}
+.ow-menu__item {
+  padding: 4px 20px 4px 9px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #0a246a;
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #9a968c;
+}
+.ow-menu__sep {
+  height: 0;
+  margin: 3px 2px;
+  border-top: 1px solid #b5b0a4;
+  border-bottom: 1px solid #fff;
+}
+.ow-menu__check {
+  width: 16px;
+}
+
+/* brand mark in the menu bar (the supplied Firefox icon), like IE's globe /
+   Netscape's N. Idle static; gentle pulse while a page loads. */
+.ow-toolbar .ow-throbber {
+  display: none;
+}
+.ow-menubar__right {
+  padding-right: 4px;
+}
+.ow-menubar .ow-throbber {
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: url('assets/firefox.png') center / 18px 18px no-repeat;
+}
+.ow-menubar .ow-throbber.is-active {
+  animation: ow-fox-pulse 0.7s ease-in-out infinite;
+}
+@keyframes ow-fox-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.86);
+  }
+}
+
+/* --- toolbar (flat icons; raise on hover, sink on press) ----------------- */
+.ow-toolbar {
+  background: #d4d0c8;
+  height: 38px;
+  padding: 0 5px;
+  gap: 1px;
+  border-bottom: 1px solid #b5b0a4;
+}
+.ow-btn {
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 2px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: #000;
+}
+.ow-btn:hover:not(:disabled) {
+  border-color: #fff #808080 #808080 #fff;
+  background: #e7e4da;
+}
+.ow-btn:active:not(:disabled) {
+  border-color: #808080 #fff #fff #808080;
+  background: #dcd9cf;
+}
+.ow-btn:disabled {
+  opacity: 0.32;
+  filter: grayscale(1);
+}
+.ow-btn__icon {
+  width: 24px;
+  height: 23px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 22px 22px;
+}
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/back.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/forward.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/reload.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn__label {
+  font-size: 11px;
+}
+
+/* vertical divider between tool groups */
+.ow-toolbar-sep {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 0;
+  margin: 7px 4px;
+  border-left: 1px solid #aaa699;
+  border-right: 1px solid #fff;
+}
+
+/* --- address bar --------------------------------------------------------- */
+.ow-addressbar {
+  background: #d4d0c8;
+  height: 30px;
+  padding: 0 6px;
+  gap: 5px;
+  border-bottom: 1px solid #b5b0a4;
+}
+/* Firefox 1.0 had no "Address:" caption */
+.ow-address-label {
+  display: none;
+}
+/* page favicon inside the field */
+.ow-address-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin: 0 2px 0 4px;
+  flex: 0 0 auto;
+  background: url('assets/website.png') center / contain no-repeat;
+}
+.ow-address-combo {
+  height: 22px;
+  background: #fff;
+  border: 1px solid;
+  border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
+}
+.ow-address-input {
+  padding: 2px 4px;
+  font-size: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+.ow-address-dropdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  border: 0;
+  background: transparent;
+  color: #444;
+  font-size: 9px;
+}
+.ow-address-dropdown::before {
+  content: '▾';
+}
+.ow-address-dropdown:active {
+  transform: translate(1px, 1px);
+}
+.ow-address-list {
+  background: #fff;
+  border: 1px solid #5a5a5a;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.28);
+  font-size: 12px;
+}
+.ow-address-item {
+  padding: 3px 8px;
+}
+.ow-address-item:hover {
+  background: #0a246a;
+  color: #fff;
+}
+/* borderless green "Go" control (icon + text) */
+.ow-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  min-width: 0;
+  padding: 0 6px 0 4px;
+  font-size: 12px;
+  color: #1f7a33;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.ow-go:hover {
+  text-decoration: underline;
+}
+.ow-go:active {
+  opacity: 0.6;
+}
+.ow-go__icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background: url('assets/go.png') center / contain no-repeat;
+}
+
+/* --- bookmarks toolbar --------------------------------------------------- */
+.ow-personalbar {
+  background: #d4d0c8;
+  height: 21px;
+  padding: 0 6px;
+  border-bottom: 1px solid #9d998d;
+  gap: 2px;
+}
+.ow-pbar-btn {
+  height: 18px;
+  padding: 0 6px;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #000;
+}
+.ow-pbar-btn:hover {
+  border-color: #fff #808080 #808080 #fff;
+  background: #e7e4da;
+}
+.ow-pbar-btn:active {
+  border-color: #808080 #fff #fff #808080;
+}
+.ow-pbar-btn__icon {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  background: url('assets/website.png') center / contain no-repeat;
+}
+
+/* --- tabs (Firefox 1.0 simple tab strip) -------------------------------- */
+.ow-tabstrip {
+  background: #d4d0c8;
+  padding: 3px 4px 0 6px;
+  gap: 1px;
+  border-bottom: 1px solid #b5b0a4;
+}
+.ow-tab {
+  background: #cfcabf;
+  border: 1px solid;
+  border-color: #fff #808080 transparent #fff;
+  border-radius: 2px 2px 0 0;
+  padding: 3px 8px 4px;
+  position: relative;
+  top: 2px;
+  font-size: 11px;
+}
+.ow-tab.is-active {
+  top: 0;
+  background: #fff;
+  padding-bottom: 6px;
+  z-index: 5;
+}
+.ow-tab__spinner {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  background: url('assets/firefox.png') center / contain no-repeat;
+}
+.ow-tab__spinner:not(.is-active) {
+  display: none;
+}
+.ow-tab__spinner.is-active {
+  animation: ow-fox-pulse 0.7s ease-in-out infinite;
+}
+.ow-tab__close {
+  width: 14px;
+  height: 14px;
+  font-size: 11px;
+  color: #555;
+  background: transparent;
+  border-radius: 2px;
+}
+.ow-tab__close:hover {
+  background: #e25c5c;
+  color: #fff;
+}
+.ow-tab-new {
+  align-self: center;
+  width: 20px;
+  height: 18px;
+  margin-left: 4px;
+  font-size: 13px;
+  line-height: 1;
+  background: #d4d0c8;
+  border: 1px solid;
+  border-color: #fff #808080 #808080 #fff;
+}
+.ow-tab-new:active {
+  border-color: #808080 #fff #fff #808080;
+}
+
+/* --- content ------------------------------------------------------------- */
+.ow-content {
+  background: #fff;
+}
+
+/* --- status bar ---------------------------------------------------------- */
+.ow-statusbar {
+  background: #d4d0c8;
+  height: 22px;
+  padding: 0 2px;
+  gap: 3px;
+  border-top: 1px solid #fff;
+}
+.ow-status-text {
+  border: 1px solid;
+  border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
+  padding: 2px 5px;
+  height: 18px;
+  line-height: 14px;
+}
+.ow-progress {
+  width: 170px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 1px solid;
+  border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
+  padding: 2px;
+  overflow: hidden;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #2a6fe0 0 6px,
+    #4d8af0 6px 8px
+  );
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 100%;
+  animation: ow-marquee 0.7s linear infinite;
+}
+@keyframes ow-marquee {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 8px;
+  }
+}
+.ow-zone {
+  border: 1px solid;
+  border-color: #7f7f7f #e8e6df #e8e6df #7f7f7f;
+  padding: 2px 6px;
+  height: 18px;
+  line-height: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* --- scrollbars (light Luna-ish) ----------------------------------------- */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+::-webkit-scrollbar-track {
+  background: #e6e3dc;
+}
+::-webkit-scrollbar-thumb {
+  background: #c3bfb3;
+  border: 1px solid;
+  border-color: #fff #808080 #808080 #fff;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #cfcbbf;
+}

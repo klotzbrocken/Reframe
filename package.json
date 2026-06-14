@@ -1,6 +1,6 @@
 {
   "name": "reframe",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Reframe — today's web, yesterday's look. A modern Chromium browser wrapped in pixel-faithful retro chrome (IE5, Netscape, Aqua Safari).",
   "author": "Maik Klotz",
   "license": "MIT",
@@ -15,17 +15,38 @@
   "build": {
     "appId": "app.myretromac.reframe",
     "productName": "Reframe",
-    "directories": { "output": "dist" },
-    "files": ["out/**/*"],
-    "extraResources": ["resources/**/*"],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "extraResources": [
+      "resources/**/*"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "klotzbrocken",
+        "repo": "Reframe"
+      }
+    ],
     "mac": {
       "icon": "build/icon.icns",
       "category": "public.app-category.utilities",
-      "target": "dmg"
+      "target": [
+        {
+          "target": "dmg"
+        },
+        {
+          "target": "zip"
+        }
+      ]
     }
   },
   "dependencies": {
     "98.css": "^0.1.21",
+    "electron-updater": "^6.8.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
