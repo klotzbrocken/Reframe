@@ -64,30 +64,71 @@ function newSplashWindow(w: number, h: number): BrowserWindow {
 }
 
 let startupFinished = false
+const THEME_SPLASH_MS = 4000
+
+/** Animate a window's opacity (soft fade in/out instead of a hard cut). */
+function fadeWindow(win: BrowserWindow, to: number, ms: number, done?: () => void): void {
+  const steps = 14
+  const start = win.getOpacity()
+  let i = 0
+  const iv = setInterval(() => {
+    if (win.isDestroyed()) {
+      clearInterval(iv)
+      return
+    }
+    i++
+    win.setOpacity(Math.max(0, Math.min(1, start + (to - start) * (i / steps))))
+    if (i >= steps) {
+      clearInterval(iv)
+      done?.()
+    }
+  }, ms / steps)
+}
 
 /** The Reframe startup splash — shown before the app window, on its own. */
 function showStartupSplash(): void {
   splashWin = newSplashWindow(460, 345)
+  splashWin.setOpacity(0)
+  splashWin.webContents.once('did-finish-load', () => {
+    if (splashWin && !splashWin.isDestroyed()) fadeWindow(splashWin, 1, 350)
+  })
   splashWin.loadURL(pageUrl('startup.html'))
 }
 
 function finishStartup(): void {
   if (startupFinished) return
   startupFinished = true
-  if (splashWin && !splashWin.isDestroyed()) splashWin.close()
+  const w = splashWin
   splashWin = null
   mainWindow?.show()
+  if (w && !w.isDestroyed()) {
+    fadeWindow(w, 0, 300, () => {
+      if (!w.isDestroyed()) w.close()
+    })
+  }
 }
 
-/** A theme's boot splash — its own frameless window, auto-closed after a beat. */
+/**
+ * A theme's boot splash — its own frameless window, fading in/out and holding
+ * for a few seconds. The main window is hidden for the duration so the splash
+ * is seen alone, then revealed again with the new theme applied.
+ */
 function showThemeSplash(themeId: string): void {
   const s = THEME_SPLASH[themeId]
   if (!s) return
   const win = newSplashWindow(s.w, s.h)
+  win.setOpacity(0)
+  mainWindow?.hide()
+  win.webContents.once('did-finish-load', () => {
+    if (!win.isDestroyed()) fadeWindow(win, 1, 300)
+  })
   win.loadURL(pageUrl(`splash.html?img=${encodeURIComponent(s.img)}`))
   setTimeout(() => {
-    if (!win.isDestroyed()) win.close()
-  }, 2500)
+    fadeWindow(win, 0, 350, () => {
+      if (!win.isDestroyed()) win.close()
+      mainWindow?.show()
+    })
+  }, THEME_SPLASH_MS)
 }
 
 // Reframe app / dock icon. We load a PNG rather than the .icns: nativeImage
