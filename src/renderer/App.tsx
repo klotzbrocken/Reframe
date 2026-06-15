@@ -255,7 +255,22 @@ export function App() {
     edit: { label: labels.edit, onClick: () => {} },
     netscape: { label: labels.netscape, onClick: () => actions.navigate(homeUrl) },
     security: { label: labels.security, onClick: () => {} },
-    shop: { label: labels.shop, onClick: () => actions.navigate('https://www.amazon.com') }
+    shop: { label: labels.shop, onClick: () => actions.navigate('https://www.amazon.com') },
+    // Opera 3.x toolbar actions (period MDI features map to the closest action).
+    new: { label: labels.new, onClick: actions.newTab },
+    open: { label: labels.open, onClick: () => {} },
+    save: { label: labels.save, onClick: actions.print },
+    copy: { label: labels.copy, onClick: () => {} },
+    url: {
+      label: labels.url,
+      onClick: () => (document.querySelector('.ow-address-input') as HTMLInputElement | null)?.focus()
+    },
+    hotlist: {
+      label: labels.hotlist,
+      onClick: () => openPanel('bookmarks', '.ow-btn[data-action="hotlist"]')
+    },
+    tile: { label: labels.tile, onClick: () => {} },
+    cascade: { label: labels.cascade, onClick: () => {} }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
   const menus = manifest?.menus ?? DEFAULT_MENUS
@@ -331,6 +346,7 @@ export function App() {
   // Firefox-era layout: the address field + search box sit on the nav-button
   // row itself, and the throbber lives in the menu bar (not the toolbar).
   const unified = layout.unifiedToolbar === true
+  const addressAtBottom = layout.addressPosition === 'bottom'
   const addressBarEl = (
     <AddressBar
       url={waybackDisplay(activeTab?.url ?? '', waybackDate.slice(0, 4))}
@@ -399,7 +415,7 @@ export function App() {
         )}
       </div>
 
-      {!unified && addressBarEl}
+      {!unified && !addressAtBottom && addressBarEl}
 
       {manifest?.personalBar && (
         <PersonalBar
@@ -418,6 +434,9 @@ export function App() {
       <div className="ow-content" ref={contentRef} />
 
       {layout.showTabs !== false && layout.tabsPosition === 'bottom' && tabStrip}
+
+      {/* Opera 3.x: the URL field lives in the status bar at the foot. */}
+      {addressAtBottom && <div className="ow-bottombar">{addressBarEl}</div>}
 
       {layout.showStatusBar !== false && (
         <StatusBar text={state.statusText} loading={loading} />
