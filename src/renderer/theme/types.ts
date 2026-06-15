@@ -20,6 +20,15 @@ export type ToolbarItem =
   | 'netscape'
   | 'security'
   | 'shop'
+  // Opera 3.x toolbar set
+  | 'new'
+  | 'open'
+  | 'save'
+  | 'copy'
+  | 'url'
+  | 'hotlist'
+  | 'tile'
+  | 'cascade'
   | '|'
 
 export interface ThemeManifest {
@@ -50,6 +59,9 @@ export interface ThemeManifest {
     unifiedToolbar?: boolean
     /** Show the live page favicon in the address field (over the dummy icon). */
     showFavicon?: boolean
+    /** Where the address bar sits: 'top' (default) or 'bottom' (Opera 3.x, the
+     *  URL lives in the status bar at the foot of the window). */
+    addressPosition?: 'top' | 'bottom'
   }
   throbber?: {
     /** 'css' = animated purely in theme.css; 'image' = animated background. */
@@ -74,6 +86,14 @@ export interface ThemeManifest {
     netscape?: string
     security?: string
     shop?: string
+    new?: string
+    open?: string
+    save?: string
+    copy?: string
+    url?: string
+    hotlist?: string
+    tile?: string
+    cascade?: string
   }
   /** Event name -> sound file (relative to the theme's sounds/ dir). */
   sounds?: Record<string, string>
@@ -98,7 +118,15 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
   edit: 'Edit',
   netscape: 'My Netscape',
   security: 'Security',
-  shop: 'Shop'
+  shop: 'Shop',
+  new: 'New',
+  open: 'Open',
+  save: 'Save',
+  copy: 'Copy',
+  url: 'URL',
+  hotlist: 'Hot List',
+  tile: 'Tile',
+  cascade: 'Cascade'
 }
 
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']
