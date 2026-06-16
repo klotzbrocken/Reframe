@@ -264,6 +264,14 @@ body,
   min-height: 0;
 }
 
+/* A horizontal band holding a docked side panel + the content. .ow-content
+   shrinks beside the panel, so the reported insets push the page right of it. */
+.ow-content-row {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .ow-statusbar {
   display: flex;
   align-items: center;
