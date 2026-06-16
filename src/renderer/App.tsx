@@ -6,6 +6,8 @@ import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEdi
 import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
 import { SearchBox } from './components/SearchBox'
+import { HotListPanel, type HotListEntry } from './components/HotListPanel'
+import { Clock } from './components/Clock'
 import { SettingsDialog, type Settings } from './components/SettingsDialog'
 import { StatusBar } from './components/StatusBar'
 import { TabStrip } from './components/TabStrip'
@@ -134,6 +136,9 @@ export function App() {
   const saveBarBookmark = (d: BookmarkDraft): void =>
     setBarBookmarks((b) => b.map((x) => (x.id === d.id ? { ...x, label: d.label, url: d.url } : x)))
 
+  // Opera HotList side panel — docked open by default.
+  const [hotlistOpen, setHotlistOpen] = useState(true)
+
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
     window.oldweb.setChromeOnTop(
@@ -202,7 +207,7 @@ export function App() {
     })
   }, [])
 
-  useLayoutEffect(report, [report, state.tabs.length, themeId, manifest])
+  useLayoutEffect(report, [report, state.tabs.length, themeId, manifest, hotlistOpen])
 
   useEffect(() => {
     let raf = 0
@@ -225,6 +230,7 @@ export function App() {
 
   const labels = { ...DEFAULT_LABELS, ...(manifest?.labels ?? {}) }
   const layout = manifest?.layout ?? {}
+  const hasSidePanel = layout.sidePanel === 'hotlist'
   const activeTab = state.tabs.find((t) => t.id === state.activeId) ?? null
   const loading = activeTab?.isLoading ?? false
   const homeUrl = settings.home || 'https://www.myretromac.app'
@@ -267,7 +273,10 @@ export function App() {
     },
     hotlist: {
       label: labels.hotlist,
-      onClick: () => openPanel('bookmarks', '.ow-btn[data-action="hotlist"]')
+      onClick: () =>
+        hasSidePanel
+          ? setHotlistOpen((o) => !o)
+          : openPanel('bookmarks', '.ow-btn[data-action="hotlist"]')
     },
     tile: { label: labels.tile, onClick: () => {} },
     cascade: { label: labels.cascade, onClick: () => {} }
@@ -371,6 +380,12 @@ export function App() {
       icon: 'doc'
     }))
   ]
+  // Entries for the Opera HotList tree/list (real bookmarks + personal bar).
+  const hotlistEntries: HotListEntry[] = [
+    ...bookmarks.map((b) => ({ title: b.title, url: b.url })),
+    ...(manifest?.personalBar ?? []).map((p) => ({ title: p.label, url: p.url, folder: true })),
+    ...barBookmarks.map((b) => ({ title: b.label, url: b.url }))
+  ]
   const searchBoxEl = (
     <SearchBox
       engineId={settings.searchEngine || DEFAULT_ENGINE_ID}
@@ -411,6 +426,7 @@ export function App() {
           <>
             <div className="ow-toolbar__spacer" />
             <Throbber active={loading} />
+            {layout.showClock && <Clock />}
           </>
         )}
       </div>
@@ -430,8 +446,21 @@ export function App() {
 
       {layout.showTabs !== false && (layout.tabsPosition ?? 'top') === 'top' && tabStrip}
 
-      {/* The page WebContentsView is positioned by the engine to cover this. */}
-      <div className="ow-content" ref={contentRef} />
+      {/* The page WebContentsView is positioned by the engine to cover .ow-content.
+          With a docked side panel, wrapping in a row shrinks .ow-content so the
+          reported insets push the page to the right of the panel automatically. */}
+      {hasSidePanel && hotlistOpen ? (
+        <div className="ow-content-row">
+          <HotListPanel
+            entries={hotlistEntries}
+            onNavigate={actions.navigate}
+            onClose={() => setHotlistOpen(false)}
+          />
+          <div className="ow-content" ref={contentRef} />
+        </div>
+      ) : (
+        <div className="ow-content" ref={contentRef} />
+      )}
 
       {layout.showTabs !== false && layout.tabsPosition === 'bottom' && tabStrip}
 
