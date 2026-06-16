@@ -107,13 +107,13 @@ body {
 }
 .ow-menu.is-open .ow-menu__label,
 .ow-menu__label:hover {
-  background: var(--op-accent);
+  background: #1a4ea8;
   color: #fff;
 }
 .ow-menu__dropdown {
   background: var(--op-menu);
   padding: 2px;
-  border: 1px solid;
+  border: 2px solid;
   border-color: var(--op-light) #404040 #404040 var(--op-light);
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
   font-size: 11px;
@@ -127,7 +127,7 @@ body {
   padding: 3px 22px 3px 10px;
 }
 .ow-menu__item:hover:not(.is-disabled) {
-  background: var(--op-accent);
+  background: #1a4ea8;
   color: #fff;
 }
 .ow-menu__item.is-disabled {
@@ -389,4 +389,183 @@ body {
 }
 ::-webkit-scrollbar-corner {
   background: #d8d4c8;
+}
+
+/* --- live clock at the right of the toolbar ------------------------------ */
+.ow-clock {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 64px;
+  height: 16px;
+  margin-left: 4px;
+  line-height: 16px;
+  text-align: center;
+  font-size: 11px;
+  background: var(--op-toolbar);
+  border: 1px solid;
+  border-color: var(--op-dark) var(--op-light) var(--op-light) var(--op-dark);
+}
+
+/* --- HotList side panel (docked left, 208px) ---------------------------- */
+.ow-hotlist {
+  flex: 0 0 208px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--op-menu);
+  border: 1px solid;
+  border-color: var(--op-light) var(--op-dark) var(--op-dark) var(--op-light);
+  margin: 1px;
+}
+.ow-hotlist__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 18px;
+  padding: 0 2px 0 6px;
+  flex: 0 0 auto;
+  background: var(--op-menu);
+  border-bottom: 1px solid var(--op-mid);
+  font-weight: 700;
+}
+.ow-hotlist__btns {
+  display: flex;
+  gap: 2px;
+}
+.ow-hotlist__btn {
+  width: 14px;
+  height: 13px;
+  padding: 0;
+  background-color: var(--op-menu);
+  border: 1px solid;
+  border-color: var(--op-light) var(--op-dark) var(--op-dark) var(--op-light);
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: default;
+}
+.ow-hotlist__btn:active {
+  border-color: var(--op-dark) var(--op-light) var(--op-light) var(--op-dark);
+}
+.ow-hotlist__btn[data-c='min'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 2px center;
+}
+.ow-hotlist__btn[data-c='close'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h1V1h1V0h2v1H6v1H5v1h1v1h1v1H5V5H4V4H3v1H2v1H0V5h1V4h1V3H1V2H0V0z' fill='%23000'/%3E%3C/svg%3E");
+}
+
+/* bookmark tree (white, folder icons + selection) */
+.ow-hotlist__tree {
+  flex: 3 1 0;
+  min-height: 0;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--op-dark) var(--op-light) var(--op-light) var(--op-dark);
+  margin: 2px;
+  padding: 2px 0;
+}
+.ow-hl-row,
+.ow-hl-lrow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  padding: 0 4px;
+  white-space: nowrap;
+  cursor: default;
+}
+.ow-hl-root {
+  padding-left: 4px;
+  font-weight: 700;
+}
+.ow-hl-child {
+  padding-left: 22px;
+}
+.ow-hl-row.is-sel,
+.ow-hl-lrow.is-sel {
+  background: #316ac5;
+  color: #fff;
+}
+.ow-hl-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  image-rendering: pixelated;
+}
+.ow-hl-icon[data-i='open'] {
+  background-image: url('assets/folder_hotlist.png');
+}
+.ow-hl-icon[data-i='folder'] {
+  background-image: url('assets/folder_closed.png');
+}
+.ow-hl-icon[data-i='doc'] {
+  background-image: url('assets/mdi_doc.png');
+}
+
+/* mini toolbar (↑ + File Edit New) */
+.ow-hotlist__bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  height: 20px;
+  padding: 1px 3px;
+}
+.ow-hl-tb {
+  height: 16px;
+  min-width: 16px;
+  padding: 0 3px;
+  font-size: 11px;
+  line-height: 14px;
+  background: var(--op-menu);
+  border: 1px solid;
+  border-color: var(--op-light) var(--op-dark) var(--op-dark) var(--op-light);
+  cursor: default;
+}
+.ow-hl-tb:active {
+  border-color: var(--op-dark) var(--op-light) var(--op-light) var(--op-dark);
+}
+.ow-hl-tb--txt {
+  font-weight: 400;
+}
+
+/* list view (Title / Last) */
+.ow-hotlist__list {
+  flex: 2 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0 2px 2px;
+  border: 1px solid;
+  border-color: var(--op-dark) var(--op-light) var(--op-light) var(--op-dark);
+  background: #fff;
+}
+.ow-hl-head {
+  display: flex;
+  flex: 0 0 auto;
+  height: 17px;
+  background: var(--op-menu);
+  border-bottom: 1px solid var(--op-mid);
+}
+.ow-hl-col {
+  padding: 1px 5px;
+  line-height: 15px;
+  font-size: 11px;
+  border-right: 1px solid var(--op-mid);
+  box-shadow: inset -1px 0 var(--op-light);
+}
+.ow-hl-col--title {
+  flex: 1 1 auto;
+}
+.ow-hl-col--last {
+  flex: 0 0 60px;
+}
+.ow-hotlist__rows {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
 }

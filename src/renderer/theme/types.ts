@@ -62,6 +62,10 @@ export interface ThemeManifest {
     /** Where the address bar sits: 'top' (default) or 'bottom' (Opera 3.x, the
      *  URL lives in the status bar at the foot of the window). */
     addressPosition?: 'top' | 'bottom'
+    /** Dock a left side panel beside the page (Opera 3.x HotList). */
+    sidePanel?: 'hotlist'
+    /** Show a live clock at the right of the toolbar (Opera 3.x). */
+    showClock?: boolean
   }
   throbber?: {
     /** 'css' = animated purely in theme.css; 'image' = animated background. */

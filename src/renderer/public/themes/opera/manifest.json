@@ -39,7 +39,9 @@
     "showMenuBar": true,
     "showStatusBar": false,
     "showTabs": false,
-    "addressPosition": "bottom"
+    "addressPosition": "bottom",
+    "sidePanel": "hotlist",
+    "showClock": true
   },
   "throbber": { "kind": "css", "label": "Loading" },
   "labels": {
