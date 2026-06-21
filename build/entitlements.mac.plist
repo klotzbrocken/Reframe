@@ -2,14 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
-    <!-- Electron/Chromium needs these under the hardened runtime to run V8's JIT. -->
+    <!-- Required under the hardened runtime to run V8's JIT (Electron/Chromium). -->
     <key>com.apple.security.cs.allow-jit</key>
     <true/>
     <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
     <true/>
-    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
-    <true/>
+    <!-- Kept: electron-builder signs the framework + helpers with the same Team
+         ID, but library validation must stay disabled so the (separately built)
+         Electron Framework and native modules load under Developer ID. -->
     <key>com.apple.security.cs.disable-library-validation</key>
     <true/>
+    <!-- Removed com.apple.security.cs.allow-dyld-environment-variables: not
+         needed by Electron and an unnecessary attack surface. -->
   </dict>
 </plist>

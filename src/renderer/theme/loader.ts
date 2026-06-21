@@ -1,4 +1,5 @@
 import type { ThemeManifest, ThemeSummary } from './types'
+import { sanitizeManifest } from './validate'
 
 const CSS_LINK_ID = 'oldweb-theme-css'
 const VARS_STYLE_ID = 'oldweb-theme-vars'
@@ -17,7 +18,16 @@ export class ThemeEngine {
     try {
       const res = await fetch('/themes/index.json')
       if (!res.ok) return []
-      return (await res.json()) as ThemeSummary[]
+      const data: unknown = await res.json()
+      if (!Array.isArray(data)) return []
+      return data
+        .map((t) => (t && typeof t === 'object' ? (t as Record<string, unknown>) : null))
+        .filter((t): t is Record<string, unknown> => !!t && typeof t.id === 'string')
+        .map((t) => ({
+          id: t.id as string,
+          name: typeof t.name === 'string' ? t.name : (t.id as string),
+          era: typeof t.era === 'string' ? (t.era as string) : undefined
+        }))
     } catch {
       return []
     }
@@ -37,9 +47,10 @@ export class ThemeEngine {
     // stylesheet, so an edited theme.css (or re-applying the same theme) would
     // show nothing new. A per-apply token forces a fresh fetch every time.
     const bust = `?v=${Date.now()}`
-    const manifest = (await (
-      await fetch(`${base}/manifest.json${bust}`, { cache: 'no-store' })
-    ).json()) as ThemeManifest
+    const rawManifest = await (await fetch(`${base}/manifest.json${bust}`, { cache: 'no-store' })).json()
+    // Validate + sanitize: enforce required strings, restrict navigable URLs to
+    // http/https, and drop any CSS-var value that could break out of :root{}.
+    const manifest = sanitizeManifest(rawManifest, id)
 
     // 1. apply CSS variables from the manifest FIRST, so the swapped stylesheet
     //    (which references them) has them available immediately.

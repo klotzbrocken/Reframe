@@ -296,10 +296,9 @@ export function App() {
     new: { label: labels.new, onClick: actions.newTab },
     open: {
       label: labels.open,
-      onClick: async () => {
-        const path = await window.oldweb.openLocalFile()
-        if (path) actions.navigate('file://' + path)
-      }
+      // The main process shows the dialog AND loads the file into the active
+      // tab; no file:// URL is constructed here (it would be rejected anyway).
+      onClick: () => void window.oldweb.openLocalFile()
     },
     save: {
       label: labels.save,

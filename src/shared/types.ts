@@ -69,7 +69,7 @@ export interface OldwebAPI {
   /** Open a URL in the user's default system browser. */
   openExternal(url: string): Promise<void>
   /** Show a native file-open dialog; resolves to the chosen path or null. */
-  openLocalFile(): Promise<string | null>
+  openLocalFile(): Promise<void>
   /** Quit the whole application. */
   quitApp(): Promise<void>
   /** From the startup splash window: dismiss it and reveal the main window. */

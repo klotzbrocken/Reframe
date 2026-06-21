@@ -7,7 +7,9 @@ import {
   shell as electronShell
 } from 'electron'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import type { ContentInsets, MenuCommand, ShellEvent, TabState } from '../shared/types'
+import { normalizeInput, isAllowedExternal } from '../shared/url'
 
 interface Tab {
   id: number
@@ -283,6 +285,27 @@ export class BrowserShell {
     }
   }
 
+  /**
+   * Show the native Open-File dialog and load the chosen local file into the
+   * active tab. file:// URLs are constructed and loaded here in the main
+   * process only — they are never accepted from renderer input or bookmarks
+   * (normalizeInput rejects them), so local-file access is gated by this dialog.
+   */
+  async openLocalFile(): Promise<void> {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [
+        { name: 'Web pages', extensions: ['html', 'htm', 'mht', 'mhtml'] },
+        { name: 'All files', extensions: ['*'] }
+      ]
+    })
+    if (canceled || !filePaths.length) return
+    const id = this.activeId
+    const wc = id != null ? this.tabs.get(id)?.view.webContents : undefined
+    if (!wc || wc.isDestroyed()) return
+    wc.loadURL(pathToFileURL(filePaths[0]).toString()).catch(() => {})
+  }
+
   /** Opera image toggle: hide/show all images on the current page. */
   async setImagesEnabled(id: number, enabled: boolean): Promise<void> {
     const tab = this.tabs.get(id)
@@ -322,7 +345,7 @@ export class BrowserShell {
       {
         label: 'Open in default browser',
         click: () => {
-          if (url) electronShell.openExternal(url)
+          if (isAllowedExternal(url)) void electronShell.openExternal(url)
         }
       },
       {
@@ -439,13 +462,3 @@ function injectRetro(enabled: boolean): void {
   document.documentElement.appendChild(el)
 }
 
-/** Turn whatever the user typed into a loadable URL (or a web search). */
-export function normalizeInput(input: string): string | null {
-  const raw = input.trim()
-  if (!raw || raw === 'about:blank') return null
-  if (/^[a-z]+:\/\//i.test(raw) || raw.startsWith('about:')) return raw
-  // looks like a domain / has a dot and no spaces -> treat as URL
-  if (/^[^\s]+\.[^\s]{2,}(\/.*)?$/.test(raw)) return 'https://' + raw
-  if (raw === 'localhost' || raw.startsWith('localhost:')) return 'http://' + raw
-  return 'https://duckduckgo.com/?q=' + encodeURIComponent(raw)
-}
