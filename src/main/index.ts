@@ -17,6 +17,7 @@ import { dirname } from 'path'
 import electronUpdater from 'electron-updater'
 import { BrowserShell } from './browser-shell'
 import { registerIpc } from './ipc'
+import { isAllowedExternal } from '../shared/url'
 
 const { autoUpdater } = electronUpdater
 
@@ -342,7 +343,12 @@ app.whenReady().then(() => {
   buildAppMenu()
   setupAutoUpdate()
   ipcMain.handle('app:setIcon', () => {})
-  ipcMain.handle('app:openExternal', (_e, url: string) => electronShell.openExternal(url))
+  ipcMain.handle('app:openExternal', (_e, url: unknown) => {
+    // Only hand http/https/mailto to the OS default handler; reject everything
+    // else (file:, smb:, custom protocol handlers, malformed bookmarks, …).
+    if (typeof url === 'string' && isAllowedExternal(url)) return electronShell.openExternal(url)
+    return undefined
+  })
   // Splash control (from the splash windows + the renderer on theme switch).
   ipcMain.on('splash:done', () => finishStartup())
   ipcMain.on('splash:theme', (_e, themeId: string) => showThemeSplash(themeId))
