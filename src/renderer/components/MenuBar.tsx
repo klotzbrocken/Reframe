@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { requestChromeTop } from '../shell/chromeTop'
 
 export type MenuItem =
   | { type: 'sep' }
@@ -29,21 +30,12 @@ export function MenuBar({ model, right }: { model: Menu[]; right?: ReactNode }) 
     return () => document.removeEventListener('mousedown', onDown)
   }, [open])
 
-  // Float the chrome above the page ONLY when the open dropdown actually
-  // reaches into the page area (otherwise short menus would needlessly blank
-  // the whole page). Measured after layout so the dropdown exists.
-  useLayoutEffect(() => {
-    if (open === null) {
-      window.oldweb.setChromeOnTop(false)
-      return
-    }
-    const dd = rootRef.current?.querySelector('.ow-menu__dropdown')
-    const content = document.querySelector('.ow-content')
-    const need =
-      !dd || !content
-        ? true
-        : dd.getBoundingClientRect().bottom > content.getBoundingClientRect().top
-    window.oldweb.setChromeOnTop(need)
+  // Raise the chrome above the page whenever a menu is open, so its dropdown is
+  // never clipped at the page boundary. Ref-counted so it coexists with other
+  // open popups (panels, address list) instead of fighting them.
+  useEffect(() => {
+    requestChromeTop('menu', open !== null)
+    return () => requestChromeTop('menu', false)
   }, [open])
 
   return (

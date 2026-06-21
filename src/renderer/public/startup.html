@@ -118,25 +118,38 @@
       </div>
     </div>
     <script>
-      const api = window.oldweb || {}
+      // The ESM preload (contextBridge) loads asynchronously, so window.oldweb
+      // may not exist yet when this inline script first runs. Always read it
+      // *lazily* at call time — by the time the countdown ends or the user
+      // clicks, the preload has finished and window.oldweb is available.
+      let done = false
+      const finish = () => {
+        if (done) return
+        if (!window.oldweb || !window.oldweb.splashDone) {
+          // Preload not ready yet — retry shortly (covers an early click).
+          setTimeout(finish, 80)
+          return
+        }
+        done = true
+        window.oldweb.splashDone()
+      }
       let left = 8
       const countEl = document.getElementById('count')
-      const done = () => api.splashDone && api.splashDone()
       const tick = () => {
         countEl.textContent = 'Starting in ' + left + 's…'
-        if (left <= 0) return done()
+        if (left <= 0) return finish()
         left--
         setTimeout(tick, 1000)
       }
       tick()
-      document.getElementById('enter').onclick = done
+      document.getElementById('enter').onclick = finish
       document.getElementById('gh').onclick = (e) => {
         e.preventDefault()
-        api.openExternal && api.openExternal('https://github.com/klotzbrocken/Reframe')
+        window.oldweb && window.oldweb.openExternal('https://github.com/klotzbrocken/Reframe')
       }
       document.getElementById('kofi').onclick = (e) => {
         e.preventDefault()
-        api.openExternal && api.openExternal('https://ko-fi.com/N4N11K1NC')
+        window.oldweb && window.oldweb.openExternal('https://ko-fi.com/N4N11K1NC')
       }
     </script>
   </body>

@@ -1,0 +1,47 @@
+{
+  "id": "kmeleon",
+  "name": "K-Meleon 0.2",
+  "era": "2000 · Windows 2000",
+  "toolbar": ["back", "forward", "|", "stop", "refresh", "home", "|", "search", "favorites", "|", "print"],
+  "menus": ["File", "View", "Go", "Favorites", "Help"],
+  "homeUrl": "https://kmeleonbrowser.org",
+  "oldWebDate": "20010601",
+  "layout": {
+    "showStatusBar": true,
+    "showMenuBar": true,
+    "showTabs": false
+  },
+  "personalBar": [
+    { "label": "K-Meleon", "url": "https://kmeleonbrowser.org" },
+    { "label": "Mozilla", "url": "https://www.mozilla.org" },
+    { "label": "SlashDot", "url": "https://slashdot.org" },
+    { "label": "WinAmp", "url": "https://www.winamp.com" },
+    { "label": "Google", "url": "https://www.google.com" }
+  ],
+  "throbber": { "kind": "css", "label": "" },
+  "labels": {
+    "address": "Address",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "search": "Search",
+    "favorites": "Favorites",
+    "history": "History",
+    "print": "Print",
+    "edit": "Edit"
+  },
+  "vars": {
+    "--km-face": "#d4d0c8",
+    "--km-light": "#ffffff",
+    "--km-dark": "#808080",
+    "--km-darker": "#404040",
+    "--km-field": "#ffffff",
+    "--km-text": "#000000",
+    "--km-titlebar": "#0a246a",
+    "--km-highlight": "#316ac5",
+    "--km-font": "Tahoma, Arial, sans-serif"
+  }
+}

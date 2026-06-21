@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { requestChromeTop } from '../shell/chromeTop'
 
 interface Props {
   url: string
@@ -12,6 +13,13 @@ interface Props {
   dragTitle?: string
   onSubmit: (input: string) => void
   onBookmarks?: () => void
+  /** IE5 "Links »" — open the Favorites panel anchored under the Links label. */
+  onLinks?: () => void
+  /** Netscape "What's Related" — open related sites for the current page. */
+  onRelated?: () => void
+  /** Opera: the middle status icon toggles page images instead of bookmarks. */
+  onToggleImages?: () => void
+  imagesOff?: boolean
 }
 
 export function AddressBar({
@@ -23,7 +31,11 @@ export function AddressBar({
   dragUrl,
   dragTitle,
   onSubmit,
-  onBookmarks
+  onBookmarks,
+  onLinks,
+  onRelated,
+  onToggleImages,
+  imagesOff
 }: Props) {
   const [value, setValue] = useState(url)
   const [focused, setFocused] = useState(false)
@@ -41,7 +53,8 @@ export function AddressBar({
   // nothing the first time, before any address has been entered.
   const listVisible = listOpen && history.length > 0
   useEffect(() => {
-    window.oldweb.setChromeOnTop(listVisible)
+    requestChromeTop('addrlist', listVisible)
+    return () => requestChromeTop('addrlist', false)
   }, [listVisible])
 
   // Close the dropdown on an outside click.
@@ -79,7 +92,18 @@ export function AddressBar({
         <span className="ow-loc-bookmarks__icon" aria-hidden />
         Bookmarks
       </button>
-      <span className="ow-loc-proxy" aria-hidden />
+      {/* Opera: the MIDDLE status icon toggles page images on/off. */}
+      {onToggleImages ? (
+        <button
+          type="button"
+          className={'ow-loc-proxy' + (imagesOff ? ' is-off' : '')}
+          title={imagesOff ? 'Show images' : 'Hide images'}
+          aria-label="Toggle images"
+          onClick={onToggleImages}
+        />
+      ) : (
+        <span className="ow-loc-proxy" aria-hidden />
+      )}
       <span className="ow-address-label">{label}</span>
 
       {/* Combobox: the address field plus a recent-addresses dropdown. */}
@@ -146,11 +170,13 @@ export function AddressBar({
         <span className="ow-go__icon" aria-hidden />
         {goLabel}
       </button>
-      <button type="button" className="ow-loc-related" title="What's Related">
+      <button type="button" className="ow-loc-related" title="What's Related" onClick={onRelated}>
         <span className="ow-loc-related__icon" aria-hidden />
         What's Related
       </button>
-      <span className="ow-loc-links">Links »</span>
+      <span className="ow-loc-links" title="Links" onClick={onLinks ?? onBookmarks}>
+        Links »
+      </span>
     </form>
   )
 }

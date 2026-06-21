@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { engineById, SEARCH_ENGINES } from '../shell/engines'
+import { requestChromeTop } from '../shell/chromeTop'
 
 /**
  * The toolbar search box (Firefox 1.0 / early-2000s style): a clickable engine
@@ -24,7 +25,7 @@ export function SearchBox({
   // Float the chrome above the page while the picker is open, so it isn't
   // clipped by the page view; close on an outside click.
   useEffect(() => {
-    window.oldweb.setChromeOnTop(open)
+    requestChromeTop('search', open)
     if (!open) return
     const onDown = (e: MouseEvent): void => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)

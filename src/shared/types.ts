@@ -54,14 +54,24 @@ export interface OldwebAPI {
   setContentInsets(insets: ContentInsets): Promise<void>
   /** Toggle the optional CRT "retro content" overlay for a tab. */
   setRetroContent(id: number, enabled: boolean): Promise<void>
+  /** "Time Warp Modem": throttle the network to a period speed (full/isdn/56k/28.8k). */
+  setNetworkSpeed(profile: string): Promise<void>
   /** Open the print dialog for a tab's page. */
   print(id: number): Promise<void>
+  /** Save a tab's page to a local HTML file (Opera "Save to file"). */
+  savePage(id: number): Promise<void>
+  /** Toggle image loading/display for a tab (Opera image button). */
+  setImagesEnabled(id: number, enabled: boolean): Promise<void>
   /** Raise the chrome UI above the page (so DOM menus/popups are visible). */
   setChromeOnTop(onTop: boolean): Promise<void>
   /** Swap the macOS dock / app icon to match the active theme. */
   setAppIcon(themeId: string): Promise<void>
   /** Open a URL in the user's default system browser. */
   openExternal(url: string): Promise<void>
+  /** Show a native file-open dialog; resolves to the chosen path or null. */
+  openLocalFile(): Promise<string | null>
+  /** Quit the whole application. */
+  quitApp(): Promise<void>
   /** From the startup splash window: dismiss it and reveal the main window. */
   splashDone(): void
   /** Ask the main process to show a theme's boot splash window on switch. */

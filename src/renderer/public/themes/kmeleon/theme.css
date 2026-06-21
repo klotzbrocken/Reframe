@@ -1,0 +1,408 @@
+/*
+ * K-Meleon 0.x — the lightweight Gecko browser, Windows 2000 "Classic" era (2000).
+ * The toolbar icons, the chameleon program icon, the throbber globe, the links
+ * page icon and both watermark background tiles are native-pixel crops from a
+ * period K-Meleon screenshot (rendered with image-rendering:pixelated), so the
+ * chrome looks exactly like the original rather than IE5 stand-ins.
+ */
+
+:root {
+  --w98-raised: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+  --w98-pressed: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+  --w98-sunken: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf,
+    inset 2px 2px #0a0a0a;
+  --w98-window: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px #808080,
+    inset 2px 2px #fff;
+  --w98-status: inset -1px -1px #dfdfdf, inset 1px 1px #808080;
+}
+
+body {
+  font-family: var(--km-font);
+  font-size: 11px;
+  color: #000;
+  background: #d4d0c8;
+}
+
+.ow-root {
+  background: #d4d0c8;
+  box-shadow: var(--w98-window);
+  padding: 5px;
+}
+
+/* --- title bar ----------------------------------------------------------- */
+.ow-titlebar {
+  background: linear-gradient(90deg, var(--km-titlebar) 0%, #1084d0 100%);
+  padding: 2px 2px 2px 3px;
+  height: 22px;
+  gap: 3px;
+}
+.ow-titlebar__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  /* the real K-Meleon logo (the site favicon from kmeleon.sourceforge.net) */
+  background: url('assets/kmeleon_logo.png') center / contain no-repeat;
+}
+.ow-titlebar__text {
+  color: #fff;
+  font-weight: 700;
+  padding: 0 4px;
+}
+.ow-titlebar__controls { gap: 2px; }
+.ow-winbtn {
+  width: 16px;
+  height: 14px;
+  min-width: 16px;
+  padding: 0;
+  background: #d4d0c8;
+  border: 1px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  background-repeat: no-repeat;
+}
+.ow-winbtn:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+.ow-winbtn[data-control='minimize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 3px left 4px;
+}
+.ow-winbtn[data-control='maximize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='close'] {
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 3px left 4px;
+}
+
+/* --- menu bar ------------------------------------------------------------ */
+.ow-menubar {
+  background: #d4d0c8;
+  padding: 2px 4px;
+  gap: 0;
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
+}
+.ow-menu__label {
+  padding: 2px 8px;
+  line-height: 16px;
+  font-size: 12px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--km-highlight);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #d4d0c8;
+  padding: 2px;
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+  font-size: 11px;
+}
+.ow-menu__heading {
+  padding: 4px 22px 2px 8px;
+  font-weight: 700;
+  color: #555;
+}
+.ow-menu__item { padding: 3px 22px 3px 8px; }
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--km-highlight);
+  color: #fff;
+}
+.ow-menu__item.is-disabled { color: #808080; }
+.ow-menu__sep {
+  height: 0;
+  margin: 3px 2px;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+}
+.ow-menu__check { width: 16px; }
+
+/* --- nav toolbar (Win2000, watermark tile background, real colour icons) -- */
+.ow-toolbar {
+  background: #d4d0c8 url('assets/bgtile.png') repeat;
+  image-rendering: pixelated;
+  height: 28px;
+  padding: 1px 5px;
+  gap: 0;
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
+}
+.ow-btn {
+  flex-direction: row;
+  justify-content: center;
+  min-width: 0;
+  width: auto;
+  height: 24px;
+  padding: 1px 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: #000;
+}
+/* flat → raised on hover → sunken on press (Win2000 toolbar button) */
+.ow-btn:hover:not(:disabled) {
+  border-color: #fff #404040 #404040 #fff;
+}
+.ow-btn:active:not(:disabled) {
+  border-color: #404040 #fff #fff #404040;
+}
+.ow-btn__label { display: none; }
+.ow-btn__icon {
+  width: 26px;
+  height: 20px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto; /* native pixel size, never scaled */
+  image-rendering: pixelated;
+}
+/* The original colour icons (native crops); they stay colour at all times,
+   only dimming via opacity when the button is disabled. */
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/back.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/fwd.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/reload.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn[data-action='search'] .ow-btn__icon {
+  background-image: url('assets/search.png');
+}
+.ow-btn[data-action='favorites'] .ow-btn__icon {
+  background-image: url('assets/fav.png');
+}
+.ow-btn[data-action='print'] .ow-btn__icon {
+  background-image: url('assets/print.png');
+}
+.ow-btn:disabled .ow-btn__icon {
+  opacity: 0.4;
+}
+
+/* raised vertical separator between toolbar groups (Win2000) */
+.ow-toolbar-sep {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 2px;
+  height: 20px;
+  margin: 0 4px;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+}
+
+/* throbber — the REAL K-Meleon animated throbber, extracted frame-by-frame from
+   the AVI resource inside kmeleon02.exe (14 frames of a rotating cylinder,
+   47x25 each, laid out as a horizontal sprite strip). Static frame 0 at rest;
+   steps(14) cycles the strip while a page loads. */
+.ow-toolbar .ow-throbber {
+  display: block;
+  width: 47px;
+  height: 25px;
+  margin-left: 5px;
+  background: url('assets/throbber_anim.png') 0 0 / 658px 25px no-repeat;
+}
+.ow-toolbar .ow-throbber.is-active {
+  animation: km-throb 0.9s steps(14) infinite;
+}
+@keyframes km-throb {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -658px 0;
+  }
+}
+
+/* --- address bar --------------------------------------------------------- */
+.ow-addressbar {
+  background: #d4d0c8;
+  padding: 2px 6px 3px 6px;
+  gap: 5px;
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
+}
+.ow-address-label {
+  color: #404040;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.ow-address-icon { display: none; }
+.ow-address-combo {
+  height: 21px;
+  background: #fff;
+  box-shadow: var(--w98-sunken);
+}
+.ow-address-input {
+  padding: 2px 4px;
+  font-size: 11px;
+  background: transparent;
+}
+.ow-address-input:focus { outline: none; }
+.ow-address-dropdown {
+  display: inline-block;
+  width: 18px;
+  margin: 1px;
+  padding: 0;
+  background: url('../ie5/assets/dropdown.png') center / cover no-repeat;
+  border: 0;
+  box-shadow: none;
+}
+.ow-address-dropdown:active { transform: translate(1px,1px); }
+.ow-address-list {
+  background: #fff;
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+  font-size: 11px;
+}
+.ow-address-item { padding: 2px 6px; }
+.ow-address-item:hover {
+  background: var(--km-highlight);
+  color: #fff;
+}
+.ow-go {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  min-width: 0;
+  padding: 0 8px;
+  font-size: 11px;
+  background: transparent;
+  border: 1px solid transparent;
+}
+.ow-go:hover {
+  border-color: #fff #808080 #808080 #fff;
+}
+.ow-go:active {
+  border-color: #808080 #fff #fff #808080;
+}
+
+/* --- links bar (watermark tile bg, "Links" label + page-icon chips) ------ */
+.ow-personalbar {
+  background: #d4d0c8 url('assets/bgtile_links.png') repeat;
+  image-rendering: pixelated;
+  height: 22px;
+  padding: 2px 6px 2px 4px;
+  gap: 1px;
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
+}
+/* "Links" label at the start of the links bar (K-Meleon shows it inline) */
+.ow-personalbar::before {
+  content: 'Links';
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 16px;
+  color: #000;
+  font-size: 11px;
+  padding: 0 7px 0 4px;
+  white-space: nowrap;
+  border-right: 1px solid #808080;
+  box-shadow: 1px 0 0 #fff;
+  margin-right: 5px;
+}
+.ow-pbar-btn {
+  height: 18px;
+  padding: 1px 6px 1px 3px;
+  gap: 4px;
+  font-size: 11px;
+  color: #000;
+  background: transparent;
+  border: 1px solid transparent;
+}
+.ow-pbar-btn:hover {
+  border-color: #fff #404040 #404040 #fff;
+}
+.ow-pbar-btn:active {
+  border-color: #404040 #fff #fff #404040;
+}
+/* the real K-Meleon links-bar page/document icon on each chip */
+.ow-pbar-btn__icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  background: url('assets/link_page.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+/* --- status bar ---------------------------------------------------------- */
+.ow-statusbar {
+  background: #d4d0c8;
+  padding: 2px 8px;
+  border-top: 1px solid #808080;
+  box-shadow: inset 0 1px 0 #fff;
+  font-size: 11px;
+  gap: 0;
+}
+.ow-status-text {
+  box-shadow: var(--w98-status);
+  padding: 1px 4px;
+}
+
+/* --- bookmarks/history dropdown panel ------------------------------------ */
+.ow-panel {
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+  background: #fff;
+  font-size: 11px;
+}
+.ow-panel__item:hover, .ow-panel__add:hover {
+  background: var(--km-highlight);
+  color: #fff;
+}
+
+/* --- settings dialog (inherit Win98 style) ------------------------------- */
+.ow-dialog {
+  font-family: var(--km-font);
+  font-size: 12px;
+  background: #d4d0c8;
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+}
+.ow-dialog__title {
+  background: linear-gradient(90deg, var(--km-titlebar), #1084d0);
+}
+.ow-dialog__buttons {
+  background: #d4d0c8;
+}
+.ow-dialog__buttons button {
+  background: #d4d0c8;
+  border: 1px solid;
+  border-color: #fff #808080 #808080 #fff;
+  box-shadow: var(--w98-raised);
+}
+.ow-dialog__buttons button:active {
+  box-shadow: var(--w98-pressed);
+}
+
+/* context menu */
+.ow-ctxmenu {
+  background: #d4d0c8;
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+  font-size: 11px;
+}
+.ow-ctxmenu__item:hover {
+  background: var(--km-highlight);
+  color: #fff;
+}

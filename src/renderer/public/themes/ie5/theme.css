@@ -134,6 +134,8 @@ body {
 .ow-menu__label {
   padding: 2px 7px;
   line-height: 15px;
+  /* same size as the toolbar button captions (.ow-btn__label) */
+  font-size: 11px;
 }
 .ow-menu.is-open .ow-menu__label,
 .ow-menu__label:hover {
@@ -280,6 +282,13 @@ body {
 .ow-btn__label {
   font-size: 11px;
 }
+/* Menu-bar text and toolbar captions must render at exactly the same size. */
+.ow-menubar .ow-menu__label,
+.ow-toolbar .ow-btn__label {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 11px;
+  line-height: 14px;
+}
 
 /* toolbar group separator — etched vertical line (Win98) */
 .ow-toolbar-sep {
@@ -334,7 +343,7 @@ body {
   display: none;
 }
 .ow-address-combo {
-  height: 21px;
+  height: 23px;
   background: #fff;
   box-shadow: var(--w98-sunken);
 }
@@ -397,20 +406,39 @@ body {
   border-color: var(--ow-face-darker) var(--ow-face-light) var(--ow-face-light)
     var(--ow-face-darker);
 }
-/* green "Go" arrow icon */
+/* IE5 "Go" curved arrow — the original icon, cropped & made transparent */
 .ow-go__icon {
   display: inline-block;
-  width: 14px;
-  height: 14px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M4 8a4 4 0 1 1 1.2 2.9' fill='none' stroke='%231b7a2e' stroke-width='2'/%3E%3Cpath d='M3.2 11.4 4.5 7.7 8 9.1z' fill='%231b7a2e'/%3E%3C/svg%3E")
-    center / contain no-repeat;
+  width: 16px;
+  height: 16px;
+  background: url('assets/go.png') center / contain no-repeat;
 }
-/* "Links »" at the right of the location bar */
+/* "Links »" at the right of the location bar — opens the Favorites panel */
 .ow-loc-links {
   display: inline-block;
   color: #404040;
   padding: 0 6px;
   white-space: nowrap;
+  cursor: default;
+}
+.ow-loc-links:hover {
+  text-decoration: underline;
+}
+/* Favorites / Links / History dropdown — gray Win98 menu look (like IE menus) */
+.ow-panel {
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  color: #000;
+}
+.ow-panel__add {
+  border-bottom: 1px solid #808080;
+}
+.ow-panel__item:hover,
+.ow-panel__add:hover {
+  background: #4160c9;
+  color: #fff;
 }
 
 /* --- tabs (Win98 tab strip) --------------------------------------------- */
@@ -480,10 +508,13 @@ body {
 }
 .ow-menubar .ow-throbber {
   display: block;
-  width: 38px;
-  height: 26px;
-  margin: -3px 0 -3px 8px;
-  background: #000 url('assets/throbber_idle.png') center / cover no-repeat;
+  /* Match IE5: a WIDE (landscape) black box; the flag logo fills the HEIGHT
+     (contain) and is centred, leaving black margin on the LEFT/RIGHT only. */
+  width: 35px;
+  height: 24px;
+  /* negative right margin pulls it flush to the right edge, like IE5 */
+  margin: -1px -2px -1px 8px;
+  background: #000 url('assets/throbber_idle.png') center / contain no-repeat;
 }
 .ow-menubar .ow-throbber.is-active {
   background-image: url('assets/throbber.gif');
