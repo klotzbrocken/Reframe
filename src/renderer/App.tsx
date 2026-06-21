@@ -8,12 +8,14 @@ import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
 import { SearchBox } from './components/SearchBox'
 import { HotListPanel, type HotListEntry } from './components/HotListPanel'
 import { Clock } from './components/Clock'
+import { requestChromeTop } from './shell/chromeTop'
 import { SettingsDialog, type Settings } from './components/SettingsDialog'
 import { StatusBar } from './components/StatusBar'
 import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
 import { TitleBar } from './components/TitleBar'
 import { WhatsNewDialog, WHATS_NEW_VERSION } from './components/WhatsNewDialog'
+import { UrlDialog } from './components/UrlDialog'
 import { DEFAULT_ENGINE_ID } from './shell/engines'
 import { useShell } from './shell/useShell'
 import { stripWaybackDisplay, unwrapWayback, waybackDisplay } from './shell/wayback'
@@ -26,6 +28,14 @@ import {
   type ThemeSummary,
   type ToolbarItem
 } from './theme/types'
+
+// "Time Warp Modem" speed choices shown in the Help menu (Help → Time Warp Modem).
+const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string }[] = [
+  { id: 'full', label: 'Broadband (today)' },
+  { id: 'isdn', label: 'ISDN — 64 kbit/s' },
+  { id: '56k', label: '56k modem' },
+  { id: '28.8k', label: '28.8k modem' }
+]
 
 export function App() {
   const loadSettings = (): Settings => {
@@ -101,7 +111,8 @@ export function App() {
     if (u && /^https?:/i.test(u) && u !== lastUrlRef.current) {
       lastUrlRef.current = u
       const title = at?.title || u
-      setHistory((h) => [{ title, url: u }, ...h.filter((x) => x.url !== u)].slice(0, 50))
+      const last = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      setHistory((h) => [{ title, url: u, last }, ...h.filter((x) => x.url !== u)].slice(0, 50))
     }
   }, [state.tabs, state.activeId])
 
@@ -138,13 +149,23 @@ export function App() {
 
   // Opera HotList side panel — docked open by default.
   const [hotlistOpen, setHotlistOpen] = useState(true)
+  // Opera image button: hide/show page images on the active tab.
+  const [imagesOff, setImagesOff] = useState(false)
+  // Opera "Direct URL input": a small modal to type a URL and open it.
+  const [urlDialogOpen, setUrlDialogOpen] = useState(false)
 
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
-    window.oldweb.setChromeOnTop(
-      panel !== null || dialogOpen || whatsNewOpen || editBookmark !== null || barMenuOpen
+    requestChromeTop(
+      'overlays',
+      panel !== null ||
+        dialogOpen ||
+        whatsNewOpen ||
+        editBookmark !== null ||
+        barMenuOpen ||
+        urlDialogOpen
     )
-  }, [panel, dialogOpen, whatsNewOpen, editBookmark, barMenuOpen])
+  }, [panel, dialogOpen, whatsNewOpen, editBookmark, barMenuOpen, urlDialogOpen])
 
   const openPanel = (kind: 'bookmarks' | 'history', selector: string): void => {
     const r = document.querySelector(selector)?.getBoundingClientRect()
@@ -190,6 +211,15 @@ export function App() {
     if (settings.themeSplash !== false) window.oldweb.showThemeSplash(id)
     setThemeId(id)
   }
+  const setConnectionSpeed = (id: Settings['connectionSpeed']): void => {
+    saveSettings({ ...settings, connectionSpeed: id })
+    window.oldweb.setNetworkSpeed(id ?? 'full')
+  }
+  // Apply the saved "Time Warp Modem" speed on startup (and whenever it changes),
+  // so it covers the initial tab and survives restarts.
+  useEffect(() => {
+    window.oldweb.setNetworkSpeed(settings.connectionSpeed || 'full')
+  }, [settings.connectionSpeed])
   useEffect(() => {
     actions.setOldWebDate(waybackDate)
   }, [waybackDate, actions])
@@ -264,12 +294,29 @@ export function App() {
     shop: { label: labels.shop, onClick: () => actions.navigate('https://www.amazon.com') },
     // Opera 3.x toolbar actions (period MDI features map to the closest action).
     new: { label: labels.new, onClick: actions.newTab },
-    open: { label: labels.open, onClick: () => {} },
-    save: { label: labels.save, onClick: actions.print },
-    copy: { label: labels.copy, onClick: () => {} },
+    open: {
+      label: labels.open,
+      onClick: async () => {
+        const path = await window.oldweb.openLocalFile()
+        if (path) actions.navigate('file://' + path)
+      }
+    },
+    save: {
+      label: labels.save,
+      onClick: () => {
+        if (activeTab) window.oldweb.savePage(activeTab.id)
+      }
+    },
+    copy: {
+      label: labels.copy,
+      onClick: () => {
+        const url = activeTab?.url ?? ''
+        if (url) navigator.clipboard.writeText(url).catch(() => {})
+      }
+    },
     url: {
       label: labels.url,
-      onClick: () => (document.querySelector('.ow-address-input') as HTMLInputElement | null)?.focus()
+      onClick: () => setUrlDialogOpen(true)
     },
     hotlist: {
       label: labels.hotlist,
@@ -278,8 +325,14 @@ export function App() {
           ? setHotlistOpen((o) => !o)
           : openPanel('bookmarks', '.ow-btn[data-action="hotlist"]')
     },
-    tile: { label: labels.tile, onClick: () => {} },
-    cascade: { label: labels.cascade, onClick: () => {} }
+    tile: { label: labels.tile, onClick: () => {}, disabled: true },
+    cascade: { label: labels.cascade, onClick: () => {}, disabled: true },
+    // Internet Explorer 1.0 toolbar actions
+    favadd: { label: labels.favadd, onClick: addBookmark },
+    fontup: { label: labels.fontup, onClick: () => {} },
+    fontdown: { label: labels.fontdown, onClick: () => {} },
+    cut: { label: labels.cut, onClick: () => {} },
+    paste: { label: labels.paste, onClick: () => {} }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
   const menus = manifest?.menus ?? DEFAULT_MENUS
@@ -331,7 +384,17 @@ export function App() {
           { type: 'sep' },
           { type: 'item', label: 'Old Web (Wayback)', checked: oldWeb, onSelect: actions.toggleOldWeb },
           { type: 'sep' },
-          { type: 'item', label: 'About Oldweb', disabled: true }
+          { type: 'title', label: 'Time Warp Modem' },
+          ...SPEED_OPTS.map(
+            (s): MenuItem => ({
+              type: 'item',
+              label: s.label,
+              checked: (settings.connectionSpeed || 'full') === s.id,
+              onSelect: () => setConnectionSpeed(s.id)
+            })
+          ),
+          { type: 'sep' },
+          { type: 'item', label: 'About Reframe', onSelect: () => setDialogOpen(true) }
         ]
       default:
         return [{ type: 'item', label: '(empty)', disabled: true }]
@@ -350,12 +413,23 @@ export function App() {
     />
   )
 
+  // Injected CSS is dropped on navigation; re-hide images when still toggled off.
+  useEffect(() => {
+    if (imagesOff && activeTab) window.oldweb.setImagesEnabled(activeTab.id, false)
+  }, [activeTab?.url, activeTab?.id, imagesOff])
+
   const titleText = (activeTab?.title ? `${activeTab.title} - ` : '') + 'Reframe'
 
   // Firefox-era layout: the address field + search box sit on the nav-button
   // row itself, and the throbber lives in the menu bar (not the toolbar).
   const unified = layout.unifiedToolbar === true
   const addressAtBottom = layout.addressPosition === 'bottom'
+  const toggleImages = (): void => {
+    if (!activeTab) return
+    const next = !imagesOff
+    setImagesOff(next)
+    window.oldweb.setImagesEnabled(activeTab.id, !next)
+  }
   const addressBarEl = (
     <AddressBar
       url={waybackDisplay(activeTab?.url ?? '', waybackDate.slice(0, 4))}
@@ -365,8 +439,15 @@ export function App() {
       favicon={layout.showFavicon ? activeTab?.favicon ?? null : null}
       dragUrl={unwrapWayback(activeTab?.url ?? '')}
       dragTitle={activeTab?.title}
+      imagesOff={imagesOff}
+      onToggleImages={addressAtBottom ? toggleImages : undefined}
       onSubmit={submitAddress}
       onBookmarks={() => openPanel('bookmarks', '.ow-loc-bookmarks')}
+      onLinks={() => openPanel('bookmarks', '.ow-loc-links')}
+      onRelated={() => {
+        const u = unwrapWayback(activeTab?.url ?? '')
+        if (u) actions.navigate('https://www.google.com/search?q=related:' + encodeURIComponent(u))
+      }}
     />
   )
   const barItems: PersonalBarItem[] = [
@@ -380,11 +461,37 @@ export function App() {
       icon: 'doc'
     }))
   ]
-  // Entries for the Opera HotList tree/list (real bookmarks + personal bar).
+  // Entries for the Opera HotList tree/list — bookmarks with last-visited dates + history folder.
+  const historyMap = new Map(history.map((h) => [h.url, h.last]))
   const hotlistEntries: HotListEntry[] = [
-    ...bookmarks.map((b) => ({ title: b.title, url: b.url })),
-    ...(manifest?.personalBar ?? []).map((p) => ({ title: p.label, url: p.url, folder: true })),
-    ...barBookmarks.map((b) => ({ title: b.label, url: b.url }))
+    ...bookmarks.map((b) => ({ title: b.title, url: b.url, last: historyMap.get(b.url) })),
+    ...(manifest?.personalBar ?? []).map((p) => ({
+      title: p.label,
+      url: p.url,
+      last: historyMap.get(p.url ?? '')
+    })),
+    ...(barBookmarks.length > 0
+      ? [
+          {
+            title: 'Personal Bar',
+            folder: true,
+            children: barBookmarks.map((b) => ({
+              title: b.label,
+              url: b.url,
+              last: historyMap.get(b.url)
+            }))
+          }
+        ]
+      : []),
+    ...(history.length > 0
+      ? [
+          {
+            title: 'History',
+            folder: true,
+            children: history.slice(0, 15).map((h) => ({ title: h.title, url: h.url, last: h.last }))
+          }
+        ]
+      : [])
   ]
   const searchBoxEl = (
     <SearchBox
@@ -395,8 +502,22 @@ export function App() {
   )
 
   return (
-    <div className="ow-root">
-      <TitleBar title={titleText} maximized={state.maximized} />
+    <div
+      className="ow-root"
+      data-menu-style={settings.menuStyle || 'win98'}
+      data-theme={themeId}
+      data-menu-size={settings.menuFontSize || 'normal'}
+      data-label-size={settings.labelFontSize || 'normal'}
+    >
+      <TitleBar
+        title={titleText}
+        maximized={state.maximized}
+        onClose={() =>
+          settings.closeAction === 'minimize'
+            ? window.oldweb.minimizeWindow()
+            : window.oldweb.quitApp()
+        }
+      />
 
       {layout.showMenuBar !== false && (
         <MenuBar model={menuModel} right={<Throbber active={loading} />} />
@@ -501,6 +622,10 @@ export function App() {
           onClose={() => setWhatsNewOpen(false)}
           onOpenExternal={(u) => window.oldweb.openExternal(u)}
         />
+      )}
+
+      {urlDialogOpen && (
+        <UrlDialog onOpen={(u) => submitAddress(u)} onClose={() => setUrlDialogOpen(false)} />
       )}
 
       {editBookmark && (

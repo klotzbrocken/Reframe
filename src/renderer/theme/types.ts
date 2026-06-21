@@ -29,6 +29,12 @@ export type ToolbarItem =
   | 'hotlist'
   | 'tile'
   | 'cascade'
+  // Internet Explorer 1.0 toolbar set
+  | 'favadd'
+  | 'fontup'
+  | 'fontdown'
+  | 'cut'
+  | 'paste'
   | '|'
 
 export interface ThemeManifest {
@@ -98,6 +104,11 @@ export interface ThemeManifest {
     hotlist?: string
     tile?: string
     cascade?: string
+    favadd?: string
+    fontup?: string
+    fontdown?: string
+    cut?: string
+    paste?: string
   }
   /** Event name -> sound file (relative to the theme's sounds/ dir). */
   sounds?: Record<string, string>
@@ -130,7 +141,12 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
   url: 'URL',
   hotlist: 'Hot List',
   tile: 'Tile',
-  cascade: 'Cascade'
+  cascade: 'Cascade',
+  favadd: 'Add To Favorites',
+  fontup: 'Use Larger Font',
+  fontdown: 'Use Smaller Font',
+  cut: 'Cut',
+  paste: 'Paste'
 }
 
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']
