@@ -14,10 +14,15 @@ const api: OldwebAPI = {
     ipcRenderer.invoke('shell:setContentInsets', insets),
   setRetroContent: (id, enabled) =>
     ipcRenderer.invoke('shell:setRetroContent', id, enabled),
+  setNetworkSpeed: (profile) => ipcRenderer.invoke('shell:setNetworkSpeed', profile),
   print: (id) => ipcRenderer.invoke('shell:print', id),
+  savePage: (id) => ipcRenderer.invoke('shell:savePage', id),
+  setImagesEnabled: (id, enabled) => ipcRenderer.invoke('shell:setImagesEnabled', id, enabled),
   setChromeOnTop: (onTop) => ipcRenderer.invoke('shell:setChromeOnTop', onTop),
   setAppIcon: (themeId) => ipcRenderer.invoke('app:setIcon', themeId),
   openExternal: (url) => ipcRenderer.invoke('app:openExternal', url),
+  openLocalFile: () => ipcRenderer.invoke('app:openFile'),
+  quitApp: () => ipcRenderer.invoke('app:quit'),
   splashDone: () => ipcRenderer.send('splash:done'),
   showThemeSplash: (themeId) => ipcRenderer.send('splash:theme', themeId),
   onMenuCommand: (handler) => {

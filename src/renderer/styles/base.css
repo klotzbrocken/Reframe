@@ -378,9 +378,9 @@ body,
   justify-content: center;
 }
 .ow-dialog {
-  width: 470px;
-  max-width: 92vw;
-  max-height: 88vh;
+  width: 660px;
+  max-width: 94vw;
+  max-height: 92vh;
   overflow-y: auto;
   background: #f0f0f0;
   color: #111;
@@ -390,10 +390,45 @@ body,
   font-size: 13px;
 }
 .ow-dialog__title {
-  padding: 7px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px 7px 14px;
   font-weight: bold;
   color: #fff;
   background: linear-gradient(90deg, #000080, #1084d0);
+}
+.ow-dialog__close {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 20px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  color: #fff;
+  cursor: pointer;
+  background: #c5402c;
+  border: 1px solid #e89488;
+  border-radius: 3px;
+}
+.ow-dialog__close:hover {
+  background: #db4a33;
+}
+.ow-dialog__close:active {
+  background: #a8341f;
+}
+/* two-column field grid so everything fits without scrolling */
+.ow-dialog__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+}
+.ow-field--wide {
+  grid-column: 1 / -1;
 }
 .ow-dialog__body {
   padding: 14px;
@@ -494,4 +529,164 @@ body,
   font: inherit;
   padding: 4px 16px;
   cursor: pointer;
+}
+
+/* ======================================================================== *
+ * Size adjustment (Settings). Uses `zoom` so it scales RELATIVE to each theme
+ * (Normal = the theme's own default, then proportionally larger). Menu size
+ * scales the menu-bar labels + the open dropdown; label size scales whole
+ * toolbar buttons (icon + caption), the bookmark bar and the tabs — so it has
+ * a visible effect even in icon-only themes.
+ * ======================================================================== */
+.ow-root[data-menu-size='medium'] .ow-menu__label,
+.ow-root[data-menu-size='medium'] .ow-menu__dropdown {
+  zoom: 1.12;
+}
+.ow-root[data-menu-size='large'] .ow-menu__label,
+.ow-root[data-menu-size='large'] .ow-menu__dropdown {
+  zoom: 1.28;
+}
+.ow-root[data-menu-size='xlarge'] .ow-menu__label,
+.ow-root[data-menu-size='xlarge'] .ow-menu__dropdown {
+  zoom: 1.45;
+}
+.ow-root[data-label-size='medium'] .ow-btn,
+.ow-root[data-label-size='medium'] .ow-pbar-btn,
+.ow-root[data-label-size='medium'] .ow-tab__title {
+  zoom: 1.12;
+}
+.ow-root[data-label-size='large'] .ow-btn,
+.ow-root[data-label-size='large'] .ow-pbar-btn,
+.ow-root[data-label-size='large'] .ow-tab__title {
+  zoom: 1.28;
+}
+.ow-root[data-label-size='xlarge'] .ow-btn,
+.ow-root[data-label-size='xlarge'] .ow-pbar-btn,
+.ow-root[data-label-size='xlarge'] .ow-tab__title {
+  zoom: 1.45;
+}
+
+/* ======================================================================== *
+ * Title-bar style switch (the bar with the min/max/close buttons).
+ * Internet Explorer's title bar is the shared template for all Windows
+ * themes (Opera, Firefox, Netscape, K-Meleon); Safari keeps its own Aqua bar.
+ *   win98 — classic Windows 95/98: solid navy gradient + square 3D buttons
+ *   luna  — Windows XP Luna: glossy blue gradient + rounded buttons, red close
+ * ======================================================================== */
+
+/* ---- Windows 95/98 (IE template) -------------------------------------- */
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-titlebar {
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%) !important;
+  height: 22px !important;
+  padding: 2px 3px 2px 4px !important;
+  border-radius: 0 !important;
+}
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-titlebar__text {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-family: Tahoma, 'Segoe UI', sans-serif !important;
+  text-shadow: none !important;
+}
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn {
+  width: 16px !important;
+  height: 14px !important;
+  min-width: 16px !important;
+  margin: 0 0 0 1px !important;
+  background-color: #c0c0c0 !important;
+  background-repeat: no-repeat !important;
+  border: 1px solid !important;
+  border-color: #fff #808080 #808080 #fff !important;
+  border-radius: 0 !important;
+}
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn:active {
+  border-color: #808080 #fff #fff #808080 !important;
+}
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='minimize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E") !important;
+  background-position: bottom 3px left 4px !important;
+}
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='maximize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E") !important;
+  background-position: top 2px left 3px !important;
+}
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E") !important;
+  background-position: top 2px left 3px !important;
+}
+.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='close'] {
+  margin-left: 2px !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E") !important;
+  background-position: top 3px left 4px !important;
+}
+
+/* ---- Windows XP Luna --------------------------------------------------- */
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-titlebar {
+  /* XP Luna Blue — the glossy active caption: bright top edge, deep blue body,
+     a lighter sheen band near the bottom. cornerRadius 0 (no rounding). */
+  background: linear-gradient(
+    180deg,
+    #4a93f0 0%,
+    #1e72e6 6%,
+    #0b54d8 22%,
+    #0b54d8 50%,
+    #1361e8 55%,
+    #2e84f2 90%,
+    #0e4fc4 100%
+  ) !important;
+  height: 29px !important;
+  padding: 2px 4px 3px 8px !important;
+  border-radius: 0 !important;
+  /* bright top bevel highlight + a deep bottom edge line */
+  box-shadow:
+    inset 0 1px 0 #8fc0ff,
+    inset 0 -1px 0 #0a246a !important;
+  border-top: 1px solid #0c3b94 !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-titlebar__text {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-family: Tahoma, 'Segoe UI', sans-serif !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 40, 0.6) !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn {
+  width: 22px !important;
+  height: 21px !important;
+  min-width: 22px !important;
+  margin: 0 0 0 2px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  border: 1px solid #0c3b94 !important;
+  border-radius: 3px !important;
+  background-color: #2a72e6 !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55) !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn:active {
+  background-color: #173f9c !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='minimize'] {
+  background-image:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='3' y='8' width='6' height='2' fill='%23fff'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='maximize'] {
+  background-image:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='2' y='2' width='8' height='8' fill='none' stroke='%23fff' stroke-width='1.4'/%3E%3Crect x='2' y='2' width='8' height='2.6' fill='%23fff'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='restore'] {
+  background-image:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='4' y='2' width='6' height='6' fill='none' stroke='%23fff' stroke-width='1.3'/%3E%3Crect x='2' y='4' width='6' height='6' fill='%232a5fce' stroke='%23fff' stroke-width='1.3'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='close'] {
+  margin-left: 3px !important;
+  border-color: #a52a18 !important;
+  background-color: #e0512f !important;
+  background-image:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath stroke='%23fff' stroke-width='1.9' d='M3 3l6 6M9 3l-6 6'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 45%, rgba(80, 0, 0, 0.3)) !important;
+}
+.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='close']:active {
+  background-color: #c23e22 !important;
 }

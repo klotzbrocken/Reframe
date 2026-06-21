@@ -81,29 +81,33 @@ body {
   border-color: #e88 #802018 #802018 #e88;
 }
 
-/* --- menu bar (IE/Netscape-style, MDI doc icon at left, 10 menus) -------- */
+/* --- menu bar (Win98 gray, IE-style grip handle at left) ----------------- */
 .ow-menubar {
-  background: var(--op-menu);
-  height: 20px;
-  padding: 0 4px 0 24px;
+  background: #d4d0c8;
+  height: 22px;
+  align-items: center;
+  padding: 2px 4px 2px 11px;
   gap: 0;
   position: relative;
-  border-bottom: 1px solid var(--op-mid);
-  box-shadow: 0 1px 0 var(--op-light);
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #fff;
 }
+/* IE5 "grip" handle (raised vertical bar) at the far left of the menu bar */
 .ow-menubar::before {
   content: '';
   position: absolute;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 14px;
-  background: url('assets/mdi_doc.png') center / contain no-repeat;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: 4px;
+  background: #d4d0c8;
+  border: 1px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
 }
 .ow-menu__label {
-  padding: 3px 7px;
-  line-height: 13px;
+  padding: 3px 8px;
+  font-size: 12px;
+  line-height: 16px;
 }
 .ow-menu.is-open .ow-menu__label,
 .ow-menu__label:hover {
@@ -111,10 +115,10 @@ body {
   color: #fff;
 }
 .ow-menu__dropdown {
-  background: var(--op-menu);
+  background: #d4d0c8;
   padding: 2px;
   border: 2px solid;
-  border-color: var(--op-light) #404040 #404040 var(--op-light);
+  border-color: #fff #404040 #404040 #fff;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
   font-size: 11px;
 }
@@ -143,44 +147,41 @@ body {
 /* --- toolbar (icon-only 32×32 nav buttons; flat → raised → sunken) ------- */
 .ow-toolbar {
   background: var(--op-toolbar);
-  height: 40px;
-  padding: 0 5px;
-  gap: 1px;
+  height: 36px;
+  padding: 0 4px;
+  gap: 2px;
   border-bottom: 1px solid var(--op-mid);
 }
 .ow-btn {
   justify-content: center;
   align-items: center;
   min-width: 0;
-  width: 34px;
-  height: 34px;
-  padding: 0;
+  width: 30px;
+  height: 30px;
+  padding: 2px;
   background: transparent;
   border: 1px solid transparent;
   box-shadow: none;
 }
 .ow-btn:hover:not(:disabled) {
-  border-color: var(--op-light) var(--op-dark) var(--op-dark) var(--op-light);
+  background: rgba(255,255,255,0.45);
 }
 .ow-btn:active:not(:disabled) {
-  border-color: var(--op-dark) var(--op-light) var(--op-light) var(--op-dark);
-}
-.ow-btn:active:not(:disabled) .ow-btn__icon {
-  transform: translate(1px, 1px);
+  background: rgba(0,0,0,0.08);
 }
 .ow-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
 }
 /* icon-only — labels are tooltips (title) only */
 .ow-btn__label {
   display: none;
 }
 .ow-btn__icon {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 22px;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 32px 32px;
+  background-size: contain;
   image-rendering: pixelated;
 }
 .ow-btn[data-action='new'] .ow-btn__icon {
@@ -226,15 +227,9 @@ body {
   background-image: url('assets/nav_cascade.png');
 }
 
-/* group separators */
+/* group separators — Opera 3.6x used no visible separators between groups */
 .ow-toolbar-sep {
-  flex: 0 0 auto;
-  align-self: center;
-  width: 2px;
-  height: 28px;
-  margin: 0 3px;
-  border-left: 1px solid var(--op-dark);
-  border-right: 1px solid var(--op-light);
+  display: none;
 }
 .ow-toolbar__spacer {
   flex: 1 1 auto;
@@ -280,45 +275,71 @@ body {
   border-top: 1px solid var(--op-light);
 }
 .ow-bottombar .ow-addressbar {
-  height: 24px;
-  padding: 2px 4px;
+  height: 26px;
+  padding: 3px 4px;
   gap: 4px;
   background: transparent;
   border: none;
   position: relative;
 }
-/* three status icons at the far left (repurposed location-bar slots) */
+/* three status icons (repurposed location-bar slots):
+   left = page, MIDDLE = image toggle, right = window */
 .ow-bottombar .ow-loc-bookmarks {
   display: inline-block;
   width: 20px;
   height: 18px;
   padding: 0;
   font-size: 0;
-  background: url('assets/stat_img.png') center / contain no-repeat;
+  background: url('assets/stat_page.png') center / contain no-repeat;
   border: 0;
+  cursor: pointer;
 }
 .ow-bottombar .ow-loc-bookmarks__icon {
   display: none;
 }
+/* MIDDLE icon = the image on/off toggle */
 .ow-bottombar .ow-loc-proxy {
   display: inline-block;
   width: 20px;
   height: 18px;
-  background: url('assets/stat_win.png') center / contain no-repeat;
+  padding: 0;
+  border: 0;
+  background: url('assets/stat_img.png') center / contain no-repeat;
+  cursor: pointer;
+  position: relative;
+}
+/* images-off: pressed/sunken look + a bold red "no" slash over the icon */
+.ow-bottombar .ow-loc-proxy.is-off {
+  background-color: #cfcabb;
+  box-shadow:
+    inset 1px 1px 0 #7f7f7f,
+    inset -1px -1px 0 #fff;
+}
+.ow-bottombar .ow-loc-proxy.is-off::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  margin-top: -1.5px;
+  height: 3px;
+  background: #d8442c;
+  border-radius: 2px;
+  transform: rotate(-28deg);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 .ow-bottombar .ow-address-label {
   display: inline-block;
   width: 20px;
   height: 18px;
-  background: url('assets/stat_page.png') center / contain no-repeat;
+  background: url('assets/stat_win.png') center / contain no-repeat;
 }
 /* the URL field */
 .ow-bottombar .ow-address-combo {
   flex: 1 1 auto;
   height: 18px;
   background: var(--op-light);
-  border: 1px solid;
-  border-color: #7f7f7f var(--op-mid2) var(--op-mid2) #7f7f7f;
+  border: 1px solid #999;
 }
 .ow-bottombar .ow-address-input {
   padding: 0 4px;
@@ -343,9 +364,12 @@ body {
   content: '▾';
 }
 .ow-bottombar .ow-address-list {
+  /* address bar sits at the bottom, so the recent list must open upward */
+  top: auto;
+  bottom: 100%;
   background: #fff;
   border: 1px solid #5a5a5a;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 2px -2px 0 rgba(0, 0, 0, 0.3);
   font-size: 11px;
 }
 .ow-bottombar .ow-address-item {
@@ -370,8 +394,7 @@ body {
   line-height: 16px;
   text-align: center;
   background: var(--op-menu);
-  border: 1px solid;
-  border-color: #7f7f7f var(--op-mid2) var(--op-mid2) #7f7f7f;
+  border: 1px solid #999;
 }
 
 /* --- scrollbars (classic Win) ------------------------------------------- */
@@ -568,4 +591,37 @@ body {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+}
+/* [+]/[−] expander slot — fixed width keeps icon column aligned */
+.ow-hl-exp-slot {
+  flex: 0 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ow-hl-exp {
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+  color: #555;
+  font-family: monospace;
+  user-select: none;
+}
+.ow-hl-exp:hover {
+  color: #000;
+}
+/* List view row columns */
+.ow-hl-ltitle {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ow-hl-llast {
+  flex: 0 0 56px;
+  text-align: right;
+  color: #666;
+  font-size: 10px;
+  white-space: nowrap;
+  padding-right: 4px;
 }

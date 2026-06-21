@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { DEFAULT_ENGINE_ID, SEARCH_ENGINES } from '../shell/engines'
 
+export type FontSize = 'normal' | 'medium' | 'large' | 'xlarge'
+
 export interface Settings {
   home?: string
   defaultTheme?: string
@@ -8,6 +10,16 @@ export interface Settings {
   searchEngine?: string
   /** Show the period boot splash when switching themes (default true). */
   themeSplash?: boolean
+  /** Menu bar visual style across all themes. */
+  menuStyle?: 'win98' | 'luna'
+  /** Size scale for the top menus (File/Edit/…) and their dropdowns. */
+  menuFontSize?: FontSize
+  /** Size scale for toolbar buttons (icon + caption), bookmarks and tabs. */
+  labelFontSize?: FontSize
+  /** What the title-bar close button does. */
+  closeAction?: 'quit' | 'minimize'
+  /** "Time Warp Modem" simulated connection speed. */
+  connectionSpeed?: 'full' | 'isdn' | '56k' | '28.8k'
 }
 
 interface Props {
@@ -35,11 +47,25 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [year, setYear] = useState(settings.waybackYear || 0)
   const [engine, setEngine] = useState(settings.searchEngine || DEFAULT_ENGINE_ID)
   const [splash, setSplash] = useState(settings.themeSplash !== false)
+  const [menuStyle, setMenuStyle] = useState(settings.menuStyle || 'win98')
+  const [menuFontSize, setMenuFontSize] = useState(settings.menuFontSize || 'normal')
+  const [labelFontSize, setLabelFontSize] = useState(settings.labelFontSize || 'normal')
+  const [closeAction, setCloseAction] = useState(settings.closeAction || 'quit')
 
   return (
     <div className="ow-dialog-backdrop" onMouseDown={onClose}>
       <div className="ow-dialog" onMouseDown={(e) => e.stopPropagation()}>
-        <div className="ow-dialog__title">Reframe — Settings</div>
+        <div className="ow-dialog__title">
+          <span>Reframe — Settings</span>
+          <button
+            className="ow-dialog__close"
+            onClick={onClose}
+            aria-label="Close"
+            title="Close"
+          >
+            ×
+          </button>
+        </div>
         <div className="ow-dialog__body">
           <p className="ow-dialog__about">
             <b>Reframe</b> — today’s web, yesterday’s look.{' '}
@@ -54,10 +80,11 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             </a>
           </p>
 
-          <label className="ow-field">
-            <span>Home page</span>
-            <input value={home} spellCheck={false} onChange={(e) => setHome(e.target.value)} />
-          </label>
+          <div className="ow-dialog__grid">
+            <label className="ow-field ow-field--wide">
+              <span>Home page</span>
+              <input value={home} spellCheck={false} onChange={(e) => setHome(e.target.value)} />
+            </label>
 
           <label className="ow-field">
             <span>Default theme at start</span>
@@ -92,10 +119,54 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             </select>
           </label>
 
-          <label className="ow-field ow-field--check">
-            <input type="checkbox" checked={splash} onChange={(e) => setSplash(e.target.checked)} />
-            <span>Show theme splash screens on switch</span>
+          <label className="ow-field">
+            <span>Title bar style (window controls)</span>
+            <select value={menuStyle} onChange={(e) => setMenuStyle(e.target.value as 'win98' | 'luna')}>
+              <option value="win98">Windows 95 / 98 (navy, square buttons)</option>
+              <option value="luna">Windows XP Luna (blue, rounded buttons)</option>
+            </select>
           </label>
+
+          <label className="ow-field">
+            <span>Menu text size</span>
+            <select value={menuFontSize} onChange={(e) => setMenuFontSize(e.target.value as FontSize)}>
+              <option value="normal">Normal</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+              <option value="xlarge">Extra large</option>
+            </select>
+          </label>
+
+          <label className="ow-field">
+            <span>Toolbar / icon label size</span>
+            <select value={labelFontSize} onChange={(e) => setLabelFontSize(e.target.value as FontSize)}>
+              <option value="normal">Normal</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+              <option value="xlarge">Extra large</option>
+            </select>
+          </label>
+
+          <label className="ow-field">
+            <span>When closing the window</span>
+            <select
+              value={closeAction}
+              onChange={(e) => setCloseAction(e.target.value as 'quit' | 'minimize')}
+            >
+              <option value="quit">Quit Reframe completely</option>
+              <option value="minimize">Just minimize to the Dock</option>
+            </select>
+          </label>
+
+            <label className="ow-field ow-field--check ow-field--wide">
+              <input
+                type="checkbox"
+                checked={splash}
+                onChange={(e) => setSplash(e.target.checked)}
+              />
+              <span>Show theme splash screens on switch</span>
+            </label>
+          </div>
 
           <p className="ow-dialog__legal">{LEGAL}</p>
 
@@ -122,7 +193,11 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 defaultTheme: theme,
                 waybackYear: year || undefined,
                 searchEngine: engine,
-                themeSplash: splash
+                themeSplash: splash,
+                menuStyle: menuStyle as 'win98' | 'luna',
+                menuFontSize: menuFontSize as FontSize,
+                labelFontSize: labelFontSize as FontSize,
+                closeAction: closeAction as 'quit' | 'minimize'
               })
               onClose()
             }}

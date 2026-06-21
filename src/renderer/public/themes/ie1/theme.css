@@ -1,0 +1,395 @@
+/*
+ * Internet Explorer 1.0 (1995) on Windows 95 — pixel-faithful.
+ * Toolbar glyphs, the IE logo, the back/forward arrows and the waving-flag
+ * throbber are native-pixel crops from original IE 1.0 screenshots. The MS Sans
+ * Serif bitmap font + Win95 bevels are shared with the IE5 theme.
+ */
+
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    url('../ie5/fonts/ms_sans_serif.woff2') format('woff2'),
+    url('../ie5/fonts/ms_sans_serif.woff') format('woff');
+}
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-style: normal;
+  font-weight: 700;
+  src:
+    url('../ie5/fonts/ms_sans_serif_bold.woff2') format('woff2'),
+    url('../ie5/fonts/ms_sans_serif_bold.woff') format('woff');
+}
+
+:root {
+  --w95-raised: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080,
+    inset 2px 2px 0 #dfdfdf;
+  --w95-pressed: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+  --w95-sunken: inset -1px -1px 0 #fff, inset 1px 1px 0 #808080, inset -2px -2px 0 #dfdfdf,
+    inset 2px 2px 0 #000;
+}
+
+body {
+  font-family: var(--ie1-font);
+  font-size: 11px;
+  color: #000;
+  background: var(--ie1-face);
+  image-rendering: pixelated;
+}
+
+.ow-root {
+  background: var(--ie1-face);
+  box-shadow: var(--w95-raised);
+  padding: 3px;
+}
+
+/* --- title bar (solid navy, IE logo + caption buttons) ------------------- */
+.ow-titlebar {
+  background: var(--ie1-title);
+  height: 20px;
+  padding: 1px 2px 1px 3px;
+  gap: 4px;
+}
+.ow-titlebar__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: url('assets/ielogo.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.ow-titlebar__text {
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 0 2px;
+}
+.ow-titlebar__controls {
+  gap: 2px;
+}
+.ow-winbtn {
+  width: 16px;
+  height: 14px;
+  min-width: 16px;
+  padding: 0;
+  background: var(--ie1-face);
+  border: 1px solid;
+  border-color: #fff #000 #000 #fff;
+  box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+  background-repeat: no-repeat;
+}
+.ow-winbtn:active {
+  border-color: #000 #fff #fff #000;
+  box-shadow: inset 1px 1px 0 #808080;
+}
+.ow-winbtn[data-control='minimize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 3px left 3px;
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='10' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h10v9H0V0zm1 2v6h8V2H1z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 2px left 2px;
+}
+.ow-winbtn[data-control='close'] {
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 3px left 4px;
+}
+
+/* --- menu bar ------------------------------------------------------------ */
+.ow-menubar {
+  background: var(--ie1-face);
+  height: 20px;
+  align-items: center;
+  padding: 1px 4px;
+  gap: 0;
+}
+.ow-menu__label {
+  padding: 3px 8px;
+  font-size: 11px;
+  line-height: 13px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--ie1-title);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: var(--ie1-face);
+  padding: 2px;
+  border: 1px solid;
+  border-color: #fff #000 #000 #fff;
+  box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf, 2px 2px 0 rgba(0, 0, 0, 0.3);
+  font-size: 11px;
+}
+.ow-menu__heading {
+  padding: 4px 20px 2px 22px;
+  font-weight: 700;
+  color: #555;
+}
+.ow-menu__item {
+  padding: 3px 24px 3px 20px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--ie1-title);
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #808080;
+}
+.ow-menu__sep {
+  height: 0;
+  margin: 3px 2px;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+}
+.ow-menu__check {
+  width: 16px;
+}
+
+/* --- toolbar (flat icon buttons, real IE1 glyphs) ----------------------- */
+.ow-toolbar {
+  background: var(--ie1-face);
+  height: 38px;
+  align-items: center;
+  /* right padding reserves the tall throbber "well" that overhangs the rows */
+  padding: 2px 70px 2px 4px;
+  gap: 0;
+  position: relative;
+  z-index: 2;
+}
+.ow-btn {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: #000;
+}
+.ow-btn:hover:not(:disabled) {
+  border-color: #fff #000 #000 #fff;
+  box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+}
+.ow-btn:active:not(:disabled) {
+  border-color: #000 #fff #fff #000;
+  box-shadow: inset 1px 1px 0 #808080;
+}
+.ow-btn__label {
+  display: none;
+}
+.ow-btn__icon {
+  width: 27px;
+  height: 21px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto 21px; /* native aspect, ~21px tall */
+  image-rendering: pixelated;
+}
+.ow-btn[data-action='open'] .ow-btn__icon {
+  background-image: url('assets/open.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/back.png');
+}
+.ow-btn[data-action='back']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/back_on.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/forward.png');
+}
+.ow-btn[data-action='forward']:hover:not(:disabled) .ow-btn__icon {
+  background-image: url('assets/forward_on.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/refresh.png');
+}
+.ow-btn[data-action='favorites'] .ow-btn__icon {
+  background-image: url('assets/favopen.png');
+}
+.ow-btn[data-action='favadd'] .ow-btn__icon {
+  background-image: url('assets/favadd.png');
+}
+.ow-btn[data-action='fontup'] .ow-btn__icon {
+  background-image: url('assets/fontup.png');
+}
+.ow-btn[data-action='fontdown'] .ow-btn__icon {
+  background-image: url('assets/fontdown.png');
+}
+.ow-btn[data-action='cut'] .ow-btn__icon {
+  background-image: url('assets/cut.png');
+}
+.ow-btn[data-action='copy'] .ow-btn__icon {
+  background-image: url('assets/copy.png');
+}
+.ow-btn[data-action='paste'] .ow-btn__icon {
+  background-image: url('assets/paste.png');
+}
+.ow-btn:disabled .ow-btn__icon {
+  opacity: 0.4;
+}
+
+/* raised vertical separator between toolbar groups (Win95) */
+.ow-toolbar-sep {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 2px;
+  height: 22px;
+  margin: 0 4px;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #fff;
+}
+
+/* --- throbber: the waving Windows flag in a tall sunken well on the right.
+   It is absolutely positioned so the well overhangs BOTH the toolbar and the
+   address-bar rows (as in IE 1.0), while the rows reserve right padding so the
+   toolbar buttons and the address field stop just before it. ----------------- */
+.ow-toolbar .ow-throbber {
+  display: block;
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 58px;
+  height: 60px;
+  z-index: 50;
+  /* one frame == well width (58px); flag sits at the top of the well */
+  background: var(--ie1-face) url('assets/flag_sprite.png') 0 top / 464px 51px no-repeat;
+  box-shadow: var(--w95-sunken);
+}
+.ow-toolbar .ow-throbber.is-active {
+  animation: ie1-flag 0.5s steps(8) infinite;
+}
+@keyframes ie1-flag {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -464px;
+  }
+}
+
+/* --- address bar --------------------------------------------------------- */
+.ow-addressbar {
+  background: var(--ie1-face);
+  height: 24px;
+  /* right padding leaves the throbber well + a few px gap to its left */
+  padding: 2px 70px 3px 5px;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+.ow-address-label {
+  color: #000;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.ow-address-icon {
+  display: none;
+}
+.ow-address-combo {
+  height: 20px;
+  background: var(--ie1-field);
+  box-shadow: var(--w95-sunken);
+}
+.ow-address-input {
+  padding: 2px 4px;
+  font-size: 11px;
+  background: transparent;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+.ow-address-dropdown {
+  display: inline-block;
+  width: 16px;
+  margin: 1px;
+  padding: 0;
+  background: var(--ie1-face);
+  border: 1px solid;
+  border-color: #fff #000 #000 #fff;
+  box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+  color: #000;
+  font-size: 9px;
+}
+.ow-address-dropdown::before {
+  content: '▾';
+}
+.ow-address-dropdown:active {
+  border-color: #000 #fff #fff #000;
+  box-shadow: inset 1px 1px 0 #808080;
+}
+.ow-address-list {
+  background: #fff;
+  border: 1px solid #000;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  font-size: 11px;
+}
+.ow-address-item {
+  padding: 2px 6px;
+}
+.ow-address-item:hover {
+  background: var(--ie1-title);
+  color: #fff;
+}
+.ow-go {
+  display: none;
+}
+
+/* --- status bar ---------------------------------------------------------- */
+.ow-statusbar {
+  background: var(--ie1-face);
+  padding: 2px 4px 1px;
+  gap: 4px;
+}
+.ow-status-text {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+  font-size: 11px;
+}
+
+/* --- favorites / history dropdown panel (gray Win95 menu) ---------------- */
+.ow-panel {
+  background: var(--ie1-face);
+  border: 1px solid;
+  border-color: #fff #000 #000 #fff;
+  box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf, 2px 2px 0 rgba(0, 0, 0, 0.3);
+  color: #000;
+}
+.ow-panel__add {
+  border-bottom: 1px solid #808080;
+}
+.ow-panel__item:hover,
+.ow-panel__add:hover {
+  background: var(--ie1-title);
+  color: #fff;
+}
+
+/* --- dialogs / context menu --------------------------------------------- */
+.ow-dialog__title {
+  background: var(--ie1-title);
+}
+.ow-ctxmenu {
+  background: var(--ie1-face);
+  border: 1px solid;
+  border-color: #fff #000 #000 #fff;
+  box-shadow: inset -1px -1px 0 #808080, 2px 2px 0 rgba(0, 0, 0, 0.3);
+  font-size: 11px;
+}
+.ow-ctxmenu__item:hover {
+  background: var(--ie1-title);
+  color: #fff;
+}

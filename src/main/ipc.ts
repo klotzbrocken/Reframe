@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron'
+import { ipcMain, dialog, app } from 'electron'
 import type { BrowserShell } from './browser-shell'
 
 /**
@@ -20,7 +20,12 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
   ipcMain.handle('shell:setRetroContent', (_e, id: number, enabled: boolean) =>
     s()?.setRetroContent(id, enabled)
   )
+  ipcMain.handle('shell:setNetworkSpeed', (_e, profile: string) => s()?.setNetworkSpeed(profile))
   ipcMain.handle('shell:print', (_e, id: number) => s()?.print(id))
+  ipcMain.handle('shell:savePage', (_e, id: number) => s()?.savePage(id))
+  ipcMain.handle('shell:setImagesEnabled', (_e, id: number, enabled: boolean) =>
+    s()?.setImagesEnabled(id, enabled)
+  )
   ipcMain.handle('shell:setChromeOnTop', (_e, onTop: boolean) => s()?.setChromeOnTop(onTop))
   ipcMain.handle('shell:setContentInsets', (_e, insets) => s()?.setInsets(insets))
   ipcMain.handle('shell:getTabs', () => s()?.getSnapshot() ?? { tabs: [], activeId: null })
@@ -28,4 +33,17 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
   ipcMain.handle('shell:toggleMaximizeWindow', () => s()?.toggleMaximizeWindow())
   ipcMain.handle('shell:closeWindow', () => s()?.closeWindow())
   ipcMain.handle('shell:isWindowMaximized', () => s()?.isWindowMaximized() ?? false)
+  ipcMain.handle('app:quit', () => app.quit())
+  ipcMain.handle('app:openFile', async () => {
+    // No parent window: the main window is a BaseWindow, so getFocusedWindow()
+    // returns null and `new BrowserWindow()` would pop a blank white window.
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [
+        { name: 'Web pages', extensions: ['html', 'htm', 'mht', 'mhtml'] },
+        { name: 'All files', extensions: ['*'] }
+      ]
+    })
+    return canceled || !filePaths.length ? null : filePaths[0]
+  })
 }

@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 export interface PanelEntry {
   title: string
   url: string
+  last?: string
 }
 
 interface Props {
@@ -22,6 +23,19 @@ interface Props {
  */
 export function Panel({ kind, x, y, entries, onPick, onAdd, onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState({ left: x, top: y })
+
+  // Keep the panel fully on-screen: if anchoring at x would overflow the right
+  // (or bottom) edge, shift it back in. Measured after layout so width is known.
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const w = el.offsetWidth
+    const h = el.offsetHeight
+    const left = Math.max(4, Math.min(x, window.innerWidth - w - 6))
+    const top = Math.max(4, Math.min(y, window.innerHeight - h - 6))
+    setPos({ left, top })
+  }, [x, y, entries.length])
 
   useEffect(() => {
     const onDown = (e: MouseEvent): void => {
@@ -32,7 +46,7 @@ export function Panel({ kind, x, y, entries, onPick, onAdd, onClose }: Props) {
   }, [onClose])
 
   return (
-    <div className="ow-panel" style={{ left: x, top: y }} ref={ref}>
+    <div className="ow-panel" style={{ left: pos.left, top: pos.top }} ref={ref}>
       {kind === 'bookmarks' && onAdd && (
         <div
           className="ow-panel__add"

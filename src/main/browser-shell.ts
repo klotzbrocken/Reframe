@@ -1,4 +1,11 @@
-import { BaseWindow, WebContentsView, WebContents, Menu, shell as electronShell } from 'electron'
+import {
+  BaseWindow,
+  WebContentsView,
+  WebContents,
+  Menu,
+  dialog,
+  shell as electronShell
+} from 'electron'
 import { join } from 'path'
 import type { ContentInsets, MenuCommand, ShellEvent, TabState } from '../shared/types'
 
@@ -7,9 +14,25 @@ interface Tab {
   view: WebContentsView
   retro: boolean
   favicon: string | null
+  /** Key of the injected "hide images" stylesheet, when images are off. */
+  imagesOffKey?: string
+  /** Whether the CDP debugger is attached (for network throttling). */
+  dbgAttached?: boolean
 }
 
 const DEFAULT_INSETS: ContentInsets = { top: 78, right: 0, bottom: 26, left: 0 }
+
+/**
+ * "Time Warp Modem" — period connection speeds. Throughput is in bytes/sec
+ * (CDP units); latency in ms. `full` clears emulation (today's broadband).
+ * Real-world-ish: a modem only delivered ~80-90% of its rated line speed.
+ */
+const SPEEDS: Record<string, { down: number; up: number; latency: number }> = {
+  full: { down: -1, up: -1, latency: 0 },
+  isdn: { down: 8000, up: 8000, latency: 80 }, // 64 kbit/s ISDN
+  '56k': { down: 7000, up: 4200, latency: 180 }, // 56k down / 33.6k up
+  '28.8k': { down: 3500, up: 3500, latency: 320 }
+}
 
 /**
  * Owns the real browser engine (Electron WebContentsViews) and presents a
@@ -24,6 +47,7 @@ export class BrowserShell {
   private nextId = 1
   private insets: ContentInsets = { ...DEFAULT_INSETS }
   private chromeOnTop = false
+  private speed = 'full'
 
   constructor(
     private win: BaseWindow,
@@ -118,6 +142,7 @@ export class BrowserShell {
     this.order.push(id)
     this.win.contentView.addChildView(view)
     this.wire(tab)
+    void this.applySpeed(tab)
 
     this.emit({ type: 'tab-created', tab: this.stateOf(tab) })
     this.activateTab(id)
@@ -205,6 +230,81 @@ export class BrowserShell {
   print(id: number): void {
     const wc = this.tabs.get(id)?.view.webContents
     if (wc && !wc.isDestroyed()) wc.print()
+  }
+
+  /**
+   * "Time Warp Modem" — throttle the network to a period connection speed so
+   * pages crawl in and images paint top-to-bottom, like the dial-up days.
+   * Applied to every tab (current + future) via the Chrome DevTools Protocol.
+   */
+  setNetworkSpeed(profile: string): void {
+    this.speed = SPEEDS[profile] ? profile : 'full'
+    for (const tab of this.tabs.values()) void this.applySpeed(tab)
+  }
+
+  private async applySpeed(tab: Tab): Promise<void> {
+    const wc = tab.view.webContents
+    if (wc.isDestroyed()) return
+    const p = SPEEDS[this.speed] ?? SPEEDS.full
+    // At full speed with no debugger yet, do nothing — never attach the CDP
+    // debugger unless a period speed is actually selected.
+    if (this.speed === 'full' && !tab.dbgAttached) return
+    try {
+      if (!tab.dbgAttached) {
+        wc.debugger.attach('1.3')
+        tab.dbgAttached = true
+        await wc.debugger.sendCommand('Network.enable')
+      }
+      await wc.debugger.sendCommand('Network.emulateNetworkConditions', {
+        offline: false,
+        latency: p.latency,
+        downloadThroughput: p.down,
+        uploadThroughput: p.up
+      })
+    } catch {
+      /* debugger already in use (e.g. DevTools open) — skip throttling */
+    }
+  }
+
+  /** Opera "Save to file": save the page as a complete HTML file. */
+  async savePage(id: number): Promise<void> {
+    const wc = this.tabs.get(id)?.view.webContents
+    if (!wc || wc.isDestroyed()) return
+    const safe = (wc.getTitle() || 'page').replace(/[^\w.\- ]+/g, '_').trim().slice(0, 60)
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      defaultPath: `${safe || 'page'}.html`,
+      filters: [{ name: 'Web page, complete', extensions: ['html'] }]
+    })
+    if (canceled || !filePath) return
+    try {
+      await wc.savePage(filePath, 'HTMLComplete')
+    } catch {
+      /* user cancelled or save failed — ignore */
+    }
+  }
+
+  /** Opera image toggle: hide/show all images on the current page. */
+  async setImagesEnabled(id: number, enabled: boolean): Promise<void> {
+    const tab = this.tabs.get(id)
+    if (!tab) return
+    const wc = tab.view.webContents
+    if (wc.isDestroyed()) return
+    // Always clear any previous key first (it may be stale after a navigation,
+    // which drops injected CSS), then re-inject when images should stay hidden.
+    if (tab.imagesOffKey) {
+      await wc.removeInsertedCSS(tab.imagesOffKey).catch(() => {})
+      tab.imagesOffKey = undefined
+    }
+    if (!enabled) {
+      // Hide image elements (keeps layout, like Opera's "no images") and strip
+      // CSS background images too, so the page genuinely shows no imagery.
+      tab.imagesOffKey = await wc
+        .insertCSS(
+          'img,picture,svg,video,canvas,object,embed,iframe{visibility:hidden!important}' +
+            '*{background-image:none!important}'
+        )
+        .catch(() => undefined)
+    }
   }
 
   /** Push a command from the native menu / context menu to the chrome UI. */

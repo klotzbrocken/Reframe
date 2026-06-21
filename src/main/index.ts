@@ -22,6 +22,11 @@ const { autoUpdater } = electronUpdater
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
+// Name the app as early as possible (before `ready`) so the macOS app menu,
+// the About panel and the dock all read "Reframe" rather than "Electron".
+app.setName('Reframe')
+app.setAboutPanelOptions({ applicationName: 'Reframe' })
+
 // In the packaged app the renderer is served from this custom scheme instead of
 // file://, so absolute URLs (`/themes/…`, `/splash/…`) and fetch() resolve
 // against the renderer root — exactly like the Vite dev server. Under plain
@@ -129,6 +134,7 @@ function finishStartup(): void {
   const w = splashWin
   splashWin = null
   mainWindow?.show()
+  mainWindow?.focus()
   if (w && !w.isDestroyed()) {
     fadeWindow(w, 0, 300, () => {
       if (!w.isDestroyed()) w.close()

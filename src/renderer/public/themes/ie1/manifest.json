@@ -1,0 +1,61 @@
+{
+  "id": "ie1",
+  "name": "Internet Explorer 1.0",
+  "era": "1995 · Windows 95",
+  "toolbar": [
+    "open",
+    "home",
+    "|",
+    "back",
+    "forward",
+    "|",
+    "stop",
+    "refresh",
+    "|",
+    "favorites",
+    "favadd",
+    "|",
+    "fontup",
+    "fontdown",
+    "|",
+    "cut",
+    "copy",
+    "paste"
+  ],
+  "menus": ["File", "Edit", "View", "Favorites", "Help"],
+  "homeUrl": "https://www.microsoft.com",
+  "oldWebDate": "19950816",
+  "layout": {
+    "showStatusBar": true,
+    "showMenuBar": true,
+    "showTabs": false
+  },
+  "throbber": { "kind": "css", "label": "" },
+  "labels": {
+    "address": "Address",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "open": "Open",
+    "favorites": "Open Favorites",
+    "favadd": "Add To Favorites",
+    "fontup": "Use Larger Font",
+    "fontdown": "Use Smaller Font",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste"
+  },
+  "vars": {
+    "--ie1-face": "#c0c0c0",
+    "--ie1-light": "#ffffff",
+    "--ie1-hilight": "#dfdfdf",
+    "--ie1-shadow": "#808080",
+    "--ie1-dark": "#000000",
+    "--ie1-title": "#000080",
+    "--ie1-field": "#ffffff",
+    "--ie1-font": "'Pixelated MS Sans Serif', 'MS Sans Serif', Tahoma, sans-serif"
+  }
+}

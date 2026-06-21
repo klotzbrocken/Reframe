@@ -1,6 +1,8 @@
 interface Props {
   title: string
   maximized: boolean
+  /** Override the close button (e.g. quit vs minimize per settings). */
+  onClose?: () => void
 }
 
 /**
@@ -9,7 +11,7 @@ interface Props {
  * Themes style .ow-titlebar however they like — the IE5 theme renders a Win98
  * navy gradient bar with raised control buttons.
  */
-export function TitleBar({ title, maximized }: Props) {
+export function TitleBar({ title, maximized, onClose }: Props) {
   return (
     <div className="ow-titlebar">
       <span className="ow-titlebar__icon" aria-hidden />
@@ -31,7 +33,7 @@ export function TitleBar({ title, maximized }: Props) {
           className="ow-winbtn"
           data-control="close"
           title="Close"
-          onClick={() => window.oldweb.closeWindow()}
+          onClick={() => (onClose ? onClose() : window.oldweb.closeWindow())}
         />
       </div>
     </div>

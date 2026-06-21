@@ -152,56 +152,58 @@ body {
   border-radius: 50%;
   background: #8e8e8e;
 }
+/* The whole ring rotates clockwise (steps → dot-by-dot), so the bright "head"
+   cycles around the ring instead of every dot pulsing in place. */
+.ow-throbber.is-active {
+  animation: ow-spin 0.8s steps(8) infinite;
+}
 .ow-throbber.is-active .ow-throbber__dot {
   background: #383838;
-  animation: ow-dotfade 0.72s linear infinite;
 }
+/* fixed graduated opacity around the ring → a comet head + fading tail */
 .ow-throbber__dot:nth-child(1) {
   left: 7.2px;
   top: 1.2px;
-  animation-delay: 0s;
+  opacity: 1;
 }
 .ow-throbber__dot:nth-child(2) {
   left: 11.44px;
   top: 2.96px;
-  animation-delay: -0.09s;
+  opacity: 0.85;
 }
 .ow-throbber__dot:nth-child(3) {
   left: 13.2px;
   top: 7.2px;
-  animation-delay: -0.18s;
+  opacity: 0.7;
 }
 .ow-throbber__dot:nth-child(4) {
   left: 11.44px;
   top: 11.44px;
-  animation-delay: -0.27s;
+  opacity: 0.58;
 }
 .ow-throbber__dot:nth-child(5) {
   left: 7.2px;
   top: 13.2px;
-  animation-delay: -0.36s;
+  opacity: 0.46;
 }
 .ow-throbber__dot:nth-child(6) {
   left: 2.96px;
   top: 11.44px;
-  animation-delay: -0.45s;
+  opacity: 0.36;
 }
 .ow-throbber__dot:nth-child(7) {
   left: 1.2px;
   top: 7.2px;
-  animation-delay: -0.54s;
+  opacity: 0.28;
 }
 .ow-throbber__dot:nth-child(8) {
   left: 2.96px;
   top: 2.96px;
-  animation-delay: -0.63s;
+  opacity: 0.22;
 }
-@keyframes ow-dotfade {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.16;
+@keyframes ow-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
