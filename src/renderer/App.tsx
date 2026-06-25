@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { AddressBar } from './components/AddressBar'
 import { MenuBar, type Menu, type MenuItem } from './components/MenuBar'
 import { NavButton } from './components/NavButton'
+import { FloatingMenu } from './components/FloatingMenu'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
@@ -19,7 +20,7 @@ import { UrlDialog } from './components/UrlDialog'
 import { DEFAULT_ENGINE_ID } from './shell/engines'
 import { useShell } from './shell/useShell'
 import { stripWaybackDisplay, unwrapWayback, waybackDisplay } from './shell/wayback'
-import { themeEngine } from './theme/loader'
+import { themeEngine, safeThemeId } from './theme/loader'
 import {
   DEFAULT_LABELS,
   DEFAULT_MENUS,
@@ -62,7 +63,7 @@ export function App() {
   }, [])
 
   const [themes, setThemes] = useState<ThemeSummary[]>([])
-  const [themeId, setThemeId] = useState(() => loadSettings().defaultTheme || 'ie5')
+  const [themeId, setThemeId] = useState(() => safeThemeId(loadSettings().defaultTheme))
   const [manifest, setManifest] = useState<ThemeManifest | null>(null)
 
   const { state, actions, retro, oldWeb } = useShell(() => themeEngine.playSound('navigate'))
@@ -215,6 +216,14 @@ export function App() {
     saveSettings({ ...settings, connectionSpeed: id })
     window.oldweb.setNetworkSpeed(id ?? 'full')
   }
+  // Pick a Wayback year AND time-travel to it (the floating control's
+  // "set year" implies "make it active"). The date ref is updated first so the
+  // immediate re-navigation uses the new year.
+  const applyWaybackYear = (year: number): void => {
+    actions.setOldWebDate(`${year}0924`)
+    saveSettings({ ...settings, waybackYear: year })
+    actions.setOldWebActive(true)
+  }
   // Apply the saved "Time Warp Modem" speed on startup (and whenever it changes),
   // so it covers the initial tab and survives restarts.
   useEffect(() => {
@@ -288,9 +297,9 @@ export function App() {
     },
     mail: { label: labels.mail, onClick: () => actions.navigate('https://mail.google.com') },
     print: { label: labels.print, onClick: actions.print },
-    edit: { label: labels.edit, onClick: () => {} },
+    edit: { label: labels.edit, onClick: () => {}, disabled: true },
     netscape: { label: labels.netscape, onClick: () => actions.navigate(homeUrl) },
-    security: { label: labels.security, onClick: () => {} },
+    security: { label: labels.security, onClick: () => {}, disabled: true },
     shop: { label: labels.shop, onClick: () => actions.navigate('https://www.amazon.com') },
     // Opera 3.x toolbar actions (period MDI features map to the closest action).
     new: { label: labels.new, onClick: actions.newTab },
@@ -309,8 +318,7 @@ export function App() {
     copy: {
       label: labels.copy,
       onClick: () => {
-        const url = activeTab?.url ?? ''
-        if (url) navigator.clipboard.writeText(url).catch(() => {})
+        if (activeTab) window.oldweb.editCommand(activeTab.id, 'copy')
       }
     },
     url: {
@@ -328,10 +336,30 @@ export function App() {
     cascade: { label: labels.cascade, onClick: () => {}, disabled: true },
     // Internet Explorer 1.0 toolbar actions
     favadd: { label: labels.favadd, onClick: addBookmark },
-    fontup: { label: labels.fontup, onClick: () => {} },
-    fontdown: { label: labels.fontdown, onClick: () => {} },
-    cut: { label: labels.cut, onClick: () => {} },
-    paste: { label: labels.paste, onClick: () => {} }
+    fontup: {
+      label: labels.fontup,
+      onClick: () => {
+        if (activeTab) window.oldweb.zoomStep(activeTab.id, 1)
+      }
+    },
+    fontdown: {
+      label: labels.fontdown,
+      onClick: () => {
+        if (activeTab) window.oldweb.zoomStep(activeTab.id, -1)
+      }
+    },
+    cut: {
+      label: labels.cut,
+      onClick: () => {
+        if (activeTab) window.oldweb.editCommand(activeTab.id, 'cut')
+      }
+    },
+    paste: {
+      label: labels.paste,
+      onClick: () => {
+        if (activeTab) window.oldweb.editCommand(activeTab.id, 'paste')
+      }
+    }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
   const menus = manifest?.menus ?? DEFAULT_MENUS
@@ -349,9 +377,27 @@ export function App() {
         ]
       case 'Edit':
         return [
-          { type: 'item', label: 'Cut', disabled: true },
-          { type: 'item', label: 'Copy', disabled: true },
-          { type: 'item', label: 'Paste', disabled: true }
+          {
+            type: 'item',
+            label: 'Cut',
+            onSelect: () => activeTab && window.oldweb.editCommand(activeTab.id, 'cut')
+          },
+          {
+            type: 'item',
+            label: 'Copy',
+            onSelect: () => activeTab && window.oldweb.editCommand(activeTab.id, 'copy')
+          },
+          {
+            type: 'item',
+            label: 'Paste',
+            onSelect: () => activeTab && window.oldweb.editCommand(activeTab.id, 'paste')
+          },
+          { type: 'sep' },
+          {
+            type: 'item',
+            label: 'Select All',
+            onSelect: () => activeTab && window.oldweb.editCommand(activeTab.id, 'selectAll')
+          }
         ]
       case 'View':
         return [
@@ -541,6 +587,9 @@ export function App() {
           <>
             {addressBarEl}
             {searchBoxEl}
+            {/* Netscape 6 animates its "N" logo here, over the toolbar artwork;
+                Firefox hides this (.ow-toolbar .ow-throbber) and uses the menu bar. */}
+            <Throbber active={loading} />
           </>
         ) : (
           <>
@@ -636,6 +685,18 @@ export function App() {
         />
       )}
 
+      <FloatingMenu
+        themes={themes}
+        themeId={themeId}
+        onTheme={switchTheme}
+        oldWeb={oldWeb}
+        waybackYear={settings.waybackYear || 0}
+        onWayback={applyWaybackYear}
+        onWaybackOff={() => actions.setOldWebActive(false)}
+        speed={settings.connectionSpeed || 'full'}
+        speedOpts={SPEED_OPTS}
+        onSpeed={(id) => setConnectionSpeed(id as Settings['connectionSpeed'])}
+      />
     </div>
   )
 }

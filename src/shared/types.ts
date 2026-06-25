@@ -50,6 +50,10 @@ export interface OldwebAPI {
   goForward(id: number): Promise<void>
   reload(id: number): Promise<void>
   stop(id: number): Promise<void>
+  /** Clipboard/selection command run against the active page (Edit menu, buttons). */
+  editCommand(id: number, cmd: 'cut' | 'copy' | 'paste' | 'selectAll'): Promise<void>
+  /** Step the active page's zoom up (+1) or down (-1) — the Font +/- buttons. */
+  zoomStep(id: number, dir: 1 | -1): Promise<void>
   /** Tell the engine how much room the chrome occupies, so it can place pages. */
   setContentInsets(insets: ContentInsets): Promise<void>
   /** Toggle the optional CRT "retro content" overlay for a tab. */

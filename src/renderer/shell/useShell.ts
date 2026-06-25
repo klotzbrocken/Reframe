@@ -21,6 +21,9 @@ export interface ShellActions {
   print: () => void
   toggleRetro: () => void
   toggleOldWeb: () => void
+  /** Turn Wayback on/off explicitly (used by the floating controls) and
+   *  re-navigate the current page through (or out of) the Wayback Machine. */
+  setOldWebActive: (on: boolean) => void
   setOldWebDate: (date: string) => void
 }
 
@@ -104,6 +107,15 @@ export function useShell(onLoadStart?: () => void): {
         }
         return next
       })
+    },
+    setOldWebActive: (on: boolean) => {
+      const id = activeRef.current
+      setOldWeb(on)
+      if (id != null && currentUrlRef.current) {
+        const original = unwrapWayback(currentUrlRef.current)
+        const target = on ? wrapWayback(original, oldWebDateRef.current) : original
+        window.oldweb.navigate(id, target)
+      }
     },
     setOldWebDate: (date: string) => {
       oldWebDateRef.current = date
