@@ -13,7 +13,7 @@ import {
 } from 'electron'
 import { join } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
-import { dirname } from 'path'
+import { dirname, relative, isAbsolute } from 'path'
 import electronUpdater from 'electron-updater'
 import { BrowserShell } from './browser-shell'
 import { registerIpc } from './ipc'
@@ -63,8 +63,14 @@ function registerAppProtocol(): void {
     const { pathname } = new URL(req.url)
     const rel = pathname === '/' ? '/index.html' : decodeURIComponent(pathname)
     const file = join(RENDERER_DIR, rel)
-    // Guard against path traversal outside the renderer dir.
-    if (!file.startsWith(RENDERER_DIR)) return new Response('Forbidden', { status: 403 })
+    // Guard against path traversal. A prefix check (startsWith) would also accept
+    // sibling dirs like "<root>_evil"; instead resolve the path relative to the
+    // renderer root and reject anything that escapes it (starts with "..") or is
+    // absolute.
+    const within = relative(RENDERER_DIR, file)
+    if (within.startsWith('..') || isAbsolute(within)) {
+      return new Response('Forbidden', { status: 403 })
+    }
     return net.fetch(pathToFileURL(file).toString())
   })
 }

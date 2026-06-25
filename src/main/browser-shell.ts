@@ -103,6 +103,13 @@ export class BrowserShell {
     return this.win.isMaximized()
   }
 
+  /** WebContents id of the chrome UI — the ONLY sender allowed on IPC channels
+   *  (page tabs have no preload, so this is a defence-in-depth check). */
+  chromeWebContentsId(): number | null {
+    const wc = this.chromeView.webContents
+    return wc.isDestroyed() ? null : wc.id
+  }
+
   // --- layout --------------------------------------------------------------
 
   tabCount(): number {
@@ -214,12 +221,31 @@ export class BrowserShell {
     else wc.goForward()
   }
 
+  /** Step the page zoom up/down (the themes' Font +/- buttons), clamped. */
+  zoomStep(id: number, dir: number): void {
+    const wc = this.tabs.get(id)?.view.webContents
+    if (!wc || wc.isDestroyed()) return
+    const next = Math.min(2.5, Math.max(0.5, wc.getZoomFactor() + (dir >= 0 ? 0.1 : -0.1)))
+    wc.setZoomFactor(next)
+  }
+
   reload(id: number): void {
     this.tabs.get(id)?.view.webContents.reload()
   }
 
   stop(id: number): void {
     this.tabs.get(id)?.view.webContents.stop()
+  }
+
+  /** Clipboard / selection commands targeting the page itself, so the themes'
+   *  Edit menus and Cut/Copy/Paste toolbar buttons act on the live web page. */
+  editCommand(id: number, cmd: 'cut' | 'copy' | 'paste' | 'selectAll'): void {
+    const wc = this.tabs.get(id)?.view.webContents
+    if (!wc || wc.isDestroyed()) return
+    if (cmd === 'cut') wc.cut()
+    else if (cmd === 'copy') wc.copy()
+    else if (cmd === 'paste') wc.paste()
+    else wc.selectAll()
   }
 
   setRetroContent(id: number, enabled: boolean): void {

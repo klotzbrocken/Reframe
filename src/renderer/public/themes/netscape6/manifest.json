@@ -1,0 +1,47 @@
+{
+  "id": "netscape6",
+  "name": "Netscape Communicator 6.0",
+  "era": "2000 · Windows",
+  "toolbar": ["back", "forward", "refresh", "stop", "search", "print"],
+  "menus": ["File", "Edit", "View", "Search", "Go", "Bookmarks", "Tasks", "Help"],
+  "personalBar": [
+    { "label": "My Netscape", "icon": "doc", "url": "https://www.netscape.com" },
+    { "label": "Net2Phone", "icon": "doc", "url": "https://en.wikipedia.org/wiki/Net2Phone" },
+    { "label": "Search", "icon": "doc", "url": "https://duckduckgo.com" }
+  ],
+  "homeUrl": "https://www.netscape.com",
+  "oldWebDate": "20010401",
+  "layout": {
+    "tabsPosition": "top",
+    "showStatusBar": true,
+    "showMenuBar": true,
+    "showTabs": true,
+    "unifiedToolbar": true,
+    "showFavicon": true
+  },
+  "throbber": { "kind": "image", "label": "Netscape" },
+  "labels": {
+    "address": "",
+    "go": "",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Reload",
+    "home": "Home",
+    "search": "Search",
+    "print": "Print",
+    "netscape": "Netscape",
+    "newTab": "New Tab"
+  },
+  "vars": {
+    "--ow-face": "#c0c0c0",
+    "--ow-face-light": "#ffffff",
+    "--ow-face-dark": "#808080",
+    "--ow-face-darker": "#404040",
+    "--ow-field": "#eff7f7",
+    "--ow-text": "#101014",
+    "--ow-highlight": "#316ac5",
+    "--ow-titlebar": "#a9aabe",
+    "--ow-font": "Tahoma, 'MS Sans Serif', Arial, sans-serif"
+  }
+}
