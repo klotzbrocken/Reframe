@@ -6,7 +6,7 @@
  *   --x: red} body{display:none
  * would break out of the :root{} block. We drop anything suspicious.
  */
-import type { ThemeManifest } from './types'
+import { TOOLBAR_ITEMS, type ThemeManifest } from './types'
 import { isAllowedExternal } from '../../shared/url'
 
 const VAR_KEY_RE = /^--[a-z0-9-]+$/i
@@ -30,10 +30,46 @@ function safeUrl(u: unknown): string | undefined {
   return typeof u === 'string' && isAllowedExternal(u) ? u : undefined
 }
 
+const TOOLBAR_SET: ReadonlySet<string> = new Set<string>([...TOOLBAR_ITEMS, '|'])
+
+/** Keep only known toolbar actions (+ '|'); drop the field entirely if nothing
+ *  valid remains, so the UI falls back to DEFAULT_TOOLBAR instead of rendering
+ *  an unknown action and crashing on navAction[item]. */
+function sanitizeToolbar(v: unknown): ThemeManifest['toolbar'] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const items = v.filter((x): x is string => typeof x === 'string' && TOOLBAR_SET.has(x))
+  return items.length ? (items as ThemeManifest['toolbar']) : undefined
+}
+
+/** A non-empty array of non-empty strings, else undefined (→ defaults). */
+function sanitizeStringArray(v: unknown): string[] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const items = v.filter((x): x is string => typeof x === 'string' && x.length > 0)
+  return items.length ? items : undefined
+}
+
+/** A flat string→string map (theme labels), else undefined. */
+function sanitizeLabels(v: unknown): ThemeManifest['labels'] | undefined {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return undefined
+  const out: Record<string, string> = {}
+  for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+    if (typeof val === 'string') out[k] = val
+  }
+  return Object.keys(out).length ? (out as ThemeManifest['labels']) : undefined
+}
+
+/** A plain object (layout hints), else undefined. Values feed only the
+ *  structural UI, which already treats each field optionally. */
+function sanitizeLayout(v: unknown): ThemeManifest['layout'] | undefined {
+  return v && typeof v === 'object' && !Array.isArray(v) ? (v as ThemeManifest['layout']) : undefined
+}
+
 /**
  * Coerce a fetched manifest into a safe shape: required strings enforced,
- * navigable URLs restricted to http/https, vars sanitized. Unknown extra
- * fields are passed through (they only feed the structural UI).
+ * navigable URLs restricted to http/https, vars sanitized, and the structural
+ * fields (toolbar/menus/labels/layout) validated so a malformed manifest falls
+ * back to defaults instead of crashing the UI. Other recognized extras
+ * (oldWebDate, throbber, sounds, era) still pass through untouched.
  */
 export function sanitizeManifest(raw: unknown, fallbackId: string): ThemeManifest {
   const m = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>
@@ -55,6 +91,10 @@ export function sanitizeManifest(raw: unknown, fallbackId: string): ThemeManifes
     id,
     name,
     homeUrl: safeUrl(m.homeUrl),
+    toolbar: sanitizeToolbar(m.toolbar),
+    menus: sanitizeStringArray(m.menus),
+    labels: sanitizeLabels(m.labels),
+    layout: sanitizeLayout(m.layout),
     personalBar,
     vars: sanitizeVars(m.vars)
   } as ThemeManifest

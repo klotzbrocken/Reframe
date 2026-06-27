@@ -46,6 +46,17 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
   handle('shell:zoomStep', (_e, id, dir) =>
     validId(id) && (dir === 1 || dir === -1) ? s()?.zoomStep(id, dir) : undefined
   )
+  handle('shell:periodRender', (_e, id, opts) => {
+    if (!validId(id) || !opts || typeof opts !== 'object') return { error: 'Bad request' }
+    const o = opts as Record<string, unknown>
+    const key = typeof o.key === 'string' ? o.key.trim() : ''
+    const year = Number(o.year)
+    const quality = o.quality === 'low' || o.quality === 'high' ? o.quality : 'medium'
+    const prompt = typeof o.prompt === 'string' ? o.prompt : undefined
+    if (!key) return { error: 'No OpenAI API key set (Settings).' }
+    if (!Number.isInteger(year)) return { error: 'Invalid year' }
+    return s()?.periodRender(id, { key, year, quality, prompt })
+  })
   handle('shell:setRetroContent', (_e, id, enabled) =>
     validId(id) ? s()?.setRetroContent(id, asBool(enabled)) : undefined
   )
