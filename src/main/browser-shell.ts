@@ -1,4 +1,5 @@
 import {
+  app,
   BaseWindow,
   WebContentsView,
   WebContents,
@@ -6,10 +7,12 @@ import {
   dialog,
   shell as electronShell
 } from 'electron'
-import { join } from 'path'
+import { basename, join } from 'path'
+import { writeFile } from 'fs/promises'
 import { pathToFileURL } from 'url'
 import type { ContentInsets, MenuCommand, ShellEvent, TabState } from '../shared/types'
 import { normalizeInput, isAllowedExternal } from '../shared/url'
+import { renderPeriodImage, pickSize, type PeriodQuality } from './period-render'
 
 interface Tab {
   id: number
@@ -255,9 +258,57 @@ export class BrowserShell {
     this.applyRetro(tab)
   }
 
+
   print(id: number): void {
     const wc = this.tabs.get(id)?.view.webContents
     if (wc && !wc.isDestroyed()) wc.print()
+  }
+
+  /** Period Render: screenshot the live viewport + text, ask OpenAI to re-style
+   *  it in {year}, then show the result (fit to window) in the same tab. Returns
+   *  the live URL so the UI can offer "back to live"; restores it on failure. */
+  async periodRender(
+    id: number,
+    opts: { key: string; year: number; quality: PeriodQuality; prompt?: string }
+  ): Promise<{ liveUrl?: string; error?: string }> {
+    const wc = this.tabs.get(id)?.view.webContents
+    if (!wc || wc.isDestroyed()) return { error: 'No active page' }
+    const liveUrl = wc.getURL()
+    try {
+      // Capture the live viewport + text BEFORE swapping to the placeholder.
+      const [w, h] = this.win.getContentSize()
+      const png = (await wc.capturePage()).toPNG()
+      const text = String(
+        await wc.executeJavaScript('document.body ? document.body.innerText : ""').catch(() => '')
+      )
+      const title = wc.getTitle() || ''
+
+      // Visible progress while the model works (can take up to ~2 min).
+      await wc.loadURL(placeholderPage(opts.year))
+
+      const out = await renderPeriodImage({
+        key: opts.key,
+        year: opts.year,
+        quality: opts.quality,
+        png,
+        text,
+        title,
+        size: pickSize(w, h),
+        prompt: opts.prompt
+      })
+
+      const stamp = Date.now()
+      const dir = app.getPath('temp')
+      const pngFile = join(dir, `reframe-period-${id}-${stamp}.png`)
+      const htmlFile = join(dir, `reframe-period-${id}-${stamp}.html`)
+      await writeFile(pngFile, out)
+      await writeFile(htmlFile, viewerPage(basename(pngFile), opts.year))
+      if (!wc.isDestroyed()) await wc.loadURL(pathToFileURL(htmlFile).toString())
+      return { liveUrl }
+    } catch (e) {
+      if (!wc.isDestroyed()) wc.loadURL(liveUrl).catch(() => {})
+      return { error: e instanceof Error ? e.message : 'Render failed' }
+    }
   }
 
   /**
@@ -463,6 +514,7 @@ export class BrowserShell {
       `(${injectRetro.toString()})(${tab.retro});`
     ).catch(() => {})
   }
+
 }
 
 /** Runs inside the page. Adds or removes a CRT scanline/vignette overlay. */
@@ -486,5 +538,49 @@ function injectRetro(enabled: boolean): void {
     'box-shadow:inset 0 0 140px 30px rgba(0,0,0,0.45)'
   ].join(';')
   document.documentElement.appendChild(el)
+}
+
+/** A self-contained "rendering…" page shown while the Period Render runs; it
+ *  cycles a few playful time-travel messages on a timer. */
+function placeholderPage(year: number): string {
+  const msgs = [
+    'Going back in time…',
+    'Spinning up the flux capacitor…',
+    'Accelerating to 88 mph…',
+    'Re-pixelating the photographs…',
+    'Dialing up a 56k connection…',
+    'Asking the archive nicely…'
+  ]
+  const html =
+    '<!doctype html><meta charset=utf-8><style>' +
+    'html,body{margin:0;height:100%;display:flex;flex-direction:column;align-items:center;' +
+    'justify-content:center;gap:18px;background:#0f1216;color:#cdd6e4;' +
+    'font:600 16px -apple-system,Segoe UI,Tahoma,sans-serif}' +
+    '.s{width:34px;height:34px;border:4px solid #2a3340;border-top-color:#4a86e8;border-radius:50%;' +
+    'animation:r 1s linear infinite}#m{min-height:20px}.y{font-size:12px;color:#7e8aa0}' +
+    '@keyframes r{to{transform:rotate(360deg)}}</style>' +
+    '<div class=s></div><div id=m>' +
+    msgs[0] +
+    '</div><div class=y>Rendering this page in ' +
+    year +
+    '</div><script>var m=' +
+    JSON.stringify(msgs) +
+    ',i=0,e=document.getElementById("m");' +
+    'setInterval(function(){i=(i+1)%m.length;e.textContent=m[i]},2400);</script>'
+  return 'data:text/html,' + encodeURIComponent(html)
+}
+
+/** The viewer page that shows the rendered image fit to the window. The image
+ *  is referenced by basename (same temp dir → same file:// origin). */
+function viewerPage(imgName: string, year: number): string {
+  return (
+    '<!doctype html><meta charset=utf-8><title>Reframe · ' +
+    year +
+    '</title><style>html,body{margin:0;height:100%;background:#000}' +
+    'img{position:fixed;inset:0;width:100%;height:100%;object-fit:contain}</style>' +
+    '<img alt="" src="' +
+    imgName +
+    '">'
+  )
 }
 
