@@ -721,7 +721,7 @@ body,
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 2px;
+  bottom: 5px;
   z-index: 9000;
   font-family: -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
 }
@@ -730,20 +730,21 @@ body,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 21px;
+  height: 21px;
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: rgba(40, 44, 55, 0.32);
+  background: rgba(34, 38, 48, 0.62);
   color: #fff;
-  opacity: 0.65;
+  opacity: 0.9;
   cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4), 0 0 0 1.5px var(--ow-highlight, #4a86e8);
   transition: opacity 0.12s ease, background 0.12s ease;
 }
 .ow-fab__btn:hover {
   opacity: 1;
-  background: rgba(40, 44, 55, 0.7);
+  background: rgba(34, 38, 48, 0.85);
 }
 .ow-fab.is-open .ow-fab__btn {
   opacity: 1;
