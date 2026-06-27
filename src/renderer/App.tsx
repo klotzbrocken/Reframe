@@ -3,6 +3,7 @@ import { AddressBar } from './components/AddressBar'
 import { MenuBar, type Menu, type MenuItem } from './components/MenuBar'
 import { NavButton } from './components/NavButton'
 import { FloatingMenu } from './components/FloatingMenu'
+import { TourOverlay, TOUR_STEPS, TOUR_VERSION } from './components/TourOverlay'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
@@ -32,10 +33,10 @@ import {
 
 // "Time Warp Modem" speed choices shown in the Help menu (Help → Time Warp Modem).
 const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string }[] = [
-  { id: 'full', label: 'Broadband (today)' },
-  { id: 'isdn', label: 'ISDN — 64 kbit/s' },
-  { id: '56k', label: '56k modem' },
-  { id: '28.8k', label: '28.8k modem' }
+  { id: 'full', label: 'Off' },
+  { id: 'isdn', label: 'ISDN (64 kbit/s)' },
+  { id: '56k', label: '56K Modem' },
+  { id: '28.8k', label: '28.8 Modem' }
 ]
 
 export function App() {
@@ -53,6 +54,9 @@ export function App() {
   }
   const [dialogOpen, setDialogOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
+  const [tourActive, setTourActive] = useState(false)
+  const whatsNewRef = useRef(whatsNewOpen)
+  whatsNewRef.current = whatsNewOpen
 
   // Show the What's New dialog once per version (after an update bumps it).
   useEffect(() => {
@@ -62,11 +66,34 @@ export function App() {
     }
   }, [])
 
+  // First-run coachmark tour, once per version. Independent of What's New, but it
+  // waits until that dialog (if any) has been closed so the two don't overlap.
+  useEffect(() => {
+    if (localStorage.getItem('reframe.tour.version') === TOUR_VERSION) return
+    let cancelled = false
+    const tick = (): void => {
+      if (cancelled) return
+      if (whatsNewRef.current) {
+        window.setTimeout(tick, 400)
+        return
+      }
+      localStorage.setItem('reframe.tour.version', TOUR_VERSION)
+      setTourActive(true)
+    }
+    const t = window.setTimeout(tick, 350)
+    return () => {
+      cancelled = true
+      window.clearTimeout(t)
+    }
+  }, [])
+
   const [themes, setThemes] = useState<ThemeSummary[]>([])
   const [themeId, setThemeId] = useState(() => safeThemeId(loadSettings().defaultTheme))
   const [manifest, setManifest] = useState<ThemeManifest | null>(null)
 
-  const { state, actions, retro, oldWeb } = useShell(() => themeEngine.playSound('navigate'))
+  const { state, actions, retro, oldWeb } = useShell(() =>
+    themeEngine.playSound('navigate')
+  )
 
   const [addrHistory, setAddrHistory] = useState<string[]>([])
   const submitAddress = (input: string): void => {
@@ -272,8 +299,40 @@ export function App() {
   const hasSidePanel = layout.sidePanel === 'hotlist'
   const activeTab = state.tabs.find((t) => t.id === state.activeId) ?? null
   const loading = activeTab?.isLoading ?? false
-  const homeUrl = settings.home || 'https://www.myretromac.app'
+  // Explicit user home > the theme's era-appropriate homeUrl (manifest) > default.
+  const homeUrl = settings.home || manifest?.homeUrl || 'https://www.myretromac.app'
   const searchUrl = 'https://www.google.com'
+
+  // Period Render (AI): re-style the current page as a year-appropriate image.
+  const [periodBusy, setPeriodBusy] = useState(false)
+  const [periodLive, setPeriodLive] = useState<string | null>(null)
+  const [periodError, setPeriodError] = useState<string | null>(null)
+  const canPeriodRender = !!settings.openaiApiKey?.trim() && !!activeTab
+  const periodRender = async (): Promise<void> => {
+    const key = settings.openaiApiKey?.trim()
+    if (!activeTab || !key || periodBusy) return
+    setPeriodError(null)
+    setPeriodBusy(true)
+    const res = await window.oldweb.periodRender(activeTab.id, {
+      key,
+      year: Number(waybackDate.slice(0, 4)),
+      quality: settings.periodQuality ?? 'medium',
+      prompt: settings.periodPrompt
+    })
+    setPeriodBusy(false)
+    if (res.error) setPeriodError(res.error)
+    else setPeriodLive(res.liveUrl ?? unwrapWayback(activeTab.url))
+  }
+  const periodBack = (): void => {
+    if (periodLive && activeTab) window.oldweb.navigate(activeTab.id, periodLive)
+    setPeriodLive(null)
+    setPeriodError(null)
+  }
+  // "Off" in the flyout: return to today's live page (exit a Period Render, else Wayback).
+  const goToday = (): void => {
+    if (periodLive) periodBack()
+    else actions.setOldWebActive(false)
+  }
 
   // The toolbar is fully theme-defined: the manifest lists exactly which
   // buttons appear and in what order. Each action maps to a handler here.
@@ -439,6 +498,7 @@ export function App() {
             })
           ),
           { type: 'sep' },
+          { type: 'item', label: 'Show Feature Tour', onSelect: () => setTourActive(true) },
           { type: 'item', label: 'About Reframe', onSelect: () => setDialogOpen(true) }
         ]
       default:
@@ -569,19 +629,24 @@ export function App() {
       )}
 
       <div className={'ow-toolbar' + (unified ? ' ow-toolbar--unified' : '')}>
-        {toolbarItems.map((item, i) =>
-          item === '|' ? (
-            <span key={`sep-${i}`} className="ow-toolbar-sep" aria-hidden />
-          ) : (
+        {toolbarItems.map((item, i) => {
+          if (item === '|') {
+            return <span key={`sep-${i}`} className="ow-toolbar-sep" aria-hidden />
+          }
+          // Defensive: a malformed manifest could list an unknown action; skip it
+          // rather than crash on navAction[item].label.
+          const a = navAction[item]
+          if (!a) return null
+          return (
             <NavButton
               key={`${item}-${i}`}
               action={item}
-              label={navAction[item].label}
-              disabled={navAction[item].disabled}
-              onClick={navAction[item].onClick}
+              label={a.label}
+              disabled={a.disabled}
+              onClick={a.onClick}
             />
           )
-        )}
+        })}
 
         {unified ? (
           <>
@@ -692,11 +757,19 @@ export function App() {
         oldWeb={oldWeb}
         waybackYear={settings.waybackYear || 0}
         onWayback={applyWaybackYear}
-        onWaybackOff={() => actions.setOldWebActive(false)}
+        onWaybackOff={goToday}
+        onYearChange={(y) => saveSettings({ ...settings, waybackYear: y })}
+        canPeriodRender={canPeriodRender}
+        periodBusy={periodBusy}
+        periodActive={periodLive != null}
+        periodError={periodError}
+        onPeriodRender={periodRender}
+        forceOpen={tourActive}
         speed={settings.connectionSpeed || 'full'}
         speedOpts={SPEED_OPTS}
         onSpeed={(id) => setConnectionSpeed(id as Settings['connectionSpeed'])}
       />
+      {tourActive && <TourOverlay steps={TOUR_STEPS} onDone={() => setTourActive(false)} />}
     </div>
   )
 }

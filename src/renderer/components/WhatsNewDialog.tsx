@@ -1,26 +1,30 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.0.0'
+export const WHATS_NEW_VERSION = '1.2.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'New theme — Firefox 1.0',
-    body: 'The 2004 classic joins the line-up, with its blue title bar, bookmarks toolbar and tabbed browsing. Time-travels to 9 November 2004.'
+    title: 'New — Period Render (AI)',
+    body: 'Add your OpenAI key in Settings, then re-imagine any modern page as a single image in the style of a chosen year — the real content is kept, only the design and pictures are aged. In the floating controls.'
   },
   {
-    title: 'More default bookmarks',
-    body: 'Retrocast weather (weather.com/retro) lands in the Netscape and Firefox bookmark bars.'
+    title: 'New theme — Netscape Communicator 6.0',
+    body: 'The 2000 Mozilla-era “Modern” chrome joins the line-up, with its silver toolbar, period status bar and animated “N” throbber.'
   },
   {
-    title: 'Automatic updates',
-    body: 'Reframe now checks for new releases and can update itself — see Reframe ▸ Check for Updates.'
+    title: 'Floating quick controls',
+    body: 'A subtle button centred at the bottom opens a flyout to switch theme, set the Wayback year (and time-travel there), compare today vs an archived year, and change the Time-Warp connection speed.'
   },
   {
-    title: 'Global settings & about',
-    body: 'Pick your home page, start theme and Wayback year, all from one place (⌘,).'
+    title: 'Editing that works + page zoom',
+    body: 'Cut, Copy, Paste and Select All now act on the live page from the menus and buttons, and the Font +/− buttons zoom it.'
+  },
+  {
+    title: 'Under the hood',
+    body: 'Security hardening (URL/IPC validation, theme-id checks) and signed, notarized builds.'
   }
 ]
 
