@@ -31,6 +31,33 @@ describe('sanitizeManifest', () => {
     expect(m.name).toBe('ie5')
   })
 
+  it('keeps only known toolbar items and drops the field when none survive', () => {
+    const ok = sanitizeManifest({ id: 't', name: 'T', toolbar: ['back', 'evil', '|', 'home'] }, 't')
+    expect(ok.toolbar).toEqual(['back', '|', 'home'])
+
+    const bogus = sanitizeManifest({ id: 't', name: 'T', toolbar: ['nope', 42] }, 't')
+    expect(bogus.toolbar).toBeUndefined() // → UI falls back to DEFAULT_TOOLBAR
+
+    const notArray = sanitizeManifest({ id: 't', name: 'T', toolbar: 'back' }, 't')
+    expect(notArray.toolbar).toBeUndefined()
+  })
+
+  it('coerces menus/labels/layout to safe shapes', () => {
+    const m = sanitizeManifest(
+      {
+        id: 't',
+        name: 'T',
+        menus: ['File', 42, '', 'Help'],
+        labels: { back: 'Zurück', bad: 7 },
+        layout: ['not', 'an', 'object']
+      },
+      't'
+    )
+    expect(m.menus).toEqual(['File', 'Help'])
+    expect(m.labels).toEqual({ back: 'Zurück' })
+    expect(m.layout).toBeUndefined()
+  })
+
   it('restricts homeUrl + personalBar urls to http/https', () => {
     const m = sanitizeManifest(
       {

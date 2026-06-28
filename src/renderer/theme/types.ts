@@ -4,38 +4,45 @@ export interface ThemeSummary {
   era: string
 }
 
-/** Toolbar entries. Known actions render as buttons; '|' is a separator. */
-export type ToolbarItem =
-  | 'back'
-  | 'forward'
-  | 'stop'
-  | 'refresh'
-  | 'home'
-  | 'search'
-  | 'favorites'
-  | 'history'
-  | 'mail'
-  | 'print'
-  | 'edit'
-  | 'netscape'
-  | 'security'
-  | 'shop'
+/**
+ * Known toolbar actions — the single runtime source of truth, used both to
+ * derive the `ToolbarItem` type and to validate a fetched manifest's toolbar
+ * (see theme/validate.ts). '|' is a separator and is handled separately.
+ */
+export const TOOLBAR_ITEMS = [
+  'back',
+  'forward',
+  'stop',
+  'refresh',
+  'home',
+  'search',
+  'favorites',
+  'history',
+  'mail',
+  'print',
+  'edit',
+  'netscape',
+  'security',
+  'shop',
   // Opera 3.x toolbar set
-  | 'new'
-  | 'open'
-  | 'save'
-  | 'copy'
-  | 'url'
-  | 'hotlist'
-  | 'tile'
-  | 'cascade'
+  'new',
+  'open',
+  'save',
+  'copy',
+  'url',
+  'hotlist',
+  'tile',
+  'cascade',
   // Internet Explorer 1.0 toolbar set
-  | 'favadd'
-  | 'fontup'
-  | 'fontdown'
-  | 'cut'
-  | 'paste'
-  | '|'
+  'favadd',
+  'fontup',
+  'fontdown',
+  'cut',
+  'paste'
+] as const
+
+/** Toolbar entries. Known actions render as buttons; '|' is a separator. */
+export type ToolbarItem = (typeof TOOLBAR_ITEMS)[number] | '|'
 
 export interface ThemeManifest {
   id: string
