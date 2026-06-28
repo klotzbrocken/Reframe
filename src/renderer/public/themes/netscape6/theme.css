@@ -1,0 +1,486 @@
+/*
+ * Netscape Communicator 6.0 (2000) — the Mozilla-era "Modern" chrome.
+ *
+ * The 48px navigation strip is the supplied 1:1 reference artwork
+ * (assets/toolbar_full.png, 1024×48) painted as a stretched background; the real
+ * Back/Forward/Reload/Stop/Search/Print/N buttons, the Go circle and the address
+ * field are transparent, percentage-positioned hot-spots laid over it, so they
+ * stay aligned with the artwork at any width and remain fully functional.
+ * The title/window caption is left to the app's shared Win98/XP chrome (the
+ * global menu-style setting). The "N" throbber animates the supplied 41-frame
+ * Netscape logo. Original/period reference artwork only — no third-party logos.
+ */
+
+body {
+  font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #101014;
+  background: #c0c0c0;
+}
+
+/* Outer window frame — same raised bevel + 5px inset as the other Win-era themes */
+.ow-root {
+  background: #c0c0c0;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px #808080,
+    inset 2px 2px #ffffff;
+  padding: 5px;
+}
+
+/* --- title bar -----------------------------------------------------------
+ * Intentionally NOT restyled: the caption uses the app's shared Windows 98 /
+ * XP-Luna chrome (driven by the global menu-style setting). Only the window
+ * icon is themed to the Netscape "N". */
+.ow-titlebar__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: url('assets/title_n.png') center / contain no-repeat;
+}
+
+/* --- menu bar ------------------------------------------------------------ */
+.ow-menubar {
+  background: #dde3ea;
+  height: 21px;
+  padding: 0 4px;
+  gap: 0;
+  position: relative;
+  z-index: 50;
+  border-bottom: 1px solid #aeb8c4;
+}
+.ow-menu__label {
+  padding: 3px 8px;
+  line-height: 14px;
+  color: #101014;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: #316ac5;
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #f4f3ef;
+  padding: 2px;
+  border: 1px solid #5a5a5a;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.32);
+  font-size: 11px;
+}
+.ow-menu__heading {
+  padding: 4px 22px 2px 26px;
+  font-weight: 700;
+  color: #555;
+}
+.ow-menu__item {
+  padding: 4px 22px 4px 26px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #316ac5;
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #9a9aa2;
+}
+.ow-menu__sep {
+  height: 0;
+  margin: 3px 2px;
+  border-top: 1px solid #a6a6a6;
+}
+.ow-menu__check {
+  width: 18px;
+}
+
+/* --- "N" throbber: the 41-frame Netscape logo, animated IN PLACE over the
+ * toolbar artwork's N box (≈ left 990, 34×40 of the 1024×48 strip). The sprite
+ * frames share the artwork's black background, so the 40×40 overlay replaces
+ * the static N seamlessly — parked on frame 0 when idle, stepped while loading.
+ * The menu-bar throbber is hidden: Netscape's throbber lived in the toolbar. */
+.ow-menubar .ow-throbber {
+  display: none;
+}
+.ow-toolbar--unified .ow-throbber {
+  display: block;
+  position: absolute;
+  left: 97.7%;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  background: url('assets/throbber.png') 0 0 no-repeat;
+  pointer-events: none;
+}
+.ow-toolbar--unified .ow-throbber__dot {
+  display: none;
+}
+.ow-toolbar--unified .ow-throbber.is-active {
+  animation: ns-throb 1.3s steps(41) infinite;
+}
+@keyframes ns-throb {
+  to {
+    background-position-x: -1640px;
+  }
+}
+
+/* --- unified navigation strip = the 1:1 toolbar artwork + hot-spots ------- */
+.ow-toolbar--unified {
+  position: relative;
+  height: 48px;
+  padding: 0;
+  gap: 0;
+  overflow: visible;
+  background: url('assets/toolbar_full.png') 0 0 / 100% 100% no-repeat;
+}
+/* every toolbar button is a transparent click target over the artwork; the
+   percentages are measured from the artwork (centres: back 44, fwd 84,
+   reload 134, stop 184, go 222, search 870, print 955, N 994 of 1024px) */
+.ow-toolbar--unified .ow-btn {
+  position: absolute;
+  top: 2%;
+  height: 92%;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 50%;
+}
+.ow-toolbar--unified .ow-btn__icon,
+.ow-toolbar--unified .ow-btn__label {
+  display: none;
+}
+.ow-toolbar--unified .ow-btn:active:not(:disabled) {
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.22), transparent 70%);
+  transform: translateY(1px);
+}
+.ow-toolbar--unified .ow-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ow-toolbar--unified .ow-btn[data-action='back'] {
+  left: 2.05%;
+  width: 4.1%;
+}
+.ow-toolbar--unified .ow-btn[data-action='forward'] {
+  left: 6.25%;
+  width: 3.9%;
+}
+.ow-toolbar--unified .ow-btn[data-action='refresh'] {
+  left: 11.1%;
+  width: 3.9%;
+}
+.ow-toolbar--unified .ow-btn[data-action='stop'] {
+  left: 16%;
+  width: 3.9%;
+}
+/* "Suchen" button — rectangular, so not circular */
+.ow-toolbar--unified .ow-btn[data-action='search'] {
+  left: 81.25%;
+  width: 7.6%;
+  border-radius: 4px;
+}
+.ow-toolbar--unified .ow-btn[data-action='print'] {
+  left: 90.8%;
+  width: 5.1%;
+  border-radius: 4px;
+}
+.ow-toolbar-sep {
+  display: none;
+}
+
+/* the address form spans the whole strip as a (click-through) positioning layer;
+   only the field, dropdown and Go circle inside it take pointer events */
+.ow-toolbar--unified .ow-addressbar {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+.ow-address-label {
+  display: none;
+}
+/* the white address field sits exactly over the empty field in the artwork */
+.ow-toolbar--unified .ow-address-combo {
+  position: absolute;
+  left: 24.6%;
+  width: 53.3%;
+  top: 27%;
+  height: 46%;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  pointer-events: auto;
+}
+.ow-address-favicon {
+  display: block;
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 20px;
+  z-index: 2;
+  background: transparent;
+  cursor: grab;
+}
+.ow-address-favicon:active {
+  cursor: grabbing;
+}
+.ow-address-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 4px 0 21px;
+  font-size: 12px;
+  border: 0;
+  color: #101014;
+  /* page favicon painted as background-image by JS; CSS sets where/how big */
+  background-image: none;
+  background-position: 4px center;
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+/* recent-addresses arrow — transparent, parked over the artwork's dropdown glyph */
+.ow-address-dropdown {
+  display: inline-block;
+  width: 20px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+.ow-address-list {
+  background: #fff;
+  border: 1px solid #5a5a5a;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.32);
+  font-size: 12px;
+}
+.ow-address-item {
+  padding: 3px 8px;
+}
+.ow-address-item:hover {
+  background: #316ac5;
+  color: #fff;
+}
+/* the small "Go" circle to the left of the field is a transparent hot-spot */
+.ow-toolbar--unified .ow-go {
+  position: absolute;
+  left: 19.9%;
+  width: 3.5%;
+  top: 16%;
+  height: 70%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: auto;
+  border-radius: 50%;
+}
+.ow-go__label,
+.ow-go__icon {
+  display: none;
+}
+.ow-toolbar--unified .ow-go:active {
+  transform: translateY(1px);
+}
+/* search field is baked into the artwork ("Suchen" button) — hide the real one */
+.ow-searchbox {
+  display: none;
+}
+
+/* --- personal toolbar ---------------------------------------------------- */
+.ow-personalbar {
+  background: #dde3ea;
+  height: 20px;
+  padding: 0 6px;
+  border-bottom: 1px solid #aeb8c4;
+  gap: 2px;
+}
+.ow-pbar-btn {
+  height: 17px;
+  padding: 0 6px;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #101014;
+}
+.ow-pbar-btn:hover {
+  border-color: #fff #808080 #808080 #fff;
+  background: #eef2f7;
+}
+.ow-pbar-btn:active {
+  border-color: #808080 #fff #fff #808080;
+}
+.ow-pbar-btn__icon {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  background: radial-gradient(circle at 40% 35%, #bfe0ff 0 35%, #3f86c8 36% 70%, #1f5a9c 71%);
+  border-radius: 50%;
+}
+
+/* --- tabs (Netscape 6 rounded tabs, with real favicons) ------------------ */
+.ow-tabstrip {
+  background: #9dacbc;
+  padding: 4px 4px 0 6px;
+  gap: 2px;
+  height: 24px;
+}
+.ow-tab {
+  background: #aebbc8;
+  border: 1px solid #7e8c9c;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  padding: 2px 8px 3px;
+  position: relative;
+  top: 3px;
+  height: 20px;
+  font-size: 11px;
+  color: #1c2530;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.12);
+}
+.ow-tab.is-active {
+  top: 0;
+  height: 23px;
+  background: #c8d1da;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  z-index: 5;
+}
+/* opt in to the per-tab favicon; the loading spinner is redundant here
+   (the menu-bar throbber + status progress already signal loading) */
+.ow-root[data-theme='netscape6'] .ow-tab__favicon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 1px;
+}
+.ow-root[data-theme='netscape6'] .ow-tab__spinner {
+  display: none;
+}
+.ow-tab__close {
+  width: 14px;
+  height: 14px;
+  font-size: 11px;
+  color: #7a1a0a;
+  background: transparent;
+  border-radius: 2px;
+}
+.ow-tab__close:hover {
+  background: #d6a59c;
+  color: #4a0d04;
+}
+.ow-tab-new {
+  align-self: center;
+  width: 20px;
+  height: 18px;
+  margin-left: 4px;
+  font-size: 13px;
+  line-height: 1;
+  background: #c8d1da;
+  border: 1px solid #7e8c9c;
+  border-radius: 4px;
+}
+
+/* --- content ------------------------------------------------------------- */
+.ow-content {
+  background: #fff;
+}
+
+/* --- status bar ---------------------------------------------------------- */
+.ow-statusbar {
+  background: #c8d1da;
+  height: 24px;
+  padding: 0 4px;
+  gap: 4px;
+  border-top: 1px solid #eef1f4;
+}
+/* component icons — the supplied reference strip (116×16), shown at full size */
+.ow-statusbar::before {
+  content: '';
+  flex: 0 0 116px;
+  width: 116px;
+  height: 16px;
+  align-self: center;
+  background: url('assets/status_icons.png') left center / 116px 16px no-repeat;
+}
+.ow-status-text {
+  flex: 1 1 auto;
+  border: 1px solid;
+  border-color: #9aa6b2 #eef1f4 #eef1f4 #9aa6b2;
+  padding: 2px 6px;
+  height: 18px;
+  line-height: 14px;
+  background: #c8d1da;
+}
+.ow-progress {
+  width: 150px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 1px solid;
+  border-color: #9aa6b2 #eef1f4 #eef1f4 #9aa6b2;
+  padding: 2px;
+  overflow: hidden;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(90deg, #3f6fb0 0 6px, #5a86c2 6px 12px);
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 100%;
+  animation: ns-marquee 0.7s linear infinite;
+}
+@keyframes ns-marquee {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 12px;
+  }
+}
+.ow-zone {
+  border: 1px solid;
+  border-color: #9aa6b2 #eef1f4 #eef1f4 #9aa6b2;
+  padding: 2px 6px;
+  height: 18px;
+  line-height: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #c8d1da;
+}
+.ow-zone__lock {
+  width: 9px;
+  height: 11px;
+  flex: 0 0 auto;
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='11'%3E%3Crect x='0' y='4' width='9' height='7' rx='1' fill='%23e8c020' stroke='%23806000'/%3E%3Cpath d='M2 4V3a2.5 2.5 0 0 1 5 0v1' fill='none' stroke='%23806000' stroke-width='1'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* --- scrollbars (light Luna-ish) ----------------------------------------- */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+::-webkit-scrollbar-track {
+  background: #dbe2ea;
+}
+::-webkit-scrollbar-thumb {
+  background: #aebbc8;
+  border: 1px solid;
+  border-color: #fff #7e8c9c #7e8c9c #fff;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bcc8d4;
+}

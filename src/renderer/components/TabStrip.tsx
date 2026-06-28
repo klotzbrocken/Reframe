@@ -20,6 +20,9 @@ export function TabStrip({ tabs, activeId, newTabLabel, onActivate, onClose, onN
           title={t.title}
         >
           <span className={'ow-tab__spinner' + (t.isLoading ? ' is-active' : '')} aria-hidden />
+          {t.favicon && (
+            <img className="ow-tab__favicon" src={t.favicon} alt="" aria-hidden draggable={false} />
+          )}
           <span className="ow-tab__title">{t.title || 'Loading…'}</span>
           <button
             className="ow-tab__close"

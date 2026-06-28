@@ -10,6 +10,9 @@ const api: OldwebAPI = {
   goForward: (id) => ipcRenderer.invoke('shell:goForward', id),
   reload: (id) => ipcRenderer.invoke('shell:reload', id),
   stop: (id) => ipcRenderer.invoke('shell:stop', id),
+  editCommand: (id, cmd) => ipcRenderer.invoke('shell:editCommand', id, cmd),
+  zoomStep: (id, dir) => ipcRenderer.invoke('shell:zoomStep', id, dir),
+  periodRender: (id, opts) => ipcRenderer.invoke('shell:periodRender', id, opts),
   setContentInsets: (insets: ContentInsets) =>
     ipcRenderer.invoke('shell:setContentInsets', insets),
   setRetroContent: (id, enabled) =>
