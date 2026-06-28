@@ -5,6 +5,11 @@
 
 const WB_RE = /^https?:\/\/web\.archive\.org\/web\/(\d+)(?:[a-z]{2}_)?\/(.*)$/i
 
+/** Selectable Wayback year range — the single source of truth shared by the
+ *  Settings dialog and the floating control, so both offer the same options. */
+export const WAYBACK_MIN_YEAR = 1996
+export const WAYBACK_MAX_YEAR = 2010
+
 /** True if the URL is a Wayback Machine snapshot URL. */
 export function isWayback(url: string): boolean {
   return WB_RE.test(url)

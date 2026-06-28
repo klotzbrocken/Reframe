@@ -249,6 +249,12 @@ body,
   text-overflow: ellipsis;
 }
 
+/* per-tab favicon — hidden by default; themes that want it (Netscape 6) opt in */
+.ow-tab__favicon {
+  display: none;
+  flex: 0 0 auto;
+}
+
 .ow-tab__close,
 .ow-tab-new {
   flex: 0 0 auto;
@@ -454,11 +460,25 @@ body,
   font-size: 12px;
 }
 .ow-field input,
-.ow-field select {
+.ow-field select,
+.ow-field textarea {
   font: inherit;
   padding: 4px 6px;
   border: 1px solid #999;
   background: #fff;
+}
+.ow-field textarea {
+  resize: vertical;
+  min-height: 92px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.ow-field__reset {
+  align-self: flex-start;
+  margin-top: 2px;
+  font: inherit;
+  font-size: 11px;
 }
 .ow-field--check {
   flex-direction: row;
@@ -689,4 +709,261 @@ body,
 }
 .ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='close']:active {
   background-color: #c23e22 !important;
+}
+
+/* ======================================================================== *
+ * Floating controls (theme-independent): quick access to theme, Wayback year
+ * and connection speed. Docked bottom-right; the flyout opens upward and the
+ * chrome is floated above the page while it is open (requestChromeTop('fab')).
+ * Deliberately NOT themed — it is a Reframe app control, not period chrome.
+ * ======================================================================== */
+.ow-fab {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 5px;
+  z-index: 9000;
+  font-family: -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+/* deliberately unobtrusive: a small, faint icon-only disc centred in the footer */
+.ow-fab__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(34, 38, 48, 0.62);
+  color: #fff;
+  opacity: 0.9;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4), 0 0 0 1.5px var(--ow-highlight, #4a86e8);
+  transition: opacity 0.12s ease, background 0.12s ease;
+}
+.ow-fab__btn:hover {
+  opacity: 1;
+  background: rgba(34, 38, 48, 0.85);
+}
+.ow-fab.is-open .ow-fab__btn {
+  opacity: 1;
+  background: var(--ow-highlight, #2f6fed);
+}
+.ow-fab__btn:focus-visible,
+.ow-fab__chip:focus-visible,
+.ow-tour__next:focus-visible,
+.ow-tour__skip:focus-visible {
+  outline: 2px solid var(--ow-highlight, #2f6fed);
+  outline-offset: 2px;
+  opacity: 1;
+}
+.ow-fab__glyph {
+  font-size: 11px;
+  line-height: 1;
+}
+.ow-fab__panel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 26px;
+  width: 320px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  background: #f6f7f9;
+  color: #1a1d24;
+  border: 1px solid #c4c8d0;
+  border-radius: 11px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.38);
+}
+.ow-fab__section {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.ow-fab__title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+.ow-fab__wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.ow-fab__chip {
+  padding: 5px 11px;
+  border: 1px solid #c8ccd4;
+  border-radius: 13px;
+  background: #fff;
+  color: #1a1d24;
+  font-size: 11px;
+  cursor: pointer;
+}
+.ow-fab__chip:hover {
+  border-color: var(--ow-highlight, #2f6fed);
+}
+.ow-fab__chip.is-active {
+  background: var(--ow-highlight, #2f6fed);
+  border-color: var(--ow-highlight, #2f6fed);
+  color: #fff;
+}
+/* Theme picker: even 2-column rows instead of a ragged wrap pile */
+.ow-fab__wrap--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+.ow-fab__wrap--grid .ow-fab__chip {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Full-width action (Period Render) below the Time-Travel / Off pair */
+.ow-fab__chip--wide {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  text-align: center;
+}
+.ow-fab__chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ow-fab__chip:disabled:hover {
+  border-color: #c8ccd4;
+}
+.ow-fab__hint {
+  font-size: 10px;
+  color: #8b91a0;
+  line-height: 1.3;
+}
+.ow-fab__hint--err {
+  color: #c0392b;
+}
+
+/* ---- first-run coachmark tour (transparent, colourful arrows) --------- *
+ * No dimming — the page stays visible. The layer is click-through; only the
+ * label card takes clicks. Each step's accent colour comes from the --c var. */
+.ow-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  pointer-events: none;
+  font-family: -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+/* glowing colour ring around the highlighted feature (transparent centre) */
+.ow-tour__ring {
+  position: fixed;
+  border-radius: 9px;
+  border: 2.5px solid var(--c);
+  pointer-events: none;
+  animation: ow-tour-pulse 1.3s ease-in-out infinite;
+  transition: top 0.18s ease, left 0.18s ease, width 0.18s ease, height 0.18s ease;
+}
+@keyframes ow-tour-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--c) 28%, transparent),
+      0 0 14px 2px color-mix(in srgb, var(--c) 55%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 5px color-mix(in srgb, var(--c) 16%, transparent),
+      0 0 22px 6px color-mix(in srgb, var(--c) 70%, transparent);
+  }
+}
+/* bright colour arrow with a white halo so it pops on any background */
+.ow-tour__arrow {
+  position: fixed;
+  color: var(--c);
+  pointer-events: none;
+  filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 5px color-mix(in srgb, var(--c) 75%, transparent));
+  animation: ow-tour-nudge 0.9s ease-in-out infinite;
+}
+.ow-tour__arrow.is-left {
+  transform: rotate(180deg);
+}
+@keyframes ow-tour-nudge {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 5px 0;
+  }
+}
+.ow-tour__card {
+  position: fixed;
+  pointer-events: auto;
+  padding: 11px 12px 10px;
+  background: #ffffff;
+  border: 1px solid #d7dbe2;
+  border-left: 4px solid var(--c);
+  border-radius: 9px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+.ow-tour__title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--c);
+  margin-bottom: 3px;
+}
+.ow-tour__body {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #41474f;
+}
+.ow-tour__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+.ow-tour__dots {
+  font-size: 11px;
+  color: #9aa0aa;
+}
+.ow-tour__skip {
+  font-size: 11px;
+  background: none;
+  border: none;
+  color: #9aa0aa;
+  cursor: pointer;
+}
+.ow-tour__next {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border: none;
+  border-radius: 13px;
+  background: var(--c);
+  color: #fff;
+  cursor: pointer;
+}
+.ow-tour__next:hover {
+  filter: brightness(1.08);
+}
+.ow-fab__range {
+  width: 100%;
+  accent-color: var(--ow-highlight, #2f6fed);
+  cursor: pointer;
+}
+.ow-fab__years {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 10px;
+  color: #8b91a0;
+}
+.ow-fab__years strong {
+  font-size: 13px;
+  color: #1a1d24;
 }
