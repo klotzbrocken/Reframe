@@ -305,43 +305,14 @@ export function App() {
   const homeUrl = settings.home || manifest?.homeUrl || 'https://www.myretromac.app'
   const searchUrl = 'https://www.google.com'
 
-  // Period Render (AI): re-style the current page as a year-appropriate image.
-  const [periodBusy, setPeriodBusy] = useState(false)
-  const [periodLive, setPeriodLive] = useState<string | null>(null)
-  const [periodError, setPeriodError] = useState<string | null>(null)
-  const canPeriodRender = !!settings.openaiApiKey?.trim() && !!activeTab
-  const periodRender = async (): Promise<void> => {
-    const key = settings.openaiApiKey?.trim()
-    if (!activeTab || !key || periodBusy) return
-    setPeriodError(null)
-    setPeriodBusy(true)
-    const res = await window.oldweb.periodRender(activeTab.id, {
-      key,
-      year: Number(waybackDate.slice(0, 4)),
-      quality: settings.periodQuality ?? 'medium',
-      prompt: settings.periodPrompt
-    })
-    setPeriodBusy(false)
-    if (res.error) setPeriodError(res.error)
-    else setPeriodLive(res.liveUrl ?? unwrapWayback(activeTab.url))
-  }
-  const periodBack = (): void => {
-    if (periodLive && activeTab) window.oldweb.navigate(activeTab.id, periodLive)
-    setPeriodLive(null)
-    setPeriodError(null)
-  }
-  // "Off" in the flyout: return to today's live page (exit a Period Render, else Wayback).
-  const goToday = (): void => {
-    if (periodLive) periodBack()
-    else actions.setOldWebActive(false)
-  }
+  // "Today" in the flyout: return to today's live page (exit Wayback).
+  const goToday = (): void => actions.setOldWebActive(false)
 
-  // "Today vs {year}" share/export.
+  // "Today vs {year}" share/export (real Wayback snapshot vs the live page).
   const [shareOpen, setShareOpen] = useState(false)
   const [shareBusy, setShareBusy] = useState(false)
   const [shareImg, setShareImg] = useState<string | null>(null)
   const [shareError, setShareError] = useState<string | null>(null)
-  const [shareSource, setShareSource] = useState<'ai' | 'wayback'>('wayback')
   const [shareLabelYear, setShareLabelYear] = useState('')
   const [shareReqYear, setShareReqYear] = useState(2001)
   const [shareSuggest, setShareSuggest] = useState<number | null>(null)
@@ -349,9 +320,8 @@ export function App() {
     requestChromeTop('share', shareOpen)
     return () => requestChromeTop('share', false)
   }, [shareOpen])
-  const runShare = async (source: 'ai' | 'wayback', year: number): Promise<void> => {
+  const runShare = async (year: number): Promise<void> => {
     if (!activeTab) return
-    setShareSource(source)
     setShareReqYear(year)
     setShareOpen(true)
     setShareBusy(true)
@@ -359,11 +329,8 @@ export function App() {
     setShareImg(null)
     setShareSuggest(null)
     const res = await window.oldweb.shareSources(activeTab.id, {
-      source,
+      source: 'wayback',
       year,
-      key: settings.openaiApiKey?.trim(),
-      quality: settings.periodQuality ?? 'medium',
-      prompt: settings.periodPrompt,
       originalUrl: unwrapWayback(activeTab.url)
     })
     // No snapshot at the chosen year — ask the user to confirm the closest one.
@@ -386,8 +353,7 @@ export function App() {
     }
     setShareBusy(false)
   }
-  // Always start with the real archive snapshot (works without an OpenAI key).
-  const openShare = (): void => void runShare('wayback', Number(waybackDate.slice(0, 4)))
+  const openShare = (): void => void runShare(Number(waybackDate.slice(0, 4)))
 
   // The toolbar is fully theme-defined: the manifest lists exactly which
   // buttons appear and in what order. Each action maps to a handler here.
@@ -819,12 +785,6 @@ export function App() {
         onWayback={applyWaybackYear}
         onWaybackOff={goToday}
         onYearChange={(y) => saveSettings({ ...settings, waybackYear: y })}
-        canPeriodRender={canPeriodRender}
-        periodBusy={periodBusy}
-        periodActive={periodLive != null}
-        periodError={periodError}
-        onPeriodRender={periodRender}
-        onOpenSettings={() => setDialogOpen(true)}
         shareYear={waybackDate.slice(0, 4)}
         onShare={openShare}
         forceOpen={tourActive}
@@ -837,16 +797,13 @@ export function App() {
         <ShareDialog
           year={shareLabelYear || String(shareReqYear)}
           reqYear={shareReqYear}
-          source={shareSource}
-          canAi={!!settings.openaiApiKey?.trim()}
           busy={shareBusy}
           error={shareError}
           image={shareImg}
           suggestYear={shareSuggest}
-          onUseSuggest={() => shareSuggest && void runShare(shareSource, shareSuggest)}
-          onSource={(s) => void runShare(s, shareReqYear)}
-          onYear={(y) => void runShare(shareSource, y)}
-          onReload={() => void runShare(shareSource, shareReqYear)}
+          onUseSuggest={() => shareSuggest && void runShare(shareSuggest)}
+          onYear={(y) => void runShare(y)}
+          onReload={() => void runShare(shareReqYear)}
           onSave={() =>
             shareImg &&
             void window.oldweb.shareSave(

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { DEFAULT_ENGINE_ID, SEARCH_ENGINES } from '../shell/engines'
 import { WAYBACK_MIN_YEAR, WAYBACK_MAX_YEAR } from '../shell/wayback'
-import { DEFAULT_PERIOD_PROMPT } from '../../shared/period'
 
 export type FontSize = 'normal' | 'medium' | 'large' | 'xlarge'
 
@@ -22,12 +21,6 @@ export interface Settings {
   closeAction?: 'quit' | 'minimize'
   /** "Time Warp Modem" simulated connection speed. */
   connectionSpeed?: 'full' | 'isdn' | '56k' | '28.8k'
-  /** OpenAI API key for "Period Render" (kept locally; sent only to OpenAI). */
-  openaiApiKey?: string
-  /** Image quality for "Period Render". */
-  periodQuality?: 'low' | 'medium' | 'high'
-  /** Editable prompt template for "Period Render" ({year}/{title}/{text}). */
-  periodPrompt?: string
 }
 
 interface Props {
@@ -60,11 +53,6 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [home, setHome] = useState(settings.home || SITE)
   const [theme, setTheme] = useState(settings.defaultTheme || 'ie5')
   const [year, setYear] = useState(settings.waybackYear || 0)
-  const [openaiKey, setOpenaiKey] = useState(settings.openaiApiKey || '')
-  const [periodQuality, setPeriodQuality] = useState<'low' | 'medium' | 'high'>(
-    settings.periodQuality || 'medium'
-  )
-  const [periodPrompt, setPeriodPrompt] = useState(settings.periodPrompt || DEFAULT_PERIOD_PROMPT)
   const [engine, setEngine] = useState(settings.searchEngine || DEFAULT_ENGINE_ID)
   const [splash, setSplash] = useState(settings.themeSplash !== false)
   const [menuStyle, setMenuStyle] = useState(settings.menuStyle || 'win98')
@@ -104,46 +92,6 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             <label className="ow-field ow-field--wide">
               <span>Home page</span>
               <input value={home} spellCheck={false} onChange={(e) => setHome(e.target.value)} />
-            </label>
-
-            <label className="ow-field ow-field--wide">
-              <span>OpenAI API key — Period Render</span>
-              <input
-                type="password"
-                value={openaiKey}
-                spellCheck={false}
-                placeholder="sk-…  (stored locally; sent only to OpenAI, renders cost money)"
-                onChange={(e) => setOpenaiKey(e.target.value)}
-              />
-            </label>
-
-            <label className="ow-field">
-              <span>Period Render quality</span>
-              <select
-                value={periodQuality}
-                onChange={(e) => setPeriodQuality(e.target.value as 'low' | 'medium' | 'high')}
-              >
-                <option value="low">Low (fast, cheap)</option>
-                <option value="medium">Medium</option>
-                <option value="high">High (slow, best)</option>
-              </select>
-            </label>
-
-            <label className="ow-field ow-field--wide">
-              <span>Period Render prompt — placeholders {'{year}'} {'{title}'} {'{text}'}</span>
-              <textarea
-                rows={9}
-                value={periodPrompt}
-                spellCheck={false}
-                onChange={(e) => setPeriodPrompt(e.target.value)}
-              />
-              <button
-                type="button"
-                className="ow-field__reset"
-                onClick={() => setPeriodPrompt(DEFAULT_PERIOD_PROMPT)}
-              >
-                Reset to default prompt
-              </button>
             </label>
 
           <label className="ow-field">
@@ -257,10 +205,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 menuStyle: menuStyle as 'win98' | 'luna',
                 menuFontSize: menuFontSize as FontSize,
                 labelFontSize: labelFontSize as FontSize,
-                closeAction: closeAction as 'quit' | 'minimize',
-                openaiApiKey: openaiKey.trim() || undefined,
-                periodQuality,
-                periodPrompt: periodPrompt.trim() || undefined
+                closeAction: closeAction as 'quit' | 'minimize'
               })
               onClose()
             }}
