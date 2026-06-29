@@ -1139,7 +1139,7 @@ body,
 /* ---- Mode segment (Today / Time-Travel / ✦ Period) ------------------- */
 .ow-fab__seg {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   border: 1px solid #c6c6c6;
   border-radius: 8px;
   overflow: hidden;
@@ -1162,10 +1162,6 @@ body,
 .ow-fab__segbtn.is-active {
   background: #1f5fc4;
   color: #fff;
-}
-.ow-fab__segbtn--period.is-active {
-  background: #d9b441;
-  color: #3a2e08;
 }
 .ow-fab__segbtn:disabled {
   opacity: 0.55;
@@ -1196,59 +1192,6 @@ body,
   border-color: #1a4fb0;
   background: #1f5fc4;
   color: #fff;
-}
-
-/* ---- Period state strip ---------------------------------------------- */
-.ow-fab__strip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 11px;
-  line-height: 1.35;
-  margin-top: 6px;
-}
-.ow-fab__strip-txt {
-  flex: 1;
-}
-.ow-fab__strip--amber {
-  border: 1px solid #d8c98f;
-  background: #faf3da;
-  color: #6f5512;
-}
-.ow-fab__strip--err {
-  border: 1px solid #e0b4b0;
-  background: #fbeceb;
-  color: #9a2b22;
-}
-.ow-fab__link {
-  border: none;
-  background: transparent;
-  font-weight: 700;
-  font-size: 11px;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  white-space: nowrap;
-  color: inherit;
-}
-.ow-fab__strip--amber .ow-fab__link {
-  color: #9a6f12;
-}
-.ow-fab__spin {
-  width: 13px;
-  height: 13px;
-  border: 2px solid #d9b441;
-  border-top-color: transparent;
-  border-radius: 50%;
-  display: inline-block;
-  animation: rfSpin 0.7s linear infinite;
-}
-@keyframes rfSpin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* ---- Share ----------------------------------------------------------- */

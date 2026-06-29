@@ -6,9 +6,6 @@ interface Props {
   /** Requested year (the stepper value). */
   reqYear: number
   onYear: (y: number) => void
-  source: 'ai' | 'wayback'
-  /** AI source needs an OpenAI key. */
-  canAi: boolean
   busy: boolean
   error: string | null
   /** Composed PNG data URL, once ready. */
@@ -16,7 +13,6 @@ interface Props {
   /** Closest available year when the requested one has no snapshot (confirm flow). */
   suggestYear: number | null
   onUseSuggest: () => void
-  onSource: (s: 'ai' | 'wayback') => void
   onReload: () => void
   onSave: () => void
   onCopy: () => void
@@ -31,14 +27,11 @@ export function ShareDialog({
   year,
   reqYear,
   onYear,
-  source,
-  canAi,
   busy,
   error,
   image,
   suggestYear,
   onUseSuggest,
-  onSource,
   onReload,
   onSave,
   onCopy,
@@ -69,23 +62,7 @@ export function ShareDialog({
                 +
               </button>
             </span>
-            <button
-              type="button"
-              className={'ow-fab__chip' + (source === 'ai' ? ' is-active' : '')}
-              disabled={!canAi || busy}
-              onClick={() => onSource('ai')}
-            >
-              AI render
-            </button>
-            <button
-              type="button"
-              className={'ow-fab__chip' + (source === 'wayback' ? ' is-active' : '')}
-              disabled={busy}
-              onClick={() => onSource('wayback')}
-            >
-              Archive snapshot
-            </button>
-            {!canAi && <span className="ow-share__hint">Add an OpenAI key for AI</span>}
+            <span className="ow-share__hint">Archive snapshot vs the live page</span>
           </div>
           <div className="ow-share__preview">
             {busy ? (

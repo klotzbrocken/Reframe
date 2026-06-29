@@ -1,30 +1,26 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.2.0'
+export const WHATS_NEW_VERSION = '1.3.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'New — Period Render (AI)',
-    body: 'Add your OpenAI key in Settings, then re-imagine any modern page as a single image in the style of a chosen year — the real content is kept, only the design and pictures are aged. In the floating controls.'
+    title: 'New theme — Internet Explorer 4.01 (Mac)',
+    body: 'A pixel-faithful Mac OS 9 “Platinum” chrome: pinstriped title bar with the classic close / zoom / collapse boxes, a colour-icon toolbar, the spinning blue “e”, an “Internet zone” status bar — and the bundled Charcoal system font.'
   },
   {
-    title: 'New theme — Netscape Communicator 6.0',
-    body: 'The 2000 Mozilla-era “Modern” chrome joins the line-up, with its silver toolbar, period status bar and animated “N” throbber.'
+    title: 'Redesigned controls',
+    body: 'The floating hub is now a clean panel led by the Time Machine: a big year display, a slider, and a Today / Time-Travel switch, plus a compact theme dropdown and the page-load speed.'
   },
   {
-    title: 'Floating quick controls',
-    body: 'A subtle button centred at the bottom opens a flyout to switch theme, set the Wayback year (and time-travel there), compare today vs an archived year, and change the Time-Warp connection speed.'
+    title: 'Share — “Today vs {year}”',
+    body: 'Export a stacked image comparing today’s live page with the archived year, complete with the Reframe brand — one click from the controls.'
   },
   {
-    title: 'Editing that works + page zoom',
-    body: 'Cut, Copy, Paste and Select All now act on the live page from the menus and buttons, and the Font +/− buttons zoom it.'
-  },
-  {
-    title: 'Under the hood',
-    body: 'Security hardening (URL/IPC validation, theme-id checks) and signed, notarized builds.'
+    title: 'Two-finger swipe',
+    body: 'Swipe left/right with two fingers on the trackpad to go forward / back through history, just like a native browser.'
   }
 ]
 
