@@ -36,6 +36,12 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
   )
   handle('shell:goBack', (_e, id) => (validId(id) ? s()?.goBack(id) : undefined))
   handle('shell:goForward', (_e, id) => (validId(id) ? s()?.goForward(id) : undefined))
+
+  // Two-finger swipe sent from a page's preload (a different sender than the
+  // chrome, so it can't use `handle`). The shell verifies the sender owns a tab.
+  ipcMain.on('page:swipe', (e, dir) => {
+    if (dir === 'back' || dir === 'forward') s()?.swipeNavigate(e.sender.id, dir)
+  })
   handle('shell:reload', (_e, id) => (validId(id) ? s()?.reload(id) : undefined))
   handle('shell:stop', (_e, id) => (validId(id) ? s()?.stop(id) : undefined))
   handle('shell:editCommand', (_e, id, cmd) =>
@@ -57,6 +63,31 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
     if (!Number.isInteger(year)) return { error: 'Invalid year' }
     return s()?.periodRender(id, { key, year, quality, prompt })
   })
+  handle('share:sources', (_e, id, opts) => {
+    if (!validId(id) || !opts || typeof opts !== 'object') return { error: 'Bad request' }
+    const o = opts as Record<string, unknown>
+    const source = o.source === 'wayback' ? 'wayback' : 'ai'
+    const year = Number(o.year)
+    if (!Number.isInteger(year)) return { error: 'Invalid year' }
+    const key = typeof o.key === 'string' ? o.key.trim() : undefined
+    const quality = o.quality === 'low' || o.quality === 'high' ? o.quality : 'medium'
+    const prompt = typeof o.prompt === 'string' ? o.prompt : undefined
+    const originalUrl =
+      typeof o.originalUrl === 'string' && /^https?:\/\//i.test(o.originalUrl)
+        ? o.originalUrl
+        : undefined
+    return s()?.shareSources(id, { source, year, key, quality, prompt, originalUrl })
+  })
+  handle('share:save', (_e, dataUrl, name) =>
+    typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png;base64,')
+      ? s()?.saveShareImage(dataUrl, typeof name === 'string' && name ? name : 'reframe-share.png')
+      : { error: 'Bad image' }
+  )
+  handle('share:copy', (_e, dataUrl) =>
+    typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png;base64,')
+      ? s()?.copyShareImage(dataUrl)
+      : undefined
+  )
   handle('shell:setRetroContent', (_e, id, enabled) =>
     validId(id) ? s()?.setRetroContent(id, asBool(enabled)) : undefined
   )

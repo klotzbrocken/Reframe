@@ -1,0 +1,63 @@
+{
+  "id": "ie4mac",
+  "name": "Internet Explorer 4.01 (Mac)",
+  "era": "1998 · Mac OS 9",
+  "toolbar": [
+    "back",
+    "forward",
+    "stop",
+    "refresh",
+    "home",
+    "search",
+    "mail",
+    "favorites",
+    "fontup",
+    "fontdown",
+    "preferences"
+  ],
+  "menus": ["File", "Edit", "View", "Go", "Help"],
+  "homeUrl": "https://www.yahoo.com",
+  "oldWebDate": "19980601",
+  "layout": {
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": false
+  },
+  "throbber": {
+    "kind": "image",
+    "label": "Working"
+  },
+  "labels": {
+    "address": "Address",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "search": "Search",
+    "mail": "Mail",
+    "favorites": "Favorites",
+    "fontup": "Larger",
+    "fontdown": "Smaller",
+    "preferences": "Preferences"
+  },
+  "vars": {
+    "--ie4-platinum": "#cccccc",
+    "--ie4-light": "#dddddd",
+    "--ie4-lighter": "#eeeeee",
+    "--ie4-dark": "#262626",
+    "--ie4-med": "#808080",
+    "--ie4-edge": "#c4c4c4",
+    "--ie4-thumb": "#9999ff",
+    "--ie4-thumb-dark": "#4c4c99",
+    "--ie4-track": "#aaaaaa",
+    "--ie4-sel": "#333399",
+    "--ow-highlight": "#333399",
+    "--ow-titlebar": "#cccccc",
+    "--ow-text": "#262626",
+    "--ow-field": "#ffffff",
+    "--ow-face": "#dddddd",
+    "--ow-font": "'Charcoal', 'Geneva', 'Helvetica Neue', Arial, sans-serif"
+  }
+}

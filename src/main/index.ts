@@ -47,7 +47,7 @@ let shell: BrowserShell | null = null
 let mainWindow: BaseWindow | null = null
 let splashWin: BrowserWindow | null = null
 
-const PRELOAD = () => join(__dirname, '../preload/index.mjs')
+const PRELOAD = () => join(__dirname, '../preload/index.cjs')
 
 /** URL of a static page in the renderer (dev server, or the app:// scheme). */
 function pageUrl(file: string): string {
@@ -178,16 +178,24 @@ function showThemeSplash(themeId: string): void {
 // electron-builder when packaging the .app (build/icon.icns).
 function setDockIcon(): void {
   if (process.platform !== 'darwin' || !app.dock) return
-  const base = app.isPackaged
-    ? join(process.resourcesPath, 'app-icons')
-    : join(app.getAppPath(), 'resources/app-icons')
-  for (const file of ['reframe.png', 'reframe.icns']) {
-    const img = nativeImage.createFromPath(join(base, file))
-    if (!img.isEmpty()) {
-      app.dock.setIcon(img)
-      return
+  // Try several roots: in dev getAppPath() may resolve to the project root OR to
+  // the out/ build dir, so also probe relative to this module (out/main).
+  const bases = app.isPackaged
+    ? [join(process.resourcesPath, 'app-icons')]
+    : [
+        join(app.getAppPath(), 'resources/app-icons'),
+        join(__dirname, '../../resources/app-icons')
+      ]
+  for (const base of bases) {
+    for (const file of ['reframe.png', 'reframe.icns']) {
+      const img = nativeImage.createFromPath(join(base, file))
+      if (!img.isEmpty()) {
+        app.dock.setIcon(img)
+        return
+      }
     }
   }
+  console.error('[reframe] dock icon not found; tried:', bases.join(', '))
 }
 
 // --- auto-update (electron-updater, fed by GitHub Releases) ---------------
@@ -308,7 +316,7 @@ function createWindow(): void {
   // fills the whole window. Page views are stacked on top in the content region.
   const chromeView = new WebContentsView({
     webPreferences: {
-      preload: join(__dirname, '../preload/index.mjs'),
+      preload: join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false

@@ -38,7 +38,9 @@ export const TOOLBAR_ITEMS = [
   'fontup',
   'fontdown',
   'cut',
-  'paste'
+  'paste',
+  // Internet Explorer 4.01 (Mac) toolbar set
+  'preferences'
 ] as const
 
 /** Toolbar entries. Known actions render as buttons; '|' is a separator. */
@@ -116,6 +118,7 @@ export interface ThemeManifest {
     fontdown?: string
     cut?: string
     paste?: string
+    preferences?: string
   }
   /** Event name -> sound file (relative to the theme's sounds/ dir). */
   sounds?: Record<string, string>
@@ -153,7 +156,8 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
   fontup: 'Use Larger Font',
   fontdown: 'Use Smaller Font',
   cut: 'Cut',
-  paste: 'Paste'
+  paste: 'Paste',
+  preferences: 'Preferences'
 }
 
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import { requestChromeTop } from '../shell/chromeTop'
 
 /** Bump to re-show the tour after a future update (once per version). */
-export const TOUR_VERSION = '1.2.0'
+export const TOUR_VERSION = '1.3.0'
 
 export interface TourStep {
   /** CSS selector of the chrome element to point at. */
@@ -16,21 +16,21 @@ export interface TourStep {
 export const TOUR_STEPS: TourStep[] = [
   {
     target: '[data-tour="fab"]',
-    title: 'New: quick controls',
-    body: 'Everything new lives in this little hub — here is a quick look.',
+    title: 'Quick controls',
+    body: 'Everything lives in this little hub — click it any time. Here’s a quick look.',
     color: '#ff6a13'
-  },
-  {
-    target: '[data-tour="theme"]',
-    title: 'Switch theme',
-    body: 'Jump between the retro browser skins instantly.',
-    color: '#2f6fed'
   },
   {
     target: '[data-tour="timemachine"]',
     title: 'Time machine',
-    body: 'Pick a year, then Time-Travel (Wayback) — or AI-render this page in that year’s style.',
+    body: 'Pick a year, then Time-Travel (Wayback) to it. You can also share a “Today vs {year}” image from here.',
     color: '#8b5cf6'
+  },
+  {
+    target: '[data-tour="theme"]',
+    title: 'Switch theme',
+    body: 'Pick a retro browser skin from the dropdown — now including Internet Explorer 4.01 for Mac (Mac OS 9).',
+    color: '#2f6fed'
   }
 ]
 
