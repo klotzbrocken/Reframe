@@ -13,7 +13,10 @@ export default defineConfig({
   preload: {
     build: {
       rollupOptions: {
-        input: resolve(__dirname, 'src/preload/index.ts')
+        input: {
+          index: resolve(__dirname, 'src/preload/index.ts'),
+          page: resolve(__dirname, 'src/preload/page.ts')
+        }
       }
     }
   },

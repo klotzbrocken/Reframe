@@ -473,6 +473,11 @@ export function App() {
       onClick: () => {
         if (activeTab) window.oldweb.editCommand(activeTab.id, 'paste')
       }
+    },
+    // Internet Explorer 4.01 (Mac): Preferences opens Reframe Settings.
+    preferences: {
+      label: labels.preferences,
+      onClick: () => setDialogOpen(true)
     }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
@@ -806,7 +811,7 @@ export function App() {
       )}
 
       <FloatingMenu
-        themes={themes}
+        themes={themes.map((t) => ({ id: t.id, name: t.name, era: t.era.replace(/Windows/g, 'Win') }))}
         themeId={themeId}
         onTheme={switchTheme}
         oldWeb={oldWeb}
@@ -819,6 +824,7 @@ export function App() {
         periodActive={periodLive != null}
         periodError={periodError}
         onPeriodRender={periodRender}
+        onOpenSettings={() => setDialogOpen(true)}
         shareYear={waybackDate.slice(0, 4)}
         onShare={openShare}
         forceOpen={tourActive}

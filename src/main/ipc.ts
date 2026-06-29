@@ -36,6 +36,12 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
   )
   handle('shell:goBack', (_e, id) => (validId(id) ? s()?.goBack(id) : undefined))
   handle('shell:goForward', (_e, id) => (validId(id) ? s()?.goForward(id) : undefined))
+
+  // Two-finger swipe sent from a page's preload (a different sender than the
+  // chrome, so it can't use `handle`). The shell verifies the sender owns a tab.
+  ipcMain.on('page:swipe', (e, dir) => {
+    if (dir === 'back' || dir === 'forward') s()?.swipeNavigate(e.sender.id, dir)
+  })
   handle('shell:reload', (_e, id) => (validId(id) ? s()?.reload(id) : undefined))
   handle('shell:stop', (_e, id) => (validId(id) ? s()?.stop(id) : undefined))
   handle('shell:editCommand', (_e, id, cmd) =>

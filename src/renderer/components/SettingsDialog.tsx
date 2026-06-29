@@ -45,7 +45,9 @@ const LEGAL =
   '“Netscape” and the Netscape logo, “Internet Explorer” and the Windows logo, and “Safari” and the ' +
   'Aqua look are trademarks of their respective owners — Netscape / AOL, Microsoft and Apple. ' +
   'All trademark and design rights remain with them. Reframe is not affiliated with, sponsored by, ' +
-  'or endorsed by any of them; it exists purely as a tribute to their iconic design.'
+  'or endorsed by any of them; it exists purely as a tribute to their iconic design. ' +
+  'The bundled “Charcoal” font (Apple’s classic Mac OS system typeface) and a pixel “MS Sans Serif” ' +
+  'are used for period-accurate text; all font rights remain with their respective owners.'
 
 // 0 = "off" (today); the rest is the shared Wayback range, so this dropdown and
 // the floating control offer exactly the same years.
