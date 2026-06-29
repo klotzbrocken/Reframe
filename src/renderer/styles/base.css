@@ -597,19 +597,19 @@ body,
  * ======================================================================== */
 
 /* ---- Windows 95/98 (IE template) -------------------------------------- */
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-titlebar {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-titlebar {
   background: linear-gradient(90deg, #000080 0%, #1084d0 100%) !important;
   height: 22px !important;
   padding: 2px 3px 2px 4px !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-titlebar__text {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: none !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn {
   width: 16px !important;
   height: 14px !important;
   min-width: 16px !important;
@@ -620,29 +620,29 @@ body,
   border-color: #fff #808080 #808080 #fff !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn:active {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn:active {
   border-color: #808080 #fff #fff #808080 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='minimize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E") !important;
   background-position: bottom 3px left 4px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='maximize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='restore'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='close'] {
   margin-left: 2px !important;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 3px left 4px !important;
 }
 
 /* ---- Windows XP Luna --------------------------------------------------- */
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-titlebar {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-titlebar {
   /* XP Luna Blue — the glossy active caption: bright top edge, deep blue body,
      a lighter sheen band near the bottom. cornerRadius 0 (no rounding). */
   background: linear-gradient(
@@ -664,13 +664,13 @@ body,
     inset 0 -1px 0 #0a246a !important;
   border-top: 1px solid #0c3b94 !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-titlebar__text {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: 1px 1px 2px rgba(0, 0, 40, 0.6) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn {
   width: 22px !important;
   height: 21px !important;
   min-width: 22px !important;
@@ -683,25 +683,25 @@ body,
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn:active {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn:active {
   background-color: #173f9c !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='minimize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='3' y='8' width='6' height='2' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='maximize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='2' y='2' width='8' height='8' fill='none' stroke='%23fff' stroke-width='1.4'/%3E%3Crect x='2' y='2' width='8' height='2.6' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='restore'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='4' y='2' width='6' height='6' fill='none' stroke='%23fff' stroke-width='1.3'/%3E%3Crect x='2' y='4' width='6' height='6' fill='%232a5fce' stroke='%23fff' stroke-width='1.3'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='close'] {
   margin-left: 3px !important;
   border-color: #a52a18 !important;
   background-color: #e0512f !important;
@@ -709,144 +709,17 @@ body,
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath stroke='%23fff' stroke-width='1.9' d='M3 3l6 6M9 3l-6 6'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 45%, rgba(80, 0, 0, 0.3)) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']) .ow-winbtn[data-control='close']:active {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']) .ow-winbtn[data-control='close']:active {
   background-color: #c23e22 !important;
 }
 
-/* ======================================================================== *
- * Floating controls (theme-independent): quick access to theme, Wayback year
- * and connection speed. Docked bottom-right; the flyout opens upward and the
- * chrome is floated above the page while it is open (requestChromeTop('fab')).
- * Deliberately NOT themed — it is a Reframe app control, not period chrome.
- * ======================================================================== */
-.ow-fab {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 5px;
-  z-index: 9000;
-  font-family: -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
-}
-/* deliberately unobtrusive: a small, faint icon-only disc centred in the footer */
-.ow-fab__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 21px;
-  height: 21px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: rgba(34, 38, 48, 0.62);
-  color: #fff;
-  opacity: 0.9;
-  cursor: pointer;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4), 0 0 0 1.5px var(--ow-highlight, #4a86e8);
-  transition: opacity 0.12s ease, background 0.12s ease;
-}
-.ow-fab__btn:hover {
-  opacity: 1;
-  background: rgba(34, 38, 48, 0.85);
-}
-.ow-fab.is-open .ow-fab__btn {
-  opacity: 1;
-  background: var(--ow-highlight, #2f6fed);
-}
-.ow-fab__btn:focus-visible,
-.ow-fab__chip:focus-visible,
+/* Tour focus rings (the redesigned flyout's own styles live at the end of
+ * this file, in the "Floating controls — redesign" block). */
 .ow-tour__next:focus-visible,
 .ow-tour__skip:focus-visible {
   outline: 2px solid var(--ow-highlight, #2f6fed);
   outline-offset: 2px;
   opacity: 1;
-}
-.ow-fab__glyph {
-  font-size: 11px;
-  line-height: 1;
-}
-.ow-fab__panel {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 26px;
-  width: 320px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  background: #f6f7f9;
-  color: #1a1d24;
-  border: 1px solid #c4c8d0;
-  border-radius: 11px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.38);
-}
-.ow-fab__section {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.ow-fab__title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6b7280;
-}
-.ow-fab__wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-.ow-fab__chip {
-  padding: 5px 11px;
-  border: 1px solid #c8ccd4;
-  border-radius: 13px;
-  background: #fff;
-  color: #1a1d24;
-  font-size: 11px;
-  cursor: pointer;
-}
-.ow-fab__chip:hover {
-  border-color: var(--ow-highlight, #2f6fed);
-}
-.ow-fab__chip.is-active {
-  background: var(--ow-highlight, #2f6fed);
-  border-color: var(--ow-highlight, #2f6fed);
-  color: #fff;
-}
-/* Theme picker: even 2-column rows instead of a ragged wrap pile */
-.ow-fab__wrap--grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px;
-}
-.ow-fab__wrap--grid .ow-fab__chip {
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-/* Full-width action (Period Render) below the Time-Travel / Off pair */
-.ow-fab__chip--wide {
-  display: block;
-  width: 100%;
-  margin-top: 5px;
-  text-align: center;
-}
-.ow-fab__chip:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-.ow-fab__chip:disabled:hover {
-  border-color: #c8ccd4;
-}
-.ow-fab__hint {
-  font-size: 10px;
-  color: #8b91a0;
-  line-height: 1.3;
-}
-.ow-fab__hint--err {
-  color: #c0392b;
 }
 
 /* ---- first-run coachmark tour (transparent, colourful arrows) --------- *
@@ -1020,19 +893,480 @@ body,
 .ow-share__msg--err {
   color: #c0392b;
 }
-.ow-fab__range {
-  width: 100%;
-  accent-color: var(--ow-highlight, #2f6fed);
+
+/* ========================================================================= *
+ * Floating controls — redesign (Reframe Flyout Redesign handoff).
+ * Deliberately NOT themed: a neutral Reframe app control (90s-grey card) that
+ * sits over any period skin. Docked bottom-centre; opens upward; the chrome is
+ * floated above the page while open (requestChromeTop('fab')) so it is never
+ * clipped by the webview.
+ * ========================================================================= */
+.ow-fab {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Sit low in the footer/status-bar band: when idle the chrome is NOT floated
+     above the page, so anything reaching into the .ow-content region would be
+     covered (clipped) by the page view. */
+  bottom: 2px;
+  z-index: 9000;
+  font-family: -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+/* ---- Entry point: the R✦ marker -------------------------------------- */
+.ow-fab__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
+  transition: box-shadow 0.12s ease;
+}
+.ow-fab__mark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font: italic 800 13px/1 -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  color: #fff;
+  background: linear-gradient(160deg, #3a90e8, #2467c4);
+  box-shadow: 0 0 0 2px rgba(47, 134, 224, 0.5), 0 3px 9px rgba(0, 0, 0, 0.45);
+}
+.ow-fab__mark i {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font: 6px/1 sans-serif;
+  font-style: normal;
+  color: #ffe39a;
+}
+/* The small header mark inside the panel is 20px, no ring. */
+.ow-fab__hd .ow-fab__mark {
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  box-shadow: none;
+}
+/* Resting state of the docked marker: 20px so the whole disc + ring stays
+ * inside the bottom band (otherwise the page view clips its top). A tight blue
+ * ring — no soft outer glow — keeps it findable without poking upward. */
+/* Resting: a solid blue disc (always blue, findable on any footer). */
+.ow-fab__mark--btn {
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  background: linear-gradient(160deg, #3a90e8, #2467c4);
+  border: 1px solid transparent;
+  color: #fff;
+  box-shadow: 0 0 0 1.5px rgba(47, 134, 224, 0.5), 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+.ow-fab__btn:hover .ow-fab__mark--btn {
+  background: linear-gradient(160deg, #4a9cf2, #2f74d4);
+  box-shadow: 0 0 0 2px rgba(47, 134, 224, 0.7), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+/* Pressed / open: inverted — a light disc with a blue ring and blue glyph. */
+.ow-fab.is-open .ow-fab__mark--btn {
+  background: #eaf2fe;
+  border-color: transparent;
+  color: #2467c4;
+  box-shadow: 0 0 0 1.5px #2f86e0;
+}
+.ow-fab__btn:focus-visible {
+  outline: 2px solid #2f6fed;
+  outline-offset: 2px;
+}
+
+/* ---- Panel ----------------------------------------------------------- */
+.ow-fab__panel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 30px;
+  width: 328px;
+  display: flex;
+  flex-direction: column;
+  /* NOTE: no overflow:hidden — the theme dropdown must escape the panel. */
+  background: #e9e9e9;
+  color: #23272e;
+  border: 1px solid #b5b5b5;
+  border-radius: 13px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.ow-fab__section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+}
+.ow-fab__div {
+  height: 1px;
+  background: #d2d2d2;
+}
+.ow-fab__title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #5a5f68;
+}
+
+/* ---- Time Machine header --------------------------------------------- */
+.ow-fab__hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ow-fab__close {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border: 1px solid #c2c2c2;
+  border-radius: 6px;
+  background: #fbfbfb;
+  color: #6a6f78;
+  font-size: 10px;
+  cursor: pointer;
+}
+.ow-fab__close:hover {
+  background: #e0e0e0;
+  color: #1c2027;
+}
+
+/* ---- Big year / Today display ---------------------------------------- */
+.ow-fab__big {
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+}
+.ow-fab__bigval {
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  color: #1c2027;
+  font-variant-numeric: tabular-nums;
+}
+.ow-fab__bigval.is-word {
+  font-size: 34px;
+}
+.ow-fab__bigmeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+.ow-fab__status {
+  font-size: 11px;
+  font-weight: 600;
+}
+.ow-fab__status--today {
+  color: #5a8f5a;
+}
+.ow-fab__status--travel {
+  color: #1f5fc4;
+}
+.ow-fab__status--period {
+  color: #9a7a1e;
+}
+.ow-fab__target {
+  font-size: 10px;
+  color: #9097a1;
+}
+
+/* ---- Slider (no fill; full width; disabled in Today mode) ------------ */
+.ow-fab__range {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  height: 4px;
+  margin-top: 13px;
+  border-radius: 3px;
+  background: #cfcfcf;
+  outline: none;
+}
+.ow-fab__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -1px;
+  border-radius: 50%;
+  background: #eaf2fe;
+  border: 2px solid #2f86e0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+.ow-fab__range::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #eaf2fe;
+  border: 2px solid #2f86e0;
+  cursor: pointer;
+}
+.ow-fab__range:disabled {
+  opacity: 0.7;
+  background: #d6d6d6;
+  cursor: not-allowed;
+}
+.ow-fab__range:disabled::-webkit-slider-thumb {
+  background: #c4c4c4;
+  border-color: #a6a6a6;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.ow-fab__range:disabled::-moz-range-thumb {
+  background: #c4c4c4;
+  border-color: #a6a6a6;
 }
 .ow-fab__years {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  font-size: 10px;
-  color: #8b91a0;
+  font-size: 9px;
+  color: #565b66;
+  margin-top: 3px;
 }
-.ow-fab__years strong {
-  font-size: 13px;
-  color: #1a1d24;
+
+/* ---- Mode segment (Today / Time-Travel / ✦ Period) ------------------- */
+.ow-fab__seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border: 1px solid #c6c6c6;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  margin-top: 3px;
+}
+.ow-fab__segbtn {
+  padding: 9px 6px;
+  border: none;
+  background: transparent;
+  color: #33373f;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+.ow-fab__seg .ow-fab__segbtn + .ow-fab__segbtn {
+  border-left: 1px solid #d2d2d2;
+}
+.ow-fab__segbtn.is-active {
+  background: #1f5fc4;
+  color: #fff;
+}
+.ow-fab__segbtn--period.is-active {
+  background: #d9b441;
+  color: #3a2e08;
+}
+.ow-fab__segbtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* Speed: equal pills in a row rather than a 3-up bordered segment. */
+.ow-fab__seg--speed {
+  display: flex;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  overflow: visible;
+  margin-top: 0;
+}
+.ow-fab__seg--speed .ow-fab__segbtn {
+  flex: 1;
+  padding: 7px 0;
+  border: 1px solid #c2c2c2;
+  border-radius: 7px;
+  background: #fcfcfc;
+  color: #4a4f58;
+  font-size: 11px;
+}
+.ow-fab__seg--speed .ow-fab__segbtn + .ow-fab__segbtn {
+  border-left: 1px solid #c2c2c2;
+}
+.ow-fab__seg--speed .ow-fab__segbtn.is-active {
+  border-color: #1a4fb0;
+  background: #1f5fc4;
+  color: #fff;
+}
+
+/* ---- Period state strip ---------------------------------------------- */
+.ow-fab__strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  margin-top: 6px;
+}
+.ow-fab__strip-txt {
+  flex: 1;
+}
+.ow-fab__strip--amber {
+  border: 1px solid #d8c98f;
+  background: #faf3da;
+  color: #6f5512;
+}
+.ow-fab__strip--err {
+  border: 1px solid #e0b4b0;
+  background: #fbeceb;
+  color: #9a2b22;
+}
+.ow-fab__link {
+  border: none;
+  background: transparent;
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  white-space: nowrap;
+  color: inherit;
+}
+.ow-fab__strip--amber .ow-fab__link {
+  color: #9a6f12;
+}
+.ow-fab__spin {
+  width: 13px;
+  height: 13px;
+  border: 2px solid #d9b441;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: rfSpin 0.7s linear infinite;
+}
+@keyframes rfSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Share ----------------------------------------------------------- */
+.ow-fab__share {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border: 1px solid #c6c6c6;
+  border-radius: 8px;
+  background: transparent;
+  color: #4a4f58;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.ow-fab__share:hover {
+  background: #e6e6e6;
+}
+.ow-fab__share span {
+  opacity: 0.55;
+  font-size: 10px;
+}
+
+/* ---- Theme dropdown -------------------------------------------------- */
+.ow-fab__dd {
+  position: relative;
+}
+.ow-fab__ddtrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid #c6c6c6;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+.ow-fab__ddtrigger:hover {
+  border-color: #9aaec9;
+}
+.ow-fab__ddname {
+  font-size: 12px;
+  font-weight: 700;
+  color: #23272e;
+  white-space: nowrap;
+}
+.ow-fab__ddera {
+  font-size: 10px;
+  font-weight: 400;
+  color: #737884;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.ow-fab__ddchev {
+  margin-left: auto;
+  color: #8a8f99;
+  font-size: 9px;
+}
+.ow-fab__ddlist {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 6px); /* opens upward */
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #b9bcc4;
+  border-radius: 9px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  padding: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.ow-fab__ddrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+.ow-fab__ddrow:hover {
+  background: #eef2f8;
+}
+.ow-fab__ddrow.is-active {
+  background: #dbe7fb;
+  border-color: #aac7ef;
+}
+.ow-fab__ddrow .ow-fab__ddera {
+  margin-left: auto;
+  font-size: 11px;
+}
+.ow-fab__ddrow.is-active .ow-fab__ddname {
+  color: #173a72;
+}
+.ow-fab__ddrow.is-active .ow-fab__ddera {
+  color: #5c7aa8;
+}
+.ow-fab__ddcheck {
+  margin-left: 8px;
+  font-size: 11px;
+  color: #1f5fc4;
+  width: 10px;
+}
+
+/* ---- Scrollbar (dropdown) -------------------------------------------- */
+.ow-fab__ddlist::-webkit-scrollbar {
+  width: 7px;
+}
+.ow-fab__ddlist::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 4px;
 }

@@ -166,7 +166,10 @@ export class BrowserShell {
       webPreferences: {
         contextIsolation: true,
         nodeIntegration: false,
-        sandbox: true
+        sandbox: true,
+        // Tiny sandboxed preload: only turns a 2-finger swipe into back/forward.
+        // It exposes nothing to the page (no window.oldweb here).
+        preload: join(__dirname, '../preload/page.mjs')
       }
     })
     const tab: Tab = { id, view, retro: false, favicon: null }
@@ -242,6 +245,18 @@ export class BrowserShell {
     if (!wc) return
     if (wc.navigationHistory) wc.navigationHistory.goForward()
     else wc.goForward()
+  }
+
+  /** A 2-finger swipe came from a page view: navigate the owning tab's history.
+   *  Matching by sender id keeps a page from steering any other tab. */
+  swipeNavigate(senderWebContentsId: number, dir: 'back' | 'forward'): void {
+    for (const tab of this.tabs.values()) {
+      if (tab.view.webContents.id === senderWebContentsId) {
+        if (dir === 'back') this.goBack(tab.id)
+        else this.goForward(tab.id)
+        return
+      }
+    }
   }
 
   /** Step the page zoom up/down (the themes' Font +/- buttons), clamped. */
