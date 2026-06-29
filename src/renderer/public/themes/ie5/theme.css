@@ -61,12 +61,10 @@ body {
   gap: 3px;
 }
 .ow-titlebar__icon {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 30%, #8fd3ff, #0a6fd0 62%, #033b78);
-  box-shadow: inset -1px -1px 1px rgba(0, 0, 0, 0.6);
+  background: url('assets/ie-logo.png') center / contain no-repeat;
 }
 .ow-titlebar__text {
   color: #fff;

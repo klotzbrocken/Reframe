@@ -57,6 +57,31 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
     if (!Number.isInteger(year)) return { error: 'Invalid year' }
     return s()?.periodRender(id, { key, year, quality, prompt })
   })
+  handle('share:sources', (_e, id, opts) => {
+    if (!validId(id) || !opts || typeof opts !== 'object') return { error: 'Bad request' }
+    const o = opts as Record<string, unknown>
+    const source = o.source === 'wayback' ? 'wayback' : 'ai'
+    const year = Number(o.year)
+    if (!Number.isInteger(year)) return { error: 'Invalid year' }
+    const key = typeof o.key === 'string' ? o.key.trim() : undefined
+    const quality = o.quality === 'low' || o.quality === 'high' ? o.quality : 'medium'
+    const prompt = typeof o.prompt === 'string' ? o.prompt : undefined
+    const originalUrl =
+      typeof o.originalUrl === 'string' && /^https?:\/\//i.test(o.originalUrl)
+        ? o.originalUrl
+        : undefined
+    return s()?.shareSources(id, { source, year, key, quality, prompt, originalUrl })
+  })
+  handle('share:save', (_e, dataUrl, name) =>
+    typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png;base64,')
+      ? s()?.saveShareImage(dataUrl, typeof name === 'string' && name ? name : 'reframe-share.png')
+      : { error: 'Bad image' }
+  )
+  handle('share:copy', (_e, dataUrl) =>
+    typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png;base64,')
+      ? s()?.copyShareImage(dataUrl)
+      : undefined
+  )
   handle('shell:setRetroContent', (_e, id, enabled) =>
     validId(id) ? s()?.setRetroContent(id, asBool(enabled)) : undefined
   )

@@ -4,6 +4,8 @@ import { MenuBar, type Menu, type MenuItem } from './components/MenuBar'
 import { NavButton } from './components/NavButton'
 import { FloatingMenu } from './components/FloatingMenu'
 import { TourOverlay, TOUR_STEPS, TOUR_VERSION } from './components/TourOverlay'
+import { ShareDialog } from './components/ShareDialog'
+import { composeShare } from './shell/shareCompose'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
@@ -333,6 +335,59 @@ export function App() {
     if (periodLive) periodBack()
     else actions.setOldWebActive(false)
   }
+
+  // "Today vs {year}" share/export.
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareBusy, setShareBusy] = useState(false)
+  const [shareImg, setShareImg] = useState<string | null>(null)
+  const [shareError, setShareError] = useState<string | null>(null)
+  const [shareSource, setShareSource] = useState<'ai' | 'wayback'>('wayback')
+  const [shareLabelYear, setShareLabelYear] = useState('')
+  const [shareReqYear, setShareReqYear] = useState(2001)
+  const [shareSuggest, setShareSuggest] = useState<number | null>(null)
+  useEffect(() => {
+    requestChromeTop('share', shareOpen)
+    return () => requestChromeTop('share', false)
+  }, [shareOpen])
+  const runShare = async (source: 'ai' | 'wayback', year: number): Promise<void> => {
+    if (!activeTab) return
+    setShareSource(source)
+    setShareReqYear(year)
+    setShareOpen(true)
+    setShareBusy(true)
+    setShareError(null)
+    setShareImg(null)
+    setShareSuggest(null)
+    const res = await window.oldweb.shareSources(activeTab.id, {
+      source,
+      year,
+      key: settings.openaiApiKey?.trim(),
+      quality: settings.periodQuality ?? 'medium',
+      prompt: settings.periodPrompt,
+      originalUrl: unwrapWayback(activeTab.url)
+    })
+    // No snapshot at the chosen year — ask the user to confirm the closest one.
+    if (res.suggestYear) {
+      setShareSuggest(Number(res.suggestYear))
+      setShareBusy(false)
+      return
+    }
+    if (res.error || !res.today || !res.year) {
+      setShareError(res.error ?? 'Share failed')
+      setShareBusy(false)
+      return
+    }
+    const labelYear = res.snapYear ?? String(year)
+    setShareLabelYear(labelYear)
+    try {
+      setShareImg(await composeShare(res.today, res.year, labelYear))
+    } catch {
+      setShareError('Could not compose the image')
+    }
+    setShareBusy(false)
+  }
+  // Always start with the real archive snapshot (works without an OpenAI key).
+  const openShare = (): void => void runShare('wayback', Number(waybackDate.slice(0, 4)))
 
   // The toolbar is fully theme-defined: the manifest lists exactly which
   // buttons appear and in what order. Each action maps to a handler here.
@@ -764,12 +819,39 @@ export function App() {
         periodActive={periodLive != null}
         periodError={periodError}
         onPeriodRender={periodRender}
+        shareYear={waybackDate.slice(0, 4)}
+        onShare={openShare}
         forceOpen={tourActive}
         speed={settings.connectionSpeed || 'full'}
         speedOpts={SPEED_OPTS}
         onSpeed={(id) => setConnectionSpeed(id as Settings['connectionSpeed'])}
       />
       {tourActive && <TourOverlay steps={TOUR_STEPS} onDone={() => setTourActive(false)} />}
+      {shareOpen && (
+        <ShareDialog
+          year={shareLabelYear || String(shareReqYear)}
+          reqYear={shareReqYear}
+          source={shareSource}
+          canAi={!!settings.openaiApiKey?.trim()}
+          busy={shareBusy}
+          error={shareError}
+          image={shareImg}
+          suggestYear={shareSuggest}
+          onUseSuggest={() => shareSuggest && void runShare(shareSource, shareSuggest)}
+          onSource={(s) => void runShare(s, shareReqYear)}
+          onYear={(y) => void runShare(shareSource, y)}
+          onReload={() => void runShare(shareSource, shareReqYear)}
+          onSave={() =>
+            shareImg &&
+            void window.oldweb.shareSave(
+              shareImg,
+              `reframe-today-vs-${shareLabelYear || waybackDate.slice(0, 4)}.png`
+            )
+          }
+          onCopy={() => shareImg && void window.oldweb.shareCopy(shareImg)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </div>
   )
 }
