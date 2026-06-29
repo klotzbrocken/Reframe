@@ -67,7 +67,9 @@ body,
 }
 
 .ow-winbtn {
-  cursor: pointer;
+  /* Native window controls (minimize/maximize/close) use the arrow cursor,
+     not a link/hand pointer. */
+  cursor: default;
   font: inherit;
   -webkit-app-region: no-drag;
   app-region: no-drag;
@@ -950,6 +952,73 @@ body,
 }
 .ow-tour__next:hover {
   filter: brightness(1.08);
+}
+
+/* ---- "Today vs {year}" share dialog ----------------------------------- */
+.ow-share__sources {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.ow-share__hint {
+  font-size: 11px;
+  color: #8b91a0;
+}
+.ow-share__year {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+}
+.ow-share__year strong {
+  min-width: 40px;
+  text-align: center;
+  font-size: 13px;
+}
+.ow-share__year button {
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  font: inherit;
+  border: 1px solid #c8ccd4;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+.ow-share__year button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ow-share__confirm {
+  margin-top: 12px;
+}
+.ow-share__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 360px;
+  min-height: 200px;
+  background: #0f1216;
+  border: 1px solid #c4c8d0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ow-share__img {
+  display: block;
+  max-width: 78vw;
+  max-height: 56vh;
+  width: auto;
+  height: auto;
+}
+.ow-share__msg {
+  padding: 40px 20px;
+  font-size: 13px;
+  color: #cdd6e4;
+  text-align: center;
+}
+.ow-share__msg--err {
+  color: #c0392b;
 }
 .ow-fab__range {
   width: 100%;

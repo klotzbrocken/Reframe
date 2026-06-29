@@ -30,6 +30,9 @@ interface Props {
   periodActive: boolean
   periodError: string | null
   onPeriodRender: () => void
+  /** "Today vs {year}" share/export. */
+  shareYear: string
+  onShare: () => void
   /** Force the flyout open (used by the first-run coachmark tour). */
   forceOpen?: boolean
   speed: string
@@ -59,6 +62,8 @@ export function FloatingMenu({
   periodActive,
   periodError,
   onPeriodRender,
+  shareYear,
+  onShare,
   forceOpen,
   speed,
   speedOpts,
@@ -163,6 +168,17 @@ export function FloatingMenu({
               }}
             >
               {periodBusy ? 'Rendering…' : 'Period-Render this Page (AI)'}
+            </button>
+            <button
+              type="button"
+              className="ow-fab__chip ow-fab__chip--wide"
+              onMouseDown={(e) => {
+                e.preventDefault()
+                onShare()
+                setOpen(false)
+              }}
+            >
+              Share: Today vs {shareYear}
             </button>
             {!canPeriodRender && (
               <div className="ow-fab__hint">Add your OpenAI key in Settings for Period Render.</div>

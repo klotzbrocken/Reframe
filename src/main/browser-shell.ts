@@ -5,6 +5,8 @@ import {
   WebContents,
   Menu,
   dialog,
+  clipboard,
+  nativeImage,
   shell as electronShell
 } from 'electron'
 import { basename, join } from 'path'
@@ -13,6 +15,24 @@ import { pathToFileURL } from 'url'
 import type { ContentInsets, MenuCommand, ShellEvent, TabState } from '../shared/types'
 import { normalizeInput, isAllowedExternal } from '../shared/url'
 import { renderPeriodImage, pickSize, type PeriodQuality } from './period-render'
+
+/** Runs in a page: resolves once every <img> has loaded (or after 6s). */
+const WAIT_IMAGES_JS = `new Promise((resolve) => {
+  try {
+    const imgs = Array.prototype.slice.call(document.images || []);
+    let pending = imgs.filter((i) => !i.complete).length;
+    const done = () => resolve(true);
+    if (pending === 0) { setTimeout(done, 50); return; }
+    const tick = () => { if (--pending <= 0) done(); };
+    imgs.forEach((i) => {
+      if (!i.complete) {
+        i.addEventListener('load', tick, { once: true });
+        i.addEventListener('error', tick, { once: true });
+      }
+    });
+    setTimeout(done, 6000);
+  } catch (e) { resolve(true); }
+})`
 
 interface Tab {
   id: number
@@ -309,6 +329,148 @@ export class BrowserShell {
       if (!wc.isDestroyed()) wc.loadURL(liveUrl).catch(() => {})
       return { error: e instanceof Error ? e.message : 'Render failed' }
     }
+  }
+
+  /** "Today vs {year}" share: capture the live viewport (Today) plus the {year}
+   *  side (AI Period Render of the same shot, or a real Wayback capture). Returns
+   *  both as base64 PNG data URLs; the renderer composes the final image. */
+  async shareSources(
+    id: number,
+    opts: {
+      source: 'ai' | 'wayback'
+      year: number
+      key?: string
+      quality?: PeriodQuality
+      prompt?: string
+      originalUrl?: string
+    }
+  ): Promise<{
+    today?: string
+    year?: string
+    snapYear?: string
+    suggestYear?: string
+    error?: string
+  }> {
+    const wc = this.tabs.get(id)?.view.webContents
+    if (!wc || wc.isDestroyed()) return { error: 'No active page' }
+    try {
+      const todayPng = (await wc.capturePage()).toPNG()
+      let yearPng: Buffer
+      let snapYear: string | undefined
+      if (opts.source === 'ai') {
+        if (!opts.key) return { error: 'No OpenAI API key set (Settings).' }
+        const [w, h] = this.win.getContentSize()
+        const text = String(
+          await wc.executeJavaScript('document.body ? document.body.innerText : ""').catch(() => '')
+        )
+        yearPng = await renderPeriodImage({
+          key: opts.key,
+          year: opts.year,
+          quality: opts.quality ?? 'medium',
+          png: todayPng,
+          text,
+          title: wc.getTitle() || '',
+          size: pickSize(w, h),
+          prompt: opts.prompt
+        })
+      } else {
+        if (!opts.originalUrl) return { error: 'No page URL' }
+        // Resolve a REAL snapshot via the availability API — loading a bare
+        // /web/{date}/ URL silently redirects to the nearest snapshot (often a
+        // modern year), which would look like "today".
+        const snap = await this.findSnapshot(opts.originalUrl, opts.year)
+        if (!snap) {
+          return { error: 'No archive snapshot found for this page.' }
+        }
+        // Respect the chosen year: the availability API returns the closest
+        // snapshot across ALL time (1999 often resolves to 2015). Within ±1 year
+        // use it; otherwise don't silently jump — hand the closest back so the
+        // renderer can ASK the user to confirm it (one-click OK).
+        if (Math.abs(Number(snap.year) - opts.year) > 1) {
+          return { suggestYear: snap.year }
+        }
+        snapYear = snap.year
+        yearPng = await this.captureUrl(snap.url)
+      }
+      const toUrl = (b: Buffer): string => 'data:image/png;base64,' + b.toString('base64')
+      return { today: toUrl(todayPng), year: toUrl(yearPng), snapYear }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Share failed' }
+    }
+  }
+
+  /** Ask the Wayback availability API for the closest real snapshot to {year}. */
+  private async findSnapshot(
+    url: string,
+    year: number
+  ): Promise<{ url: string; year: string } | null> {
+    try {
+      const ts = `${year}0915`
+      const res = await fetch(
+        `https://archive.org/wayback/available?url=${encodeURIComponent(url)}&timestamp=${ts}`
+      )
+      if (!res.ok) return null
+      const j = (await res.json()) as {
+        archived_snapshots?: { closest?: { available?: boolean; timestamp?: string } }
+      }
+      const c = j.archived_snapshots?.closest
+      if (!c?.available || !c.timestamp) return null
+      // banner-free `if_` snapshot at the exact resolved timestamp
+      return { url: `https://web.archive.org/web/${c.timestamp}if_/${url}`, year: c.timestamp.slice(0, 4) }
+    } catch {
+      return null
+    }
+  }
+
+  /** Load a URL in a temporary view hidden BEHIND the active page (no flicker)
+   *  and capture it, then tear the view down. */
+  private async captureUrl(url: string): Promise<Buffer> {
+    const [w, h] = this.win.getContentSize()
+    const { top, right, bottom, left } = this.insets
+    const view = new WebContentsView({
+      webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true }
+    })
+    this.win.contentView.addChildView(view)
+    view.setBounds({
+      x: Math.round(left),
+      y: Math.round(top),
+      width: Math.max(0, Math.round(w - left - right)),
+      height: Math.max(0, Math.round(h - top - bottom))
+    })
+    // Keep it invisible: raise the active page (and chrome, if floating) on top.
+    const active = this.activeId != null ? this.tabs.get(this.activeId) : undefined
+    if (active) this.win.contentView.addChildView(active.view)
+    if (this.chromeOnTop) this.win.contentView.addChildView(this.chromeView)
+    try {
+      await view.webContents.loadURL(url)
+      await view.webContents.executeJavaScript(WAIT_IMAGES_JS).catch(() => {})
+      await new Promise((r) => setTimeout(r, 400)) // final paint settle
+      return (await view.webContents.capturePage()).toPNG()
+    } finally {
+      this.win.contentView.removeChildView(view)
+      if (!view.webContents.isDestroyed()) view.webContents.close()
+    }
+  }
+
+  /** Save a base64 PNG data URL via a native dialog, then reveal it. */
+  async saveShareImage(dataUrl: string, name: string): Promise<{ path?: string; error?: string }> {
+    try {
+      const { canceled, filePath } = await dialog.showSaveDialog({
+        defaultPath: name,
+        filters: [{ name: 'PNG image', extensions: ['png'] }]
+      })
+      if (canceled || !filePath) return {}
+      await writeFile(filePath, Buffer.from(dataUrl.replace(/^data:image\/png;base64,/, ''), 'base64'))
+      electronShell.showItemInFolder(filePath)
+      return { path: filePath }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Save failed' }
+    }
+  }
+
+  /** Copy a base64 PNG data URL to the system clipboard. */
+  copyShareImage(dataUrl: string): void {
+    clipboard.writeImage(nativeImage.createFromDataURL(dataUrl))
   }
 
   /**
