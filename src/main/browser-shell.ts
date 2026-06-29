@@ -168,8 +168,9 @@ export class BrowserShell {
         nodeIntegration: false,
         sandbox: true,
         // Tiny sandboxed preload: only turns a 2-finger swipe into back/forward.
-        // It exposes nothing to the page (no window.oldweb here).
-        preload: join(__dirname, '../preload/page.mjs')
+        // It exposes nothing to the page (no window.oldweb here). CommonJS (.cjs)
+        // because sandboxed preloads can't be ESM.
+        preload: join(__dirname, '../preload/page.cjs')
       }
     })
     const tab: Tab = { id, view, retro: false, favicon: null }
@@ -369,22 +370,37 @@ export class BrowserShell {
     const wc = this.tabs.get(id)?.view.webContents
     if (!wc || wc.isDestroyed()) return { error: 'No active page' }
     try {
-      const todayPng = (await wc.capturePage()).toPNG()
+      // "Today" must be the LIVE page. If the tab is currently showing an
+      // archived snapshot (Time-Travel via the slider), capturePage() would grab
+      // the OLD page — so load the live original off-screen for the Today shot.
+      const onWayback = /(^|\/\/)web\.archive\.org\//i.test(wc.getURL())
+      let todayPng: Buffer
+      let todayText = ''
+      let todayTitle = ''
+      if (onWayback && opts.originalUrl) {
+        const live = await this.captureUrlFull(opts.originalUrl)
+        todayPng = live.png
+        todayText = live.text
+        todayTitle = live.title
+      } else {
+        todayPng = (await wc.capturePage()).toPNG()
+        todayText = String(
+          await wc.executeJavaScript('document.body ? document.body.innerText : ""').catch(() => '')
+        )
+        todayTitle = wc.getTitle() || ''
+      }
       let yearPng: Buffer
       let snapYear: string | undefined
       if (opts.source === 'ai') {
         if (!opts.key) return { error: 'No OpenAI API key set (Settings).' }
         const [w, h] = this.win.getContentSize()
-        const text = String(
-          await wc.executeJavaScript('document.body ? document.body.innerText : ""').catch(() => '')
-        )
         yearPng = await renderPeriodImage({
           key: opts.key,
           year: opts.year,
           quality: opts.quality ?? 'medium',
           png: todayPng,
-          text,
-          title: wc.getTitle() || '',
+          text: todayText,
+          title: todayTitle,
           size: pickSize(w, h),
           prompt: opts.prompt
         })
@@ -440,6 +456,14 @@ export class BrowserShell {
   /** Load a URL in a temporary view hidden BEHIND the active page (no flicker)
    *  and capture it, then tear the view down. */
   private async captureUrl(url: string): Promise<Buffer> {
+    return (await this.captureUrlFull(url)).png
+  }
+
+  /** Load `url` in a hidden off-screen view and return its screenshot plus the
+   *  page's innerText and title (used for the live "Today" shot + AI prompt). */
+  private async captureUrlFull(
+    url: string
+  ): Promise<{ png: Buffer; text: string; title: string }> {
     const [w, h] = this.win.getContentSize()
     const { top, right, bottom, left } = this.insets
     const view = new WebContentsView({
@@ -460,7 +484,14 @@ export class BrowserShell {
       await view.webContents.loadURL(url)
       await view.webContents.executeJavaScript(WAIT_IMAGES_JS).catch(() => {})
       await new Promise((r) => setTimeout(r, 400)) // final paint settle
-      return (await view.webContents.capturePage()).toPNG()
+      const text = String(
+        await view.webContents
+          .executeJavaScript('document.body ? document.body.innerText : ""')
+          .catch(() => '')
+      )
+      const title = view.webContents.getTitle() || ''
+      const png = (await view.webContents.capturePage()).toPNG()
+      return { png, text, title }
     } finally {
       this.win.contentView.removeChildView(view)
       if (!view.webContents.isDestroyed()) view.webContents.close()

@@ -47,7 +47,7 @@ let shell: BrowserShell | null = null
 let mainWindow: BaseWindow | null = null
 let splashWin: BrowserWindow | null = null
 
-const PRELOAD = () => join(__dirname, '../preload/index.mjs')
+const PRELOAD = () => join(__dirname, '../preload/index.cjs')
 
 /** URL of a static page in the renderer (dev server, or the app:// scheme). */
 function pageUrl(file: string): string {
@@ -316,7 +316,7 @@ function createWindow(): void {
   // fills the whole window. Page views are stacked on top in the content region.
   const chromeView = new WebContentsView({
     webPreferences: {
-      preload: join(__dirname, '../preload/index.mjs'),
+      preload: join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false

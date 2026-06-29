@@ -1,15 +1,9 @@
 /**
- * FloatingMenu — redesigned (Reframe Flyout Redesign).
- *
- * Same Props as before, with ONE additive change: `ThemeItem` gains an optional
- * `era` (e.g. "1999 · Win 98"), sourced from public/themes/index.json with
- * "Windows" abbreviated to "Win" (done in App when the prop is built).
+ * FloatingMenu — the bottom-centre Reframe control hub.
  *
  *  - Entry point is a neutral "R✦" disc (CSS-only), kept bottom-centre.
- *  - Panel: 90s-grey card with clear sections; Time Machine leads.
- *  - Theme is a dropdown (opens upward), not a chip grid.
- *  - Time-Travel / Off + separate Period chip become a 3-way mode segment:
- *      Today (= onWaybackOff) · Time-Travel (= onWayback) · ✦ Period (= onPeriodRender)
+ *  - Panel: 90s-grey card; Time Machine leads (year + Today / Time-Travel),
+ *    then a compact Theme dropdown and the page-load speed.
  *  - Slider has no fill, is full-width, and is disabled in Today mode.
  *
  * Styling lives in the "Floating controls — redesign" block of base.css.
@@ -38,18 +32,10 @@ interface Props {
   waybackYear: number
   /** Set the Wayback year AND time-travel to it (activates Old Web). */
   onWayback: (year: number) => void
-  /** "Today" — back to today's live web (also exits a Period Render). */
+  /** "Today" — back to today's live web. */
   onWaybackOff: () => void
-  /** Persist the slider year (no time-travel); drives Time-Travel + Period Render. */
+  /** Persist the slider year (no time-travel); drives Time-Travel. */
   onYearChange: (year: number) => void
-  /** Period Render (AI): can it run (key set + active tab), and its state. */
-  canPeriodRender: boolean
-  periodBusy: boolean
-  periodActive: boolean
-  periodError: string | null
-  onPeriodRender: () => void
-  /** Open Reframe Settings (used by the "needs an OpenAI key" hint). */
-  onOpenSettings?: () => void
   /** "Today vs {year}" share/export. */
   shareYear: string
   onShare: () => void
@@ -69,12 +55,6 @@ export function FloatingMenu({
   onWayback,
   onWaybackOff,
   onYearChange,
-  canPeriodRender,
-  periodBusy,
-  periodActive,
-  periodError,
-  onPeriodRender,
-  onOpenSettings,
   shareYear,
   onShare,
   forceOpen,
@@ -89,11 +69,7 @@ export function FloatingMenu({
   const panelOpen = open || !!forceOpen
 
   // Derived "mode": where the page comes from.
-  const mode: 'today' | 'travel' | 'period' = periodActive
-    ? 'period'
-    : oldWeb
-      ? 'travel'
-      : 'today'
+  const mode: 'today' | 'travel' = oldWeb ? 'travel' : 'today'
 
   useEffect(() => {
     if (waybackYear) setYear(waybackYear)
@@ -131,8 +107,7 @@ export function FloatingMenu({
 
   const current = themes.find((t) => t.id === themeId) || themes[0]
   const bigText = mode === 'today' ? 'Today' : String(year)
-  const statusText =
-    mode === 'today' ? 'live web · today' : mode === 'travel' ? 'Wayback archive' : 'AI period-render'
+  const statusText = mode === 'today' ? 'live web · today' : 'Wayback archive'
 
   return (
     <div className={'ow-fab' + (panelOpen ? ' is-open' : '')} ref={ref}>
@@ -186,8 +161,8 @@ export function FloatingMenu({
               <span>{MAX_YEAR}</span>
             </div>
 
-            {/* 3-way mode segment */}
-            <div className="ow-fab__seg" role="group" aria-label="Render mode">
+            {/* mode segment */}
+            <div className="ow-fab__seg" role="group" aria-label="Page source">
               <button
                 type="button"
                 className={'ow-fab__segbtn' + (mode === 'today' ? ' is-active' : '')}
@@ -208,62 +183,7 @@ export function FloatingMenu({
               >
                 Time-Travel
               </button>
-              <button
-                type="button"
-                className={
-                  'ow-fab__segbtn ow-fab__segbtn--period' + (mode === 'period' ? ' is-active' : '')
-                }
-                disabled={!canPeriodRender || periodBusy}
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  onPeriodRender()
-                }}
-              >
-                ✦ Period
-              </button>
             </div>
-
-            {/* Period state strip. The no-key hint shows whenever there is no
-                key (the gold ✦ Period button is disabled until then). */}
-            {!canPeriodRender && (
-              <div className="ow-fab__strip ow-fab__strip--amber">
-                <span aria-hidden>🔑</span>
-                <span className="ow-fab__strip-txt">Period-Render needs an OpenAI key.</span>
-                <button
-                  type="button"
-                  className="ow-fab__link"
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    onOpenSettings?.()
-                    setOpen(false)
-                  }}
-                >
-                  Settings
-                </button>
-              </div>
-            )}
-            {mode === 'period' && canPeriodRender && periodBusy && (
-              <div className="ow-fab__strip ow-fab__strip--amber">
-                <span className="ow-fab__spin" aria-hidden />
-                <span>Rendering this page in {year} style…</span>
-              </div>
-            )}
-            {mode === 'period' && canPeriodRender && !periodBusy && periodError && (
-              <div className="ow-fab__strip ow-fab__strip--err">
-                <span aria-hidden>⚠</span>
-                <span className="ow-fab__strip-txt">{periodError}</span>
-                <button
-                  type="button"
-                  className="ow-fab__link"
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    onPeriodRender()
-                  }}
-                >
-                  Retry
-                </button>
-              </div>
-            )}
 
             <button
               type="button"
@@ -359,7 +279,7 @@ export function FloatingMenu({
         type="button"
         className="ow-fab__btn"
         data-tour="fab"
-        title="Reframe controls — theme, time machine, period-render, page-load speed"
+        title="Reframe controls — theme, time machine, page-load speed"
         aria-label="Reframe controls"
         onMouseDown={(e) => {
           e.preventDefault()

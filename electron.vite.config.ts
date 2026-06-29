@@ -16,7 +16,10 @@ export default defineConfig({
         input: {
           index: resolve(__dirname, 'src/preload/index.ts'),
           page: resolve(__dirname, 'src/preload/page.ts')
-        }
+        },
+        // CommonJS preloads: the page preload runs sandboxed (sandbox:true) where
+        // Electron does NOT support ESM preloads, so both are emitted as .cjs.
+        output: { format: 'cjs', entryFileNames: '[name].cjs' }
       }
     }
   },
