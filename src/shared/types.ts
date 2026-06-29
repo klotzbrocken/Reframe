@@ -60,6 +60,28 @@ export interface OldwebAPI {
     id: number,
     opts: { key: string; year: number; quality: 'low' | 'medium' | 'high'; prompt?: string }
   ): Promise<{ liveUrl?: string; error?: string }>
+  /** "Today vs {year}" share: returns Today + {year} as base64 PNG data URLs. */
+  shareSources(
+    id: number,
+    opts: {
+      source: 'ai' | 'wayback'
+      year: number
+      key?: string
+      quality?: 'low' | 'medium' | 'high'
+      prompt?: string
+      originalUrl?: string
+    }
+  ): Promise<{
+    today?: string
+    year?: string
+    snapYear?: string
+    suggestYear?: string
+    error?: string
+  }>
+  /** Save a composed PNG (data URL) via a native dialog; returns the path. */
+  shareSave(dataUrl: string, name: string): Promise<{ path?: string; error?: string }>
+  /** Copy a composed PNG (data URL) to the system clipboard. */
+  shareCopy(dataUrl: string): Promise<void>
   /** Tell the engine how much room the chrome occupies, so it can place pages. */
   setContentInsets(insets: ContentInsets): Promise<void>
   /** Toggle the optional CRT "retro content" overlay for a tab. */

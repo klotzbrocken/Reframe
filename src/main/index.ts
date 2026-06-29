@@ -178,16 +178,24 @@ function showThemeSplash(themeId: string): void {
 // electron-builder when packaging the .app (build/icon.icns).
 function setDockIcon(): void {
   if (process.platform !== 'darwin' || !app.dock) return
-  const base = app.isPackaged
-    ? join(process.resourcesPath, 'app-icons')
-    : join(app.getAppPath(), 'resources/app-icons')
-  for (const file of ['reframe.png', 'reframe.icns']) {
-    const img = nativeImage.createFromPath(join(base, file))
-    if (!img.isEmpty()) {
-      app.dock.setIcon(img)
-      return
+  // Try several roots: in dev getAppPath() may resolve to the project root OR to
+  // the out/ build dir, so also probe relative to this module (out/main).
+  const bases = app.isPackaged
+    ? [join(process.resourcesPath, 'app-icons')]
+    : [
+        join(app.getAppPath(), 'resources/app-icons'),
+        join(__dirname, '../../resources/app-icons')
+      ]
+  for (const base of bases) {
+    for (const file of ['reframe.png', 'reframe.icns']) {
+      const img = nativeImage.createFromPath(join(base, file))
+      if (!img.isEmpty()) {
+        app.dock.setIcon(img)
+        return
+      }
     }
   }
+  console.error('[reframe] dock icon not found; tried:', bases.join(', '))
 }
 
 // --- auto-update (electron-updater, fed by GitHub Releases) ---------------
