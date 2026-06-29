@@ -1,0 +1,532 @@
+/*
+ * Internet Explorer 4.01 for Macintosh (1998) — Mac OS 9 "Platinum" chrome.
+ * Original CSS recreation: platinum greys, pinstriped title bar with a left
+ * close box + right zoom/collapse boxes, a colour-icon toolbar with labels, the
+ * spinning blue "e" throbber, an "Address :" location bar and a sunken
+ * "Internet zone" status bar. Values traced from the Mac OS 9 UI Kit. Toolbar /
+ * status / throbber artwork lives in assets/. No vendor fonts bundled.
+ */
+
+/* Charcoal — the Mac OS 9 system UI font, bundled (not installed by default). */
+@font-face {
+  font-family: 'Charcoal';
+  src: url('fonts/Charcoal.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: var(--ow-font);
+  font-size: 12px;
+  color: var(--ie4-dark);
+  background: var(--ie4-platinum);
+  letter-spacing: 0.01em;
+}
+
+/* Charcoal (the Mac OS 9 system UI font) for menus, toolbar labels and the
+ * address bar — --ow-font leads with 'Charcoal' and falls back gracefully. */
+.ow-menubar,
+.ow-menu__label,
+.ow-menu__item,
+.ow-menu__dropdown,
+.ow-btn__label,
+.ow-address-label,
+.ow-address-input {
+  font-family: var(--ow-font);
+}
+
+.ow-root {
+  background: var(--ie4-light);
+  /* Mac OS 9 raised window frame on ALL four sides: a 3px platinum bevel
+     (white top/left, grey bottom/right) so the page is inset and framed, plus
+     a thin dark inner line for definition. The real border (not just a shadow)
+     insets .ow-content so the page view can't cover the left/right/bottom frame. */
+  border: 3px solid;
+  border-color: #fcfcfc #6f6f6f #6f6f6f #fcfcfc;
+  box-shadow: inset 0 0 0 1px rgba(38, 38, 38, 0.4);
+}
+
+/* ===================================================================== *
+ * Title bar — platinum, pinstriped, centred title.
+ * Close box at the far LEFT, zoom + collapse at the far RIGHT (Mac OS 9).
+ * ===================================================================== */
+.ow-titlebar {
+  position: relative;
+  height: 20px;
+  padding: 0 5px;
+  /* Pinstripes run ACROSS the whole bar; the solid title plate below breaks
+     them, so the window name sits BETWEEN the stripes, not on top of them. */
+  background:
+    repeating-linear-gradient(to bottom, rgba(38, 38, 38, 0.16) 0 1px, transparent 1px 3px),
+    var(--ie4-platinum);
+  border-bottom: 1px solid var(--ie4-dark);
+  box-shadow:
+    inset 2px 2px 0 rgba(38, 38, 38, 0.1),
+    inset -2px -2px 0 rgba(38, 38, 38, 0.28);
+}
+.ow-titlebar__icon {
+  display: none;
+}
+/* Centred title on a SOLID platinum plate that interrupts the pinstripes. */
+.ow-titlebar__text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 62%;
+  padding: 1px 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ie4-dark);
+  letter-spacing: 0.035em;
+  background: var(--ie4-light);
+  pointer-events: none;
+}
+/* The controls group spans the bar so close can sit left, the rest right.
+ * It is wide, so make its empty area draggable again (base sets it no-drag);
+ * the individual boxes stay no-drag (base .ow-winbtn rule). */
+.ow-titlebar__controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+/* Mac OS 9 window boxes: a 13×13 outer bevel wrapping a 9×9 platinum body
+ * (Figma spec). Close = empty body; Zoom = small square top-left; Collapse =
+ * a centred horizontal line. */
+.ow-winbtn {
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #6e6e6e;
+  position: relative;
+}
+.ow-winbtn:focus,
+.ow-winbtn:focus-visible {
+  outline: none;
+}
+.ow-winbtn:active {
+  opacity: 0.7;
+}
+/* the inner 9×9 platinum body */
+.ow-winbtn::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(135deg, #9a9a9a, #f1f1f1);
+  box-shadow:
+    0 0 0 1px rgb(38, 38, 38),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 rgb(76, 76, 76);
+}
+/* order: close (far left) · zoom · collapse (far right) */
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  margin-right: auto;
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 1;
+}
+.ow-winbtn[data-control='minimize'] {
+  order: 2;
+}
+/* Zoom: a small white square (dark-edged) at the body's top-left. */
+.ow-winbtn[data-control='maximize']::after,
+.ow-winbtn[data-control='restore']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 3px;
+  height: 3px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgb(38, 38, 38);
+  z-index: 1;
+}
+/* Collapse (windowshade): a centred horizontal line across the body. */
+.ow-winbtn[data-control='minimize']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 50%;
+  height: 1px;
+  background: rgb(38, 38, 38);
+  z-index: 1;
+}
+
+/* ===================================================================== *
+ * Menu bar — platinum Apple-style strip.
+ * ===================================================================== */
+.ow-menubar {
+  height: 21px;
+  padding: 0 6px;
+  align-items: center;
+  background: linear-gradient(to bottom, #fbfbfb, #ededed 55%, #dcdcdc);
+  border-bottom: 1px solid var(--ie4-dark);
+}
+.ow-menu__label {
+  padding: 2px 9px;
+  font-size: 12px;
+  color: #161616;
+  border-radius: 0;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #ffffff;
+  border: 1px solid var(--ie4-dark);
+  border-radius: 0;
+  padding: 2px;
+  font-size: 12px;
+  box-shadow: 2px 2px 0 rgba(38, 38, 38, 0.35);
+}
+.ow-menu__heading,
+.ow-menu__title {
+  padding: 3px 20px;
+  color: #888;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ow-menu__item {
+  padding: 3px 22px 3px 18px;
+  border-radius: 0;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #b0b0b0;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #c8c8c8;
+  margin: 3px 4px;
+}
+.ow-menu__check {
+  width: 14px;
+}
+
+/* ===================================================================== *
+ * Toolbar — colour icons with a label underneath; e throbber at right.
+ * ===================================================================== */
+.ow-toolbar {
+  /* min-height (not a fixed height) so the icon-size setting can enlarge the
+     buttons without the toolbar clipping them. */
+  min-height: 62px;
+  /* no right padding: the throbber box sits flush against the right edge */
+  padding: 4px 0 0 8px;
+  gap: 2px;
+  align-items: flex-start;
+  background: #eeeeee;
+  border-bottom: 1px solid var(--ie4-dark);
+  box-shadow: inset 0 1px 0 #ffffff;
+}
+.ow-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  min-width: 50px;
+  height: 52px;
+  padding: 4px 4px 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #1a1a1a;
+}
+.ow-btn:hover:not(:disabled) {
+  border-color: #bcbcbc;
+  background: rgba(255, 255, 255, 0.5);
+}
+.ow-btn:active:not(:disabled) {
+  border-color: #8c8c8c;
+  background: rgba(38, 38, 38, 0.08);
+  box-shadow: inset 0 1px 2px rgba(38, 38, 38, 0.25);
+}
+.ow-btn:disabled {
+  opacity: 0.4;
+}
+.ow-btn__icon {
+  width: 32px;
+  height: 32px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.ow-btn__label {
+  font-size: 12px;
+  line-height: 1;
+  color: #1a1a1a;
+  white-space: nowrap;
+}
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/back.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  /* forward.png mirrors back.png (edge-to-edge); forward_on.png has the arrow
+     offset to the lower-right, which made Forward sit lower than Back. */
+  background-image: url('assets/forward.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/refresh.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn[data-action='search'] .ow-btn__icon {
+  background-image: url('assets/search.png');
+}
+.ow-btn[data-action='mail'] .ow-btn__icon {
+  background-image: url('assets/mail.png');
+}
+.ow-btn[data-action='favorites'] .ow-btn__icon {
+  background-image: url('assets/favorites.png');
+}
+.ow-btn[data-action='fontup'] .ow-btn__icon {
+  background-image: url('assets/larger.png');
+}
+.ow-btn[data-action='fontdown'] .ow-btn__icon {
+  background-image: url('assets/smaller.png');
+}
+.ow-btn[data-action='preferences'] .ow-btn__icon {
+  background-image: url('assets/preferences.png');
+}
+.ow-toolbar-sep {
+  align-self: center;
+  width: 1px;
+  height: 34px;
+  margin: 0 4px;
+  background: #c4c4c4;
+  box-shadow: 1px 0 0 #ffffff;
+}
+.ow-toolbar__spacer {
+  flex: 1;
+}
+
+/* Throbber: a platinum-bevelled box flush at the far right, holding the blue
+ * "e" on black. Idle shows a STATIC "e"; it only spins (the GIF) while a page
+ * is loading (Throbber adds .is-active). */
+.ow-toolbar .ow-throbber {
+  width: 54px;
+  height: 54px;
+  margin: 0;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  padding: 3px;
+  background: #dddddd;
+  border: 1px solid #5a5a5a;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #f4f4f4;
+}
+.ow-toolbar .ow-throbber::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* idle: the centred "e" glyph (square, transparent) on black */
+  background: #000000 url('assets/e_glyph.png') center / 64% no-repeat;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+.ow-toolbar .ow-throbber.is-active::before {
+  background-image: url('assets/throbber.gif');
+  background-size: cover;
+}
+.ow-throbber__dot {
+  display: none;
+}
+/* The menu-bar throbber slot is unused in this theme. */
+.ow-menubar .ow-throbber {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Address bar — "Address :" label, dropdown, sunken white field.
+ * ===================================================================== */
+.ow-addressbar {
+  height: 30px;
+  padding: 0 8px;
+  gap: 6px;
+  align-items: center;
+  background: #eeeeee;
+  border-bottom: 1px solid var(--ie4-med);
+  box-shadow: inset 0 1px 0 #ffffff;
+}
+.ow-address-label {
+  font-size: 12px;
+  color: #161616;
+}
+.ow-address-label::after {
+  content: ' :';
+}
+/* The combo is just a flex row holding the ▼ dropdown button then the white
+   field (the dropdown is reordered before the input to match Mac IE 4). */
+.ow-address-combo {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+/* Dropdown button BEFORE the field, with a ▼ glyph (platinum bevel). */
+.ow-address-dropdown {
+  order: -1;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  background: linear-gradient(to bottom, #e6e6e6, #c6c6c6);
+}
+.ow-address-dropdown::after {
+  content: '▼';
+  font-size: 8px;
+  line-height: 1;
+  color: #2a2a2a;
+}
+.ow-address-dropdown:active {
+  background: #b9b9b9;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+/* The white URL field. */
+.ow-address-input {
+  flex: 1;
+  height: 20px;
+  background: #ffffff;
+  border: 1px solid;
+  border-color: #5d5d5d #8a8a8a #8a8a8a #5d5d5d;
+  box-shadow: inset 1px 1px 0 #d6d6d6;
+  font-size: 12px;
+  padding: 0 6px;
+  color: #161616;
+}
+/* Recent-addresses dropdown list. */
+.ow-address-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 1px 0 0;
+  padding: 1px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid var(--ie4-dark);
+  box-shadow: 2px 2px 0 rgba(38, 38, 38, 0.3);
+  font-size: 12px;
+}
+.ow-address-item {
+  padding: 2px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.ow-address-item:hover {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+.ow-address-favicon,
+.ow-loc-bookmarks,
+.ow-loc-proxy,
+.ow-loc-related,
+.ow-loc-links,
+.ow-go {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Status bar — sunken "Internet zone" plate + rainbow zone badge.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 23px;
+  padding: 0 4px;
+  gap: 4px;
+  align-items: center;
+  font-size: 12px;
+  color: #161616;
+  background: linear-gradient(to bottom, #d6d6d6, #c6c6c6);
+  border-top: 1px solid #f0f0f0;
+}
+.ow-status-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 17px;
+  padding: 0 6px;
+  background: #d2d2d2;
+  border: 1px solid #9a9a9a;
+  border-color: #9a9a9a #f0f0f0 #f0f0f0 #9a9a9a;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ow-status-text::before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  background: url('assets/zone-globe.gif') center / contain no-repeat;
+}
+.ow-progress {
+  display: none;
+}
+/* Rainbow "Internet zone" badge on the right. */
+.ow-zone {
+  width: 18px;
+  height: 17px;
+  flex: 0 0 auto;
+  font-size: 0;
+  color: transparent;
+  border: 1px solid #9a9a9a;
+  background: linear-gradient(
+    to bottom,
+    #ff4d4d 0 17%,
+    #ff9a3d 17% 34%,
+    #ffe23d 34% 50%,
+    #4dd24d 50% 67%,
+    #4d9aff 67% 84%,
+    #9a4dff 84% 100%
+  );
+}
+.ow-zone__lock {
+  display: none;
+}
+
+/* Tabs are off for this theme, but guard against stray strip styling. */
+.ow-tabstrip {
+  display: none;
+}

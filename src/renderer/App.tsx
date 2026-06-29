@@ -4,6 +4,8 @@ import { MenuBar, type Menu, type MenuItem } from './components/MenuBar'
 import { NavButton } from './components/NavButton'
 import { FloatingMenu } from './components/FloatingMenu'
 import { TourOverlay, TOUR_STEPS, TOUR_VERSION } from './components/TourOverlay'
+import { ShareDialog } from './components/ShareDialog'
+import { composeShare } from './shell/shareCompose'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
@@ -303,36 +305,55 @@ export function App() {
   const homeUrl = settings.home || manifest?.homeUrl || 'https://www.myretromac.app'
   const searchUrl = 'https://www.google.com'
 
-  // Period Render (AI): re-style the current page as a year-appropriate image.
-  const [periodBusy, setPeriodBusy] = useState(false)
-  const [periodLive, setPeriodLive] = useState<string | null>(null)
-  const [periodError, setPeriodError] = useState<string | null>(null)
-  const canPeriodRender = !!settings.openaiApiKey?.trim() && !!activeTab
-  const periodRender = async (): Promise<void> => {
-    const key = settings.openaiApiKey?.trim()
-    if (!activeTab || !key || periodBusy) return
-    setPeriodError(null)
-    setPeriodBusy(true)
-    const res = await window.oldweb.periodRender(activeTab.id, {
-      key,
-      year: Number(waybackDate.slice(0, 4)),
-      quality: settings.periodQuality ?? 'medium',
-      prompt: settings.periodPrompt
+  // "Today" in the flyout: return to today's live page (exit Wayback).
+  const goToday = (): void => actions.setOldWebActive(false)
+
+  // "Today vs {year}" share/export (real Wayback snapshot vs the live page).
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareBusy, setShareBusy] = useState(false)
+  const [shareImg, setShareImg] = useState<string | null>(null)
+  const [shareError, setShareError] = useState<string | null>(null)
+  const [shareLabelYear, setShareLabelYear] = useState('')
+  const [shareReqYear, setShareReqYear] = useState(2001)
+  const [shareSuggest, setShareSuggest] = useState<number | null>(null)
+  useEffect(() => {
+    requestChromeTop('share', shareOpen)
+    return () => requestChromeTop('share', false)
+  }, [shareOpen])
+  const runShare = async (year: number): Promise<void> => {
+    if (!activeTab) return
+    setShareReqYear(year)
+    setShareOpen(true)
+    setShareBusy(true)
+    setShareError(null)
+    setShareImg(null)
+    setShareSuggest(null)
+    const res = await window.oldweb.shareSources(activeTab.id, {
+      source: 'wayback',
+      year,
+      originalUrl: unwrapWayback(activeTab.url)
     })
-    setPeriodBusy(false)
-    if (res.error) setPeriodError(res.error)
-    else setPeriodLive(res.liveUrl ?? unwrapWayback(activeTab.url))
+    // No snapshot at the chosen year — ask the user to confirm the closest one.
+    if (res.suggestYear) {
+      setShareSuggest(Number(res.suggestYear))
+      setShareBusy(false)
+      return
+    }
+    if (res.error || !res.today || !res.year) {
+      setShareError(res.error ?? 'Share failed')
+      setShareBusy(false)
+      return
+    }
+    const labelYear = res.snapYear ?? String(year)
+    setShareLabelYear(labelYear)
+    try {
+      setShareImg(await composeShare(res.today, res.year, labelYear))
+    } catch {
+      setShareError('Could not compose the image')
+    }
+    setShareBusy(false)
   }
-  const periodBack = (): void => {
-    if (periodLive && activeTab) window.oldweb.navigate(activeTab.id, periodLive)
-    setPeriodLive(null)
-    setPeriodError(null)
-  }
-  // "Off" in the flyout: return to today's live page (exit a Period Render, else Wayback).
-  const goToday = (): void => {
-    if (periodLive) periodBack()
-    else actions.setOldWebActive(false)
-  }
+  const openShare = (): void => void runShare(Number(waybackDate.slice(0, 4)))
 
   // The toolbar is fully theme-defined: the manifest lists exactly which
   // buttons appear and in what order. Each action maps to a handler here.
@@ -418,6 +439,11 @@ export function App() {
       onClick: () => {
         if (activeTab) window.oldweb.editCommand(activeTab.id, 'paste')
       }
+    },
+    // Internet Explorer 4.01 (Mac): Preferences opens Reframe Settings.
+    preferences: {
+      label: labels.preferences,
+      onClick: () => setDialogOpen(true)
     }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
@@ -751,7 +777,7 @@ export function App() {
       )}
 
       <FloatingMenu
-        themes={themes}
+        themes={themes.map((t) => ({ id: t.id, name: t.name, era: t.era.replace(/Windows/g, 'Win') }))}
         themeId={themeId}
         onTheme={switchTheme}
         oldWeb={oldWeb}
@@ -759,17 +785,36 @@ export function App() {
         onWayback={applyWaybackYear}
         onWaybackOff={goToday}
         onYearChange={(y) => saveSettings({ ...settings, waybackYear: y })}
-        canPeriodRender={canPeriodRender}
-        periodBusy={periodBusy}
-        periodActive={periodLive != null}
-        periodError={periodError}
-        onPeriodRender={periodRender}
+        shareYear={waybackDate.slice(0, 4)}
+        onShare={openShare}
         forceOpen={tourActive}
         speed={settings.connectionSpeed || 'full'}
         speedOpts={SPEED_OPTS}
         onSpeed={(id) => setConnectionSpeed(id as Settings['connectionSpeed'])}
       />
       {tourActive && <TourOverlay steps={TOUR_STEPS} onDone={() => setTourActive(false)} />}
+      {shareOpen && (
+        <ShareDialog
+          year={shareLabelYear || String(shareReqYear)}
+          reqYear={shareReqYear}
+          busy={shareBusy}
+          error={shareError}
+          image={shareImg}
+          suggestYear={shareSuggest}
+          onUseSuggest={() => shareSuggest && void runShare(shareSuggest)}
+          onYear={(y) => void runShare(y)}
+          onReload={() => void runShare(shareReqYear)}
+          onSave={() =>
+            shareImg &&
+            void window.oldweb.shareSave(
+              shareImg,
+              `reframe-today-vs-${shareLabelYear || waybackDate.slice(0, 4)}.png`
+            )
+          }
+          onCopy={() => shareImg && void window.oldweb.shareCopy(shareImg)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </div>
   )
 }
