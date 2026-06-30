@@ -8,6 +8,8 @@ export interface Settings {
   home?: string
   defaultTheme?: string
   waybackYear?: number
+  /** Wayback month 1–12 (paired with waybackYear by the flyout). */
+  waybackMonth?: number
   searchEngine?: string
   /** Show the period boot splash when switching themes (default true). */
   themeSplash?: boolean
