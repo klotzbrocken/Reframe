@@ -36,6 +36,9 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
   )
   handle('shell:goBack', (_e, id) => (validId(id) ? s()?.goBack(id) : undefined))
   handle('shell:goForward', (_e, id) => (validId(id) ? s()?.goForward(id) : undefined))
+  handle('shell:openAbout', (_e, id, themeId) =>
+    validId(id) ? s()?.openAbout(id, asString(themeId)) : undefined
+  )
 
   // Two-finger swipe sent from a page's preload (a different sender than the
   // chrome, so it can't use `handle`). The shell verifies the sender owns a tab.
