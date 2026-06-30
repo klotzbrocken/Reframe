@@ -15,6 +15,7 @@ import { pathToFileURL } from 'url'
 import type { ContentInsets, MenuCommand, ShellEvent, TabState } from '../shared/types'
 import { normalizeInput, isAllowedExternal } from '../shared/url'
 import { renderPeriodImage, pickSize, type PeriodQuality } from './period-render'
+import { pageUrl } from './page-url'
 
 /** Runs in a page: resolves once every <img> has loaded (or after 6s). */
 const WAIT_IMAGES_JS = `new Promise((resolve) => {
@@ -246,6 +247,14 @@ export class BrowserShell {
     if (!wc) return
     if (wc.navigationHistory) wc.navigationHistory.goForward()
     else wc.goForward()
+  }
+
+  /** Load a theme's bundled "About <browser>" history page in the given tab. */
+  openAbout(id: number, themeId: string): void {
+    const safe = /^[a-z0-9-]+$/i.test(themeId) ? themeId : ''
+    const wc = this.tabs.get(id)?.view.webContents
+    if (!safe || !wc || wc.isDestroyed()) return
+    void wc.loadURL(pageUrl(`about/${safe}.html`))
   }
 
   /** A 2-finger swipe came from a page view: navigate the owning tab's history.
