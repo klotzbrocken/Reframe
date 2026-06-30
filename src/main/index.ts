@@ -17,6 +17,7 @@ import { dirname, relative, isAbsolute } from 'path'
 import electronUpdater from 'electron-updater'
 import { BrowserShell } from './browser-shell'
 import { registerIpc } from './ipc'
+import { pageUrl } from './page-url'
 import { isAllowedExternal } from '../shared/url'
 
 const { autoUpdater } = electronUpdater
@@ -48,12 +49,6 @@ let mainWindow: BaseWindow | null = null
 let splashWin: BrowserWindow | null = null
 
 const PRELOAD = () => join(__dirname, '../preload/index.cjs')
-
-/** URL of a static page in the renderer (dev server, or the app:// scheme). */
-function pageUrl(file: string): string {
-  const base = process.env['ELECTRON_RENDERER_URL']
-  return base ? `${base}/${file}` : `app://bundle/${file}`
-}
 
 const RENDERER_DIR = join(__dirname, '../renderer')
 

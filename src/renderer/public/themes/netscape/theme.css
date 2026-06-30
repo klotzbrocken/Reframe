@@ -221,16 +221,18 @@ body {
 }
 
 .ow-btn[data-action='back'] .ow-btn__icon {
-  background-image: url('assets/tb_back_on.png');
+  background-image: url('assets/tb_back_active.png');
 }
 .ow-btn[data-action='back']:disabled .ow-btn__icon {
   background-image: url('assets/tb_back.png');
+  opacity: 0.45;
 }
 .ow-btn[data-action='forward'] .ow-btn__icon {
-  background-image: url('assets/tb_forward_on.png');
+  background-image: url('assets/tb_forward_active.png');
 }
 .ow-btn[data-action='forward']:disabled .ow-btn__icon {
   background-image: url('assets/tb_forward.png');
+  opacity: 0.45;
 }
 .ow-btn[data-action='refresh'] .ow-btn__icon {
   background-image: url('assets/tb_reload.png');
