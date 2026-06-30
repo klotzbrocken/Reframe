@@ -48,6 +48,8 @@ export interface OldwebAPI {
   navigate(id: number, input: string): Promise<void>
   goBack(id: number): Promise<void>
   goForward(id: number): Promise<void>
+  /** Load the active theme's bundled "About <browser>" history page in a tab. */
+  openAbout(id: number, themeId: string): Promise<void>
   reload(id: number): Promise<void>
   stop(id: number): Promise<void>
   /** Clipboard/selection command run against the active page (Edit menu, buttons). */

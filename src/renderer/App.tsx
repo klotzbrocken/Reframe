@@ -99,6 +99,12 @@ export function App() {
 
   const [addrHistory, setAddrHistory] = useState<string[]>([])
   const submitAddress = (input: string): void => {
+    // Clearing the whole address while time-travelling drops back to today's
+    // live web instead of navigating to nothing.
+    if (!input.trim()) {
+      if (oldWeb) goToday()
+      return
+    }
     // The field may show the friendly "1999://…" wayback form — turn it back
     // into the real target before navigating (the engine re-wraps if Old Web is on).
     const original = stripWaybackDisplay(input.trim())
@@ -107,8 +113,9 @@ export function App() {
     actions.navigate(original)
   }
 
+  const waybackMonth = settings.waybackMonth || 6
   const waybackDate = settings.waybackYear
-    ? `${settings.waybackYear}0924`
+    ? `${settings.waybackYear}${String(waybackMonth).padStart(2, '0')}15`
     : manifest?.oldWebDate ?? (manifest?.oldWebYear ? String(manifest.oldWebYear) : '2002')
 
   // --- bookmarks & browsing history (persisted in localStorage) ---
@@ -245,12 +252,13 @@ export function App() {
     saveSettings({ ...settings, connectionSpeed: id })
     window.oldweb.setNetworkSpeed(id ?? 'full')
   }
-  // Pick a Wayback year AND time-travel to it (the floating control's
-  // "set year" implies "make it active"). The date ref is updated first so the
-  // immediate re-navigation uses the new year.
-  const applyWaybackYear = (year: number): void => {
-    actions.setOldWebDate(`${year}0924`)
-    saveSettings({ ...settings, waybackYear: year })
+  // Pick a Wayback year+month AND time-travel to it (the floating control's
+  // sliders load on release). The date ref is updated first so the immediate
+  // re-navigation uses the new date.
+  const applyWayback = (year: number, month: number): void => {
+    const mm = String(month).padStart(2, '0')
+    actions.setOldWebDate(`${year}${mm}15`)
+    saveSettings({ ...settings, waybackYear: year, waybackMonth: month })
     actions.setOldWebActive(true)
   }
   // Apply the saved "Time Warp Modem" speed on startup (and whenever it changes),
@@ -502,6 +510,14 @@ export function App() {
         ]
       case 'Help':
         return [
+          {
+            type: 'item',
+            label: `About ${themes.find((t) => t.id === themeId)?.name ?? 'this browser'}`,
+            onSelect: () => {
+              if (activeTab) void window.oldweb.openAbout(activeTab.id, themeId)
+            }
+          },
+          { type: 'sep' },
           { type: 'title', label: 'Theme' },
           ...themes.map(
             (t): MenuItem => ({
@@ -782,9 +798,9 @@ export function App() {
         onTheme={switchTheme}
         oldWeb={oldWeb}
         waybackYear={settings.waybackYear || 0}
-        onWayback={applyWaybackYear}
+        waybackMonth={waybackMonth}
+        onWayback={applyWayback}
         onWaybackOff={goToday}
-        onYearChange={(y) => saveSettings({ ...settings, waybackYear: y })}
         shareYear={waybackDate.slice(0, 4)}
         onShare={openShare}
         forceOpen={tourActive}

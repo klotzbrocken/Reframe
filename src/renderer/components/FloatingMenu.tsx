@@ -23,6 +23,21 @@ interface SpeedItem {
   label: string
 }
 
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec'
+]
+
 interface Props {
   themes: ThemeItem[]
   themeId: string
@@ -30,12 +45,12 @@ interface Props {
   oldWeb: boolean
   /** Currently selected Wayback year (0 / undefined = none yet). */
   waybackYear: number
-  /** Set the Wayback year AND time-travel to it (activates Old Web). */
-  onWayback: (year: number) => void
+  /** Currently selected Wayback month (1–12). */
+  waybackMonth: number
+  /** Set the Wayback year+month AND time-travel to it immediately (Old Web on). */
+  onWayback: (year: number, month: number) => void
   /** "Today" — back to today's live web. */
   onWaybackOff: () => void
-  /** Persist the slider year (no time-travel); drives Time-Travel. */
-  onYearChange: (year: number) => void
   /** "Today vs {year}" share/export. */
   shareYear: string
   onShare: () => void
@@ -52,9 +67,9 @@ export function FloatingMenu({
   onTheme,
   oldWeb,
   waybackYear,
+  waybackMonth,
   onWayback,
   onWaybackOff,
-  onYearChange,
   shareYear,
   onShare,
   forceOpen,
@@ -65,8 +80,18 @@ export function FloatingMenu({
   const [open, setOpen] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
   const [year, setYear] = useState(waybackYear || 2001)
+  const [month, setMonth] = useState(waybackMonth || 6)
   const ref = useRef<HTMLDivElement>(null)
   const panelOpen = open || !!forceOpen
+
+  // Time-travel on slider RELEASE (so the page loads as soon as you pick a year
+  // or month, without flooding loads while dragging). Refs keep the values
+  // current inside the release handler.
+  const yearRef = useRef(year)
+  yearRef.current = year
+  const monthRef = useRef(month)
+  monthRef.current = month
+  const travel = (): void => onWayback(yearRef.current, monthRef.current)
 
   // Derived "mode": where the page comes from.
   const mode: 'today' | 'travel' = oldWeb ? 'travel' : 'today'
@@ -74,6 +99,9 @@ export function FloatingMenu({
   useEffect(() => {
     if (waybackYear) setYear(waybackYear)
   }, [waybackYear])
+  useEffect(() => {
+    if (waybackMonth) setMonth(waybackMonth)
+  }, [waybackMonth])
 
   useEffect(() => {
     requestChromeTop('fab', panelOpen)
@@ -107,7 +135,8 @@ export function FloatingMenu({
 
   const current = themes.find((t) => t.id === themeId) || themes[0]
   const bigText = mode === 'today' ? 'Today' : String(year)
-  const statusText = mode === 'today' ? 'live web · today' : 'Wayback archive'
+  const statusText =
+    mode === 'today' ? 'live web · today' : `Wayback archive · ${MONTHS[month - 1]}`
 
   return (
     <div className={'ow-fab' + (panelOpen ? ' is-open' : '')} ref={ref}>
@@ -143,22 +172,40 @@ export function FloatingMenu({
               </span>
             </div>
 
+            {/* Year — selecting a value loads that archived page immediately. */}
             <input
               type="range"
               className="ow-fab__range"
               min={MIN_YEAR}
               max={MAX_YEAR}
               value={year}
-              disabled={mode === 'today'}
-              onChange={(e) => {
-                const y = Number(e.target.value)
-                setYear(y)
-                onYearChange(y)
-              }}
+              aria-label="Wayback year"
+              onChange={(e) => setYear(Number(e.target.value))}
+              onPointerUp={travel}
+              onKeyUp={travel}
             />
             <div className="ow-fab__years">
               <span>{MIN_YEAR}</span>
               <span>{MAX_YEAR}</span>
+            </div>
+
+            {/* Month — 12 discrete steps; release reloads that month's snapshot.
+                The chosen month shows in the status line above, not in the scale. */}
+            <input
+              type="range"
+              className="ow-fab__range"
+              min={1}
+              max={12}
+              step={1}
+              value={month}
+              aria-label={'Wayback month — ' + MONTHS[month - 1]}
+              onChange={(e) => setMonth(Number(e.target.value))}
+              onPointerUp={travel}
+              onKeyUp={travel}
+            />
+            <div className="ow-fab__years">
+              <span>Jan</span>
+              <span>Dec</span>
             </div>
 
             {/* mode segment */}
@@ -178,7 +225,7 @@ export function FloatingMenu({
                 className={'ow-fab__segbtn' + (mode === 'travel' ? ' is-active' : '')}
                 onMouseDown={(e) => {
                   e.preventDefault()
-                  onWayback(year)
+                  onWayback(year, month)
                 }}
               >
                 Time-Travel

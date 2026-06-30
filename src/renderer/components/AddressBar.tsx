@@ -68,7 +68,9 @@ export function AddressBar({
   }, [listOpen])
 
   const submit = (): void => {
-    if (value.trim()) onSubmit(value.trim())
+    // Pass the (possibly empty) value through — an empty submit is meaningful
+    // (it exits Old Web back to today), handled by the parent.
+    onSubmit(value.trim())
     setListOpen(false)
     inputRef.current?.blur()
   }
