@@ -5,6 +5,7 @@ import { NavButton } from './components/NavButton'
 import { FloatingMenu } from './components/FloatingMenu'
 import { TourOverlay, TOUR_STEPS, TOUR_VERSION } from './components/TourOverlay'
 import { ShareDialog } from './components/ShareDialog'
+import { SecurityInfoDialog } from './components/SecurityInfoDialog'
 import { composeShare } from './shell/shareCompose'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
@@ -190,6 +191,8 @@ export function App() {
   const [imagesOff, setImagesOff] = useState(false)
   // Opera "Direct URL input": a small modal to type a URL and open it.
   const [urlDialogOpen, setUrlDialogOpen] = useState(false)
+  // Netscape "Security" toolbar button → the period Security Info dialog.
+  const [securityOpen, setSecurityOpen] = useState(false)
 
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
@@ -200,9 +203,10 @@ export function App() {
         whatsNewOpen ||
         editBookmark !== null ||
         barMenuOpen ||
-        urlDialogOpen
+        urlDialogOpen ||
+        securityOpen
     )
-  }, [panel, dialogOpen, whatsNewOpen, editBookmark, barMenuOpen, urlDialogOpen])
+  }, [panel, dialogOpen, whatsNewOpen, editBookmark, barMenuOpen, urlDialogOpen, securityOpen])
 
   const openPanel = (kind: 'bookmarks' | 'history', selector: string): void => {
     const r = document.querySelector(selector)?.getBoundingClientRect()
@@ -383,11 +387,18 @@ export function App() {
       label: labels.history,
       onClick: () => openPanel('history', '.ow-btn[data-action="history"]')
     },
-    mail: { label: labels.mail, onClick: () => actions.navigate('https://mail.google.com') },
+    mail: {
+      label: labels.mail,
+      // Configurable in Settings: open a webmail site, or the local mail app.
+      onClick: () =>
+        settings.mailUseLocal
+          ? void window.oldweb.openExternal('mailto:')
+          : actions.navigate(settings.mailUrl?.trim() || 'https://mail.google.com')
+    },
     print: { label: labels.print, onClick: actions.print },
     edit: { label: labels.edit, onClick: () => {}, disabled: true },
     netscape: { label: labels.netscape, onClick: () => actions.navigate(homeUrl) },
-    security: { label: labels.security, onClick: () => {}, disabled: true },
+    security: { label: labels.security, onClick: () => setSecurityOpen(true) },
     shop: { label: labels.shop, onClick: () => actions.navigate('https://www.amazon.com') },
     // Opera 3.x toolbar actions (period MDI features map to the closest action).
     new: { label: labels.new, onClick: actions.newTab },
@@ -829,6 +840,12 @@ export function App() {
           }
           onCopy={() => shareImg && void window.oldweb.shareCopy(shareImg)}
           onClose={() => setShareOpen(false)}
+        />
+      )}
+      {securityOpen && (
+        <SecurityInfoDialog
+          url={unwrapWayback(activeTab?.url ?? '')}
+          onClose={() => setSecurityOpen(false)}
         />
       )}
     </div>
