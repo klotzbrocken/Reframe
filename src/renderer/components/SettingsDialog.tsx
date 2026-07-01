@@ -6,6 +6,10 @@ export type FontSize = 'normal' | 'medium' | 'large' | 'xlarge'
 
 export interface Settings {
   home?: string
+  /** Mail toolbar button: open the local mail app (mailto:) instead of webmail. */
+  mailUseLocal?: boolean
+  /** Webmail URL the Mail button opens (when not using the local app). */
+  mailUrl?: string
   defaultTheme?: string
   waybackYear?: number
   /** Wayback month 1–12 (paired with waybackYear by the flyout). */
@@ -53,6 +57,8 @@ const YEARS = [
 
 export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExternal }: Props) {
   const [home, setHome] = useState(settings.home || SITE)
+  const [mailUseLocal, setMailUseLocal] = useState(settings.mailUseLocal ?? false)
+  const [mailUrl, setMailUrl] = useState(settings.mailUrl || 'https://mail.google.com')
   const [theme, setTheme] = useState(settings.defaultTheme || 'ie5')
   const [year, setYear] = useState(settings.waybackYear || 0)
   const [engine, setEngine] = useState(settings.searchEngine || DEFAULT_ENGINE_ID)
@@ -95,6 +101,28 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               <span>Home page</span>
               <input value={home} spellCheck={false} onChange={(e) => setHome(e.target.value)} />
             </label>
+
+            <label className="ow-field">
+              <span>Mail button opens</span>
+              <select
+                value={mailUseLocal ? 'local' : 'web'}
+                onChange={(e) => setMailUseLocal(e.target.value === 'local')}
+              >
+                <option value="web">A website (webmail)</option>
+                <option value="local">Local mail app (mailto:)</option>
+              </select>
+            </label>
+            {!mailUseLocal && (
+              <label className="ow-field ow-field--wide">
+                <span>Webmail URL</span>
+                <input
+                  value={mailUrl}
+                  spellCheck={false}
+                  placeholder="https://mail.google.com"
+                  onChange={(e) => setMailUrl(e.target.value)}
+                />
+              </label>
+            )}
 
           <label className="ow-field">
             <span>Default theme at start</span>
@@ -200,6 +228,8 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             onClick={() => {
               onSave({
                 home: home.trim() || undefined,
+                mailUseLocal: mailUseLocal || undefined,
+                mailUrl: mailUrl.trim() || undefined,
                 defaultTheme: theme,
                 waybackYear: year || undefined,
                 searchEngine: engine,
