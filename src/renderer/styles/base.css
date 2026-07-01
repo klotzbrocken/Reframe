@@ -894,6 +894,57 @@ body,
   color: #c0392b;
 }
 
+/* ---- Netscape "Security Info" dialog ---------------------------------- */
+.ow-secinfo {
+  width: 430px;
+}
+.ow-secinfo__head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d2d2d2;
+}
+.ow-secinfo__lock {
+  font-size: 26px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.ow-secinfo__status {
+  font-weight: 700;
+  font-size: 13px;
+}
+.ow-secinfo__sub {
+  font-size: 11px;
+  color: #5a5f68;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.ow-secinfo__grid {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 12px;
+}
+.ow-secinfo__grid th {
+  text-align: left;
+  color: #5a5f68;
+  font-weight: 600;
+  padding: 4px 12px 4px 0;
+  white-space: nowrap;
+  vertical-align: top;
+  width: 92px;
+}
+.ow-secinfo__grid td {
+  padding: 4px 0;
+}
+.ow-secinfo__note {
+  font-size: 11px;
+  color: #737884;
+  line-height: 1.45;
+  margin: 0;
+}
+
 /* ========================================================================= *
  * Floating controls — redesign (Reframe Flyout Redesign handoff).
  * Deliberately NOT themed: a neutral Reframe app control (90s-grey card) that
