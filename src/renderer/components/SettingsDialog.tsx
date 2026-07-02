@@ -136,7 +136,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
           </label>
 
           <label className="ow-field">
-            <span>Wayback year (always Sept 24)</span>
+            <span>Wayback year (mid-month snapshot; month via Time Machine)</span>
             <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
               {YEARS.map((y) => (
                 <option key={y} value={y}>
@@ -227,6 +227,10 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
           <button
             onClick={() => {
               onSave({
+                // Spread first: settings owned by OTHER surfaces (waybackMonth,
+                // connectionSpeed from the floating Time Machine, …) must
+                // survive a Settings save.
+                ...settings,
                 home: home.trim() || undefined,
                 mailUseLocal: mailUseLocal || undefined,
                 mailUrl: mailUrl.trim() || undefined,

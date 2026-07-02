@@ -46,7 +46,7 @@ export function SecurityInfoDialog({ url, onClose }: Props) {
             <tbody>
               <tr>
                 <th>Encryption</th>
-                <td>{secure ? 'High-grade (RC4, 128 bit)' : 'None'}</td>
+                <td>{secure ? 'High-grade (TLS)' : 'None'}</td>
               </tr>
               <tr>
                 <th>Web site</th>
@@ -54,19 +54,20 @@ export function SecurityInfoDialog({ url, onClose }: Props) {
               </tr>
               <tr>
                 <th>Certificate</th>
-                <td>{secure ? `Issued to ${domain}` : 'No certificate (unsecured site)'}</td>
-              </tr>
-              <tr>
-                <th>Signed by</th>
-                <td>{secure ? 'a trusted Certificate Authority' : '—'}</td>
+                <td>
+                  {secure
+                    ? `Verified for ${domain} by the browser`
+                    : 'No certificate (unsecured site)'}
+                </td>
               </tr>
             </tbody>
           </table>
 
           <p className="ow-secinfo__note">
-            Netscape Communicator uses SSL to protect information you send over the
-            Internet. The padlock in the status bar shows whether the current page is
-            encrypted — a closed lock means secure, an open lock means it is not.
+            A period-style recreation of Netscape&rsquo;s SSL front-end: the padlock
+            showed whether a page was encrypted — a closed lock meant secure, an open
+            lock meant it was not. Today the actual connection uses modern TLS,
+            verified by the underlying Chromium engine.
           </p>
         </div>
         <div className="ow-dialog__buttons">

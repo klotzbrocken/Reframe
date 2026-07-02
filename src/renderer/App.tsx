@@ -91,7 +91,12 @@ export function App() {
   }, [])
 
   const [themes, setThemes] = useState<ThemeSummary[]>([])
-  const [themeId, setThemeId] = useState(() => safeThemeId(loadSettings().defaultTheme))
+  const [themeId, setThemeId] = useState(() => {
+    // "--theme=<id>" launch parameter (main appends it as ?theme=<id> to the
+    // chrome URL): overrides the saved theme for this run only, not persisted.
+    const param = new URLSearchParams(window.location.search).get('theme')
+    return safeThemeId(param || loadSettings().defaultTheme)
+  })
   const [manifest, setManifest] = useState<ThemeManifest | null>(null)
 
   const { state, actions, retro, oldWeb } = useShell(() =>
@@ -343,6 +348,8 @@ export function App() {
     const res = await window.oldweb.shareSources(activeTab.id, {
       source: 'wayback',
       year,
+      // Share targets the same month the Time Machine is set to.
+      month: Number(waybackDate.slice(4, 6)) || undefined,
       originalUrl: unwrapWayback(activeTab.url)
     })
     // No snapshot at the chosen year — ask the user to confirm the closest one.
@@ -808,8 +815,8 @@ export function App() {
         themeId={themeId}
         onTheme={switchTheme}
         oldWeb={oldWeb}
-        waybackYear={settings.waybackYear || 0}
-        waybackMonth={waybackMonth}
+        waybackYear={Number(waybackDate.slice(0, 4)) || 0}
+        waybackMonth={Number(waybackDate.slice(4, 6)) || waybackMonth}
         onWayback={applyWayback}
         onWaybackOff={goToday}
         shareYear={waybackDate.slice(0, 4)}

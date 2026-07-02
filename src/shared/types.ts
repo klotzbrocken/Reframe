@@ -68,6 +68,8 @@ export interface OldwebAPI {
     opts: {
       source: 'ai' | 'wayback'
       year: number
+      /** Wayback month 1–12 (snapshot targeted mid-month); defaults to September. */
+      month?: number
       key?: string
       quality?: 'low' | 'medium' | 'high'
       prompt?: string
