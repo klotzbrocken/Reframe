@@ -39,6 +39,22 @@ app.userAgentFallback = app.userAgentFallback
   .replace(/\sElectron\/[\d.]+/i, '')
   .replace(/\s(?:reframe|Reframe)\/[\d.]+/, '')
 
+// Optional launch parameter: start with a specific theme for THIS run, e.g.
+//   Reframe --theme=netscape        (packaged: open -a Reframe --args --theme=netscape)
+//   npm run dev -- --theme=ie4mac   (dev)
+// Accepts "--theme=<id>" and "--theme <id>"; the id is validated here and again
+// by the renderer's safeThemeId. It overrides the saved theme only for this
+// launch — it is not persisted.
+function launchTheme(): string | null {
+  const argv = process.argv
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i]
+    const id = a.startsWith('--theme=') ? a.slice(8) : a === '--theme' ? argv[i + 1] : null
+    if (id && /^[a-z0-9-]+$/i.test(id)) return id
+  }
+  return null
+}
+
 // In the packaged app the renderer is served from this custom scheme instead of
 // file://, so absolute URLs (`/themes/…`, `/splash/…`) and fetch() resolve
 // against the renderer root — exactly like the Vite dev server. Under plain
@@ -345,7 +361,10 @@ function createWindow(): void {
   layout()
   win.on('resize', layout)
 
-  chromeView.webContents.loadURL(pageUrl('index.html'))
+  const theme = launchTheme()
+  chromeView.webContents.loadURL(
+    pageUrl('index.html') + (theme ? `?theme=${encodeURIComponent(theme)}` : '')
+  )
 
   chromeView.webContents.once('did-finish-load', () => {
     if (activeShell.tabCount() === 0) activeShell.createTab(HOME_URL)
