@@ -29,6 +29,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 app.setName('Reframe')
 app.setAboutPanelOptions({ applicationName: 'Reframe' })
 
+// Present as plain Chrome: Electron's default user agent carries
+// "Electron/<ver>" and "<appname>/<ver>" tokens, which Cloudflare and similar
+// bot-protection layers flag — sites like thomas-klotz.de or yellowpages.com
+// answered every page view with "Sorry, you have been blocked". Stripping the
+// two tokens (set before any window/view is created, so all tabs inherit it)
+// makes Reframe indistinguishable from the bundled Chromium.
+app.userAgentFallback = app.userAgentFallback
+  .replace(/\sElectron\/[\d.]+/i, '')
+  .replace(/\s(?:reframe|Reframe)\/[\d.]+/, '')
+
 // In the packaged app the renderer is served from this custom scheme instead of
 // file://, so absolute URLs (`/themes/…`, `/splash/…`) and fetch() resolve
 // against the renderer root — exactly like the Vite dev server. Under plain
