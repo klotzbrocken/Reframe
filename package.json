@@ -27,7 +27,10 @@
     ],
     "electronLanguages": [
       "en",
+      "en_US",
       "en_GB",
+      "en-US",
+      "en-GB",
       "de"
     ],
     "extraResources": [
