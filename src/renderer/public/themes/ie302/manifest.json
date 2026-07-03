@@ -1,0 +1,59 @@
+{
+  "id": "ie302",
+  "name": "Internet Explorer 3.02",
+  "era": "1997 · Windows 95",
+  "toolbar": [
+    "back",
+    "forward",
+    "stop",
+    "refresh",
+    "home",
+    "|",
+    "search",
+    "favorites",
+    "print",
+    "fontup",
+    "mail",
+    "edit"
+  ],
+  "menus": ["File", "Edit", "View", "Go", "Favorites", "Help"],
+  "homeUrl": "https://www.google.com",
+  "oldWebDate": "19970601",
+  "layout": {
+    "tabsPosition": "top",
+    "showStatusBar": true,
+    "showMenuBar": true,
+    "showTabs": false
+  },
+  "throbber": {
+    "kind": "image",
+    "label": "Working"
+  },
+  "labels": {
+    "address": "Address",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "search": "Search",
+    "favorites": "Favorites",
+    "print": "Print",
+    "fontup": "Font",
+    "mail": "Mail",
+    "edit": "Edit"
+  },
+  "sounds": {},
+  "vars": {
+    "--ow-face": "#c0c0c0",
+    "--ow-face-light": "#ffffff",
+    "--ow-face-dark": "#808080",
+    "--ow-face-darker": "#404040",
+    "--ow-field": "#ffffff",
+    "--ow-text": "#000000",
+    "--ow-highlight": "#000080",
+    "--ow-titlebar": "#000080",
+    "--ow-font": "'Pixelated MS Sans Serif', Tahoma, 'MS Sans Serif', Geneva, sans-serif"
+  }
+}
