@@ -1,6 +1,6 @@
 {
   "name": "reframe",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Reframe — today's web, yesterday's look. A modern Chromium browser wrapped in pixel-faithful retro chrome (IE5, Netscape, Aqua Safari).",
   "author": "Maik Klotz",
   "license": "MIT",
@@ -25,8 +25,16 @@
     "files": [
       "out/**/*"
     ],
+    "electronLanguages": [
+      "en",
+      "en_GB",
+      "de"
+    ],
     "extraResources": [
-      "resources/**/*"
+      "resources/**/*",
+      "!resources/app-icons/reframe.icns",
+      "!resources/app-icons/ie5.png",
+      "!resources/app-icons/netscape.png"
     ],
     "publish": [
       {
@@ -35,6 +43,7 @@
         "repo": "Reframe"
       }
     ],
+    "afterPack": "build/trim-locales.cjs",
     "afterSign": "build/notarize.cjs",
     "mac": {
       "icon": "build/icon.icns",
@@ -74,12 +83,12 @@
     }
   },
   "dependencies": {
-    "98.css": "^0.1.21",
-    "electron-updater": "^6.8.9",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "electron-updater": "^6.8.9"
   },
   "devDependencies": {
+    "98.css": "^0.1.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "@electron/notarize": "^3.1.1",
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.12",

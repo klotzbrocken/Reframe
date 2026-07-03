@@ -5,6 +5,7 @@ import { NavButton } from './components/NavButton'
 import { FloatingMenu } from './components/FloatingMenu'
 import { TourOverlay, TOUR_STEPS, TOUR_VERSION } from './components/TourOverlay'
 import { ShareDialog } from './components/ShareDialog'
+import { SecurityInfoDialog } from './components/SecurityInfoDialog'
 import { composeShare } from './shell/shareCompose'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
@@ -90,7 +91,12 @@ export function App() {
   }, [])
 
   const [themes, setThemes] = useState<ThemeSummary[]>([])
-  const [themeId, setThemeId] = useState(() => safeThemeId(loadSettings().defaultTheme))
+  const [themeId, setThemeId] = useState(() => {
+    // "--theme=<id>" launch parameter (main appends it as ?theme=<id> to the
+    // chrome URL): overrides the saved theme for this run only, not persisted.
+    const param = new URLSearchParams(window.location.search).get('theme')
+    return safeThemeId(param || loadSettings().defaultTheme)
+  })
   const [manifest, setManifest] = useState<ThemeManifest | null>(null)
 
   const { state, actions, retro, oldWeb } = useShell(() =>
@@ -190,6 +196,8 @@ export function App() {
   const [imagesOff, setImagesOff] = useState(false)
   // Opera "Direct URL input": a small modal to type a URL and open it.
   const [urlDialogOpen, setUrlDialogOpen] = useState(false)
+  // Netscape "Security" toolbar button → the period Security Info dialog.
+  const [securityOpen, setSecurityOpen] = useState(false)
 
   // float the chrome above the page while a panel or the settings dialog is open
   useEffect(() => {
@@ -200,9 +208,10 @@ export function App() {
         whatsNewOpen ||
         editBookmark !== null ||
         barMenuOpen ||
-        urlDialogOpen
+        urlDialogOpen ||
+        securityOpen
     )
-  }, [panel, dialogOpen, whatsNewOpen, editBookmark, barMenuOpen, urlDialogOpen])
+  }, [panel, dialogOpen, whatsNewOpen, editBookmark, barMenuOpen, urlDialogOpen, securityOpen])
 
   const openPanel = (kind: 'bookmarks' | 'history', selector: string): void => {
     const r = document.querySelector(selector)?.getBoundingClientRect()
@@ -339,6 +348,8 @@ export function App() {
     const res = await window.oldweb.shareSources(activeTab.id, {
       source: 'wayback',
       year,
+      // Share targets the same month the Time Machine is set to.
+      month: Number(waybackDate.slice(4, 6)) || undefined,
       originalUrl: unwrapWayback(activeTab.url)
     })
     // No snapshot at the chosen year — ask the user to confirm the closest one.
@@ -383,11 +394,18 @@ export function App() {
       label: labels.history,
       onClick: () => openPanel('history', '.ow-btn[data-action="history"]')
     },
-    mail: { label: labels.mail, onClick: () => actions.navigate('https://mail.google.com') },
+    mail: {
+      label: labels.mail,
+      // Configurable in Settings: open a webmail site, or the local mail app.
+      onClick: () =>
+        settings.mailUseLocal
+          ? void window.oldweb.openExternal('mailto:')
+          : actions.navigate(settings.mailUrl?.trim() || 'https://mail.google.com')
+    },
     print: { label: labels.print, onClick: actions.print },
     edit: { label: labels.edit, onClick: () => {}, disabled: true },
     netscape: { label: labels.netscape, onClick: () => actions.navigate(homeUrl) },
-    security: { label: labels.security, onClick: () => {}, disabled: true },
+    security: { label: labels.security, onClick: () => setSecurityOpen(true) },
     shop: { label: labels.shop, onClick: () => actions.navigate('https://www.amazon.com') },
     // Opera 3.x toolbar actions (period MDI features map to the closest action).
     new: { label: labels.new, onClick: actions.newTab },
@@ -797,8 +815,8 @@ export function App() {
         themeId={themeId}
         onTheme={switchTheme}
         oldWeb={oldWeb}
-        waybackYear={settings.waybackYear || 0}
-        waybackMonth={waybackMonth}
+        waybackYear={Number(waybackDate.slice(0, 4)) || 0}
+        waybackMonth={Number(waybackDate.slice(4, 6)) || waybackMonth}
         onWayback={applyWayback}
         onWaybackOff={goToday}
         shareYear={waybackDate.slice(0, 4)}
@@ -829,6 +847,12 @@ export function App() {
           }
           onCopy={() => shareImg && void window.oldweb.shareCopy(shareImg)}
           onClose={() => setShareOpen(false)}
+        />
+      )}
+      {securityOpen && (
+        <SecurityInfoDialog
+          url={unwrapWayback(activeTab?.url ?? '')}
+          onClose={() => setSecurityOpen(false)}
         />
       )}
     </div>
