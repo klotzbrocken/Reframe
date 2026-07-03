@@ -72,6 +72,8 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
     const source = o.source === 'wayback' ? 'wayback' : 'ai'
     const year = Number(o.year)
     if (!Number.isInteger(year)) return { error: 'Invalid year' }
+    const m = Number(o.month)
+    const month = Number.isInteger(m) && m >= 1 && m <= 12 ? m : undefined
     const key = typeof o.key === 'string' ? o.key.trim() : undefined
     const quality = o.quality === 'low' || o.quality === 'high' ? o.quality : 'medium'
     const prompt = typeof o.prompt === 'string' ? o.prompt : undefined
@@ -79,7 +81,7 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
       typeof o.originalUrl === 'string' && /^https?:\/\//i.test(o.originalUrl)
         ? o.originalUrl
         : undefined
-    return s()?.shareSources(id, { source, year, key, quality, prompt, originalUrl })
+    return s()?.shareSources(id, { source, year, month, key, quality, prompt, originalUrl })
   })
   handle('share:save', (_e, dataUrl, name) =>
     typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png;base64,')

@@ -364,6 +364,8 @@ export class BrowserShell {
     opts: {
       source: 'ai' | 'wayback'
       year: number
+      /** Wayback month 1–12 (snapshot targeted mid-month); defaults to September. */
+      month?: number
       key?: string
       quality?: PeriodQuality
       prompt?: string
@@ -418,7 +420,7 @@ export class BrowserShell {
         // Resolve a REAL snapshot via the availability API — loading a bare
         // /web/{date}/ URL silently redirects to the nearest snapshot (often a
         // modern year), which would look like "today".
-        const snap = await this.findSnapshot(opts.originalUrl, opts.year)
+        const snap = await this.findSnapshot(opts.originalUrl, opts.year, opts.month)
         if (!snap) {
           return { error: 'No archive snapshot found for this page.' }
         }
@@ -439,13 +441,15 @@ export class BrowserShell {
     }
   }
 
-  /** Ask the Wayback availability API for the closest real snapshot to {year}. */
+  /** Ask the Wayback availability API for the closest real snapshot to
+   *  mid-{month} {year} (month defaults to September). */
   private async findSnapshot(
     url: string,
-    year: number
+    year: number,
+    month?: number
   ): Promise<{ url: string; year: string } | null> {
     try {
-      const ts = `${year}0915`
+      const ts = `${year}${String(month ?? 9).padStart(2, '0')}15`
       const res = await fetch(
         `https://archive.org/wayback/available?url=${encodeURIComponent(url)}&timestamp=${ts}`
       )
