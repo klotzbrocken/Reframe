@@ -20,6 +20,9 @@ interface Props {
   /** Opera: the middle status icon toggles page images instead of bookmarks. */
   onToggleImages?: () => void
   imagesOff?: boolean
+  /** NCSA Mosaic: when set, a read-only "Document Title:" row is shown above the
+   *  URL row (the theme lays them out as two lines). Undefined = single row. */
+  documentTitle?: string
 }
 
 export function AddressBar({
@@ -35,7 +38,8 @@ export function AddressBar({
   onLinks,
   onRelated,
   onToggleImages,
-  imagesOff
+  imagesOff,
+  documentTitle
 }: Props) {
   const [value, setValue] = useState(url)
   const [focused, setFocused] = useState(false)
@@ -105,6 +109,16 @@ export function AddressBar({
         />
       ) : (
         <span className="ow-loc-proxy" aria-hidden />
+      )}
+      {/* NCSA Mosaic: read-only "Document Title:" line above the URL row. Only
+          rendered when the theme opts in; other themes stay single-row. */}
+      {documentTitle !== undefined && (
+        <div className="ow-doc-titlerow">
+          <span className="ow-address-label ow-address-label--doctitle">Document Title:</span>
+          <div className="ow-doctitle" title={documentTitle}>
+            {documentTitle}
+          </div>
+        </div>
       )}
       <span className="ow-address-label">{label}</span>
 

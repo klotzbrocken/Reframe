@@ -42,7 +42,10 @@ export const TOOLBAR_ITEMS = [
   // Internet Explorer 4.01 (Mac) toolbar set
   'preferences',
   // Internet Explorer 6.0 (Windows XP) toolbar set
-  'messenger'
+  'messenger',
+  // NCSA Mosaic toolbar set
+  'help',
+  'loaddisk'
 ] as const
 
 /** Toolbar entries. Known actions render as buttons; '|' is a separator. */
@@ -76,6 +79,8 @@ export interface ThemeManifest {
     unifiedToolbar?: boolean
     /** Show the live page favicon in the address field (over the dummy icon). */
     showFavicon?: boolean
+    /** NCSA Mosaic: show a read-only "Document Title:" row above the URL row. */
+    documentTitle?: boolean
     /** Where the address bar sits: 'top' (default) or 'bottom' (Opera 3.x, the
      *  URL lives in the status bar at the foot of the window). */
     addressPosition?: 'top' | 'bottom'
@@ -122,6 +127,8 @@ export interface ThemeManifest {
     paste?: string
     preferences?: string
     messenger?: string
+    help?: string
+    loaddisk?: string
   }
   /** Event name -> sound file (relative to the theme's sounds/ dir). */
   sounds?: Record<string, string>
@@ -161,7 +168,9 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
   cut: 'Cut',
   paste: 'Paste',
   preferences: 'Preferences',
-  messenger: 'Messenger'
+  messenger: 'Messenger',
+  help: 'Help',
+  loaddisk: 'Load to Disk'
 }
 
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']

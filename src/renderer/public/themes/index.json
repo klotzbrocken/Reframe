@@ -1,4 +1,5 @@
 [
+  { "id": "mosaic", "name": "NCSA Mosaic", "era": "1993 · Windows" },
   { "id": "ie1", "name": "Internet Explorer 1.0", "era": "1995 · Windows 95" },
   { "id": "ie302", "name": "Internet Explorer 3.02", "era": "1997 · Windows 95" },
   { "id": "ie5", "name": "Internet Explorer 5", "era": "1999 · Windows 98" },
