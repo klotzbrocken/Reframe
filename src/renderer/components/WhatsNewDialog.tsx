@@ -7,6 +7,10 @@ const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
+    title: 'New theme — NCSA Mosaic',
+    body: 'The 1993 browser that showed the world the Web: the black title bar with green caption text, silver Windows 3.1 bevel toolbar, the read-only “Document Title / Document URL” header with the spinning NCSA globe, and period-accurate menus. Its own “About NCSA Mosaic” history page included.'
+  },
+  {
     title: 'New theme — Internet Explorer 6.0',
     body: 'The 2001 classic in full Windows XP “Luna” dress: glossy full-colour toolbar buttons, the green Back orb, the original rippling Windows-flag throbber while pages load, and the grey Windows 3D window frame. Its own “About Internet Explorer 6.0” history page included.'
   },
