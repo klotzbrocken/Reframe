@@ -1,0 +1,66 @@
+{
+  "id": "mosaic",
+  "name": "NCSA Mosaic",
+  "era": "1993 · Windows",
+  "toolbar": [
+    "open",
+    "save",
+    "|",
+    "back",
+    "forward",
+    "|",
+    "refresh",
+    "home",
+    "|",
+    "url",
+    "copy",
+    "|",
+    "loaddisk",
+    "|",
+    "print",
+    "|",
+    "help"
+  ],
+  "menus": ["File", "Edit", "Options", "Navigate", "Hotlist", "Annotate", "Help"],
+  "homeUrl": "https://www.ncsa.illinois.edu",
+  "oldWebDate": "19970101",
+  "layout": {
+    "tabsPosition": "top",
+    "showStatusBar": true,
+    "showMenuBar": true,
+    "showTabs": false,
+    "showFavicon": false,
+    "documentTitle": true
+  },
+  "throbber": {
+    "kind": "css",
+    "label": "Document: Done"
+  },
+  "labels": {
+    "address": "Document URL:",
+    "go": "",
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "home": "Home",
+    "save": "Save",
+    "copy": "Copy",
+    "open": "Open Local File",
+    "url": "Open URL",
+    "loaddisk": "Load to Disk",
+    "print": "Print",
+    "help": "Help"
+  },
+  "sounds": {},
+  "vars": {
+    "--ow-face": "#c0c0c0",
+    "--ow-face-light": "#ffffff",
+    "--ow-face-dark": "#808080",
+    "--ow-face-darker": "#000000",
+    "--ow-field": "#ffffff",
+    "--ow-text": "#000000",
+    "--ow-highlight": "#000080",
+    "--ow-titlebar": "#000000",
+    "--ow-font": "'Pixelated MS Sans Serif', Tahoma, 'MS Sans Serif', Geneva, sans-serif"
+  }
+}

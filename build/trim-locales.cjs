@@ -7,7 +7,12 @@
 const { readdir, rm } = require('fs/promises')
 const path = require('path')
 
-const KEEP = new Set(['en', 'en_US', 'en_GB', 'de'])
+// Keep English (both en-US and en-GB) plus German. macOS framework .lproj folders
+// use underscores today (en.lproj / en_GB.lproj), but list the hyphenated forms too
+// so a future Electron naming change can't silently drop them. NOTE: the Windows
+// <lang>.pak files are pruned by electron-builder's `electronLanguages`, not here —
+// this hook is darwin-only and never touches them.
+const KEEP = new Set(['en', 'en_US', 'en-US', 'en_GB', 'en-GB', 'de'])
 
 exports.default = async function trimLocales(context) {
   if (context.electronPlatformName !== 'darwin') return

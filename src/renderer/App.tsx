@@ -470,6 +470,27 @@ export function App() {
     preferences: {
       label: labels.preferences,
       onClick: () => setDialogOpen(true)
+    },
+    // Internet Explorer 6.0 (Windows XP): the Messenger toolbar button. Windows
+    // Messenger was a separate app we can't launch — kept for authenticity as an
+    // inert period button (see the "never delete theme elements" note).
+    messenger: {
+      label: labels.messenger,
+      onClick: () => {}
+    },
+    // NCSA Mosaic: the Help (?) toolbar button opens the theme's About page.
+    help: {
+      label: labels.help,
+      onClick: () => {
+        if (activeTab) void window.oldweb.openAbout(activeTab.id, themeId)
+      }
+    },
+    // NCSA Mosaic: "Load to Disk" (the down-arrow button) saves the page.
+    loaddisk: {
+      label: labels.loaddisk,
+      onClick: () => {
+        if (activeTab) window.oldweb.savePage(activeTab.id)
+      }
     }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
@@ -478,6 +499,89 @@ export function App() {
   // Menu dropdown contents. The Help menu hosts the Oldweb controls (theme
   // picker, CRT shader, Old Web/Wayback) — shaders will live here too.
   const buildMenu = (name: string): MenuItem[] => {
+    // NCSA Mosaic has its own period-accurate menus (from the prototype spec).
+    // 'Help' falls through to the shared Help menu so the theme picker / Old Web
+    // controls stay reachable.
+    if (themeId === 'mosaic') {
+      switch (name) {
+        case 'File':
+          return [
+            { type: 'item', label: 'New Window', disabled: true },
+            { type: 'item', label: 'Open URL…', onSelect: () => setUrlDialogOpen(true) },
+            { type: 'item', label: 'Open Local File…', onSelect: () => void window.oldweb.openLocalFile() },
+            { type: 'sep' },
+            {
+              type: 'item',
+              label: 'Save As…',
+              onSelect: () => activeTab && window.oldweb.savePage(activeTab.id)
+            },
+            { type: 'item', label: 'Document Source', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Reload', onSelect: actions.reload },
+            { type: 'sep' },
+            { type: 'item', label: 'Print…', onSelect: actions.print },
+            { type: 'sep' },
+            { type: 'item', label: 'Exit', onSelect: () => window.oldweb.closeWindow() }
+          ]
+        case 'Edit':
+          return [
+            {
+              type: 'item',
+              label: 'Copy',
+              onSelect: () => activeTab && window.oldweb.editCommand(activeTab.id, 'copy')
+            },
+            { type: 'item', label: 'Find in Current…', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Preferences…', onSelect: () => setDialogOpen(true) }
+          ]
+        case 'Options':
+          return [
+            {
+              type: 'item',
+              label: 'Load Images Automatically',
+              checked: !imagesOff,
+              // Lazy closure: toggleImages is declared later in the component, so
+              // referencing it directly here (buildMenu runs during render, before
+              // that declaration) would hit the temporal dead zone and crash.
+              onSelect: () => toggleImages()
+            },
+            { type: 'item', label: 'Show Toolbar', checked: true, disabled: true },
+            { type: 'item', label: 'Show Status Bar', checked: true, disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Choose Font…', disabled: true }
+          ]
+        case 'Navigate':
+          return [
+            { type: 'item', label: 'Back', disabled: !activeTab?.canGoBack, onSelect: actions.back },
+            {
+              type: 'item',
+              label: 'Forward',
+              disabled: !activeTab?.canGoForward,
+              onSelect: actions.forward
+            },
+            { type: 'item', label: 'Home', onSelect: () => actions.navigate(homeUrl) },
+            { type: 'item', label: 'Reload', onSelect: actions.reload },
+            { type: 'sep' },
+            { type: 'item', label: 'History…', disabled: true }
+          ]
+        case 'Hotlist':
+          return [
+            { type: 'item', label: 'Add Current to Hotlist', onSelect: addBookmark },
+            { type: 'sep' },
+            { type: 'item', label: 'NCSA Mosaic Home Page', onSelect: () => actions.navigate(homeUrl) },
+            {
+              type: 'item',
+              label: 'Mosaic for Microsoft Windows',
+              onSelect: () => actions.navigate('https://en.wikipedia.org/wiki/Mosaic_(web_browser)')
+            }
+          ]
+        case 'Annotate':
+          return [
+            { type: 'item', label: 'Annotate…', disabled: true },
+            { type: 'item', label: 'Delete Annotation', disabled: true }
+          ]
+      }
+    }
     switch (name) {
       case 'File':
         return [
@@ -604,6 +708,7 @@ export function App() {
       favicon={layout.showFavicon ? activeTab?.favicon ?? null : null}
       dragUrl={unwrapWayback(activeTab?.url ?? '')}
       dragTitle={activeTab?.title}
+      documentTitle={layout.documentTitle ? activeTab?.title ?? '' : undefined}
       imagesOff={imagesOff}
       onToggleImages={addressAtBottom ? toggleImages : undefined}
       onSubmit={submitAddress}

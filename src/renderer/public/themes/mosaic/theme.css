@@ -1,0 +1,466 @@
+/*
+ * NCSA Mosaic for MS Windows (1993–97) — rebuilt pixel-faithfully from the
+ * reference screenshot (uploads/EHhNzl-0a7-1280.webp) and the prototype spec:
+ *   - Black title bar with bright-green (#00E000) caption text and the Mosaic
+ *     application icon; classic Windows grey 3D window buttons.
+ *   - Silver (#C0C0C0) Windows 3.1/95 chrome: raised beveled toolbar buttons
+ *     (icon-only, 32px, real inverted press-state), groove separators.
+ *   - No editable address bar in the Mosaic sense: a read-only "Document URL:"
+ *     row with the sunken field, and the NCSA globe throbber boxed at its right.
+ *   - Menus File · Edit · Options · Navigate · Hotlist · Annotate … Help (right).
+ * Toolbar glyphs, the globe and the title icon are cut from the original bitmap.
+ */
+
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  src: url('fonts/ms_sans_serif.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  src: url('fonts/ms_sans_serif_bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+body {
+  font-family: var(--ow-font);
+  font-size: 11px;
+  color: #000000;
+  background: #c0c0c0;
+  -webkit-font-smoothing: none;
+}
+
+/* Win95 raised outer window frame. */
+.ow-root {
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px 0 #dfdfdf,
+    inset -1px -1px 0 #000000,
+    inset 2px 2px 0 #ffffff,
+    inset -2px -2px 0 #808080;
+  padding: 3px;
+}
+
+/* ===================================================================== *
+ * Title bar — BLACK with green caption text, Mosaic icon, Win95 buttons.
+ * (base.css skips its win98/luna title bar for this theme.)
+ * ===================================================================== */
+.ow-titlebar {
+  height: 20px;
+  padding: 2px 2px 2px 3px;
+  gap: 3px;
+  background: #000000;
+  align-items: center;
+}
+.ow-titlebar__icon {
+  width: 18px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 0;
+  background: url('assets/titleicon.png') center / contain no-repeat;
+  image-rendering: pixelated;
+  box-shadow: none;
+}
+.ow-titlebar__text {
+  color: #00e000;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 0 4px;
+  letter-spacing: 0;
+}
+.ow-titlebar__controls {
+  gap: 2px;
+}
+/* Windows grey 3D window buttons (minimize / restore / close). */
+.ow-winbtn {
+  width: 16px;
+  height: 14px;
+  min-width: 16px;
+  padding: 0;
+  background-color: #c0c0c0;
+  background-repeat: no-repeat;
+  border: 1px solid;
+  border-color: #fff #808080 #808080 #fff;
+  border-radius: 0;
+}
+.ow-winbtn:active {
+  border-color: #808080 #fff #fff #808080;
+}
+.ow-winbtn[data-control='minimize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 3px left 4px;
+}
+.ow-winbtn[data-control='maximize'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-winbtn[data-control='close'] {
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 3px left 4px;
+}
+
+/* ===================================================================== *
+ * Menu bar — silver, black labels, "Help" pushed to the right.
+ * ===================================================================== */
+.ow-menubar {
+  height: 21px;
+  padding: 1px 4px 0;
+  background: #c0c0c0;
+}
+.ow-menu__label {
+  padding: 2px 7px;
+  font-size: 11px;
+  color: #000000;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: #000080;
+  color: #ffffff;
+}
+/* the last menu (Help) sits at the far right, as in the original */
+.ow-menubar .ow-menu:last-of-type {
+  margin-left: auto;
+}
+.ow-menu__dropdown {
+  background: #c0c0c0;
+  border: 0;
+  border-radius: 0;
+  padding: 2px;
+  font-size: 11px;
+  box-shadow:
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #000000,
+    inset 2px 2px 0 #dfdfdf,
+    inset -2px -2px 0 #808080,
+    2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+.ow-menu__item {
+  padding: 3px 20px 3px 18px;
+  border-radius: 0;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #000080;
+  color: #ffffff;
+}
+.ow-menu__item.is-disabled {
+  color: #808080;
+  text-shadow: 1px 1px 0 #ffffff;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #ffffff;
+  margin: 3px 2px;
+}
+/* the menu-bar throbber slot is unused (the globe lives by the URL row) */
+.ow-menubar .ow-throbber,
+.ow-toolbar .ow-throbber {
+  display: none;
+}
+.ow-throbber__dot {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Toolbar — raised 32px bevel buttons, icon-only, groove separators.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 34px;
+  padding: 3px 4px;
+  gap: 2px;
+  align-items: center;
+  background: #c0c0c0;
+  border-top: 1px solid #ffffff;
+  border-bottom: 1px solid #808080;
+}
+.ow-btn {
+  width: 30px;
+  height: 28px;
+  min-width: 30px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #000000,
+    inset 2px 2px 0 #dfdfdf,
+    inset -2px -2px 0 #808080;
+}
+.ow-btn:active:not(:disabled) {
+  box-shadow:
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 #ffffff,
+    inset 2px 2px 0 #000000,
+    inset -2px -2px 0 #dfdfdf;
+}
+.ow-btn:active:not(:disabled) .ow-btn__icon {
+  transform: translate(1px, 1px);
+}
+.ow-btn:disabled {
+  opacity: 1;
+}
+.ow-btn:disabled .ow-btn__icon {
+  opacity: 0.4;
+}
+.ow-btn__icon {
+  width: 28px;
+  height: 27px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 28px 27px;
+  image-rendering: pixelated;
+}
+.ow-btn__label {
+  display: none;
+}
+
+.ow-btn[data-action='open'] .ow-btn__icon {
+  background-image: url('assets/open.png');
+}
+.ow-btn[data-action='save'] .ow-btn__icon {
+  background-image: url('assets/save.png');
+}
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/back.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/fwd.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/reload.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn[data-action='url'] .ow-btn__icon {
+  background-image: url('assets/folder.png');
+}
+.ow-btn[data-action='copy'] .ow-btn__icon {
+  background-image: url('assets/copy.png');
+}
+.ow-btn[data-action='loaddisk'] .ow-btn__icon {
+  background-image: url('assets/down.png');
+}
+.ow-btn[data-action='print'] .ow-btn__icon {
+  background-image: url('assets/print.png');
+}
+.ow-btn[data-action='help'] .ow-btn__icon {
+  background-image: url('assets/help.png');
+}
+
+/* plain gap between button groups (Mosaic uses spacing, not a groove line) */
+.ow-toolbar-sep {
+  align-self: center;
+  width: 8px;
+  height: 26px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+}
+.ow-toolbar__spacer {
+  flex: 1;
+}
+
+/* ===================================================================== *
+ * "Document URL:" row — bold label, sunken read-only field, globe at right.
+ * ===================================================================== */
+/* Two stacked rows — "Document Title:" over "Document URL:" — with the globe
+   throbber boxed at the right, spanning both rows (as in the original). */
+.ow-addressbar {
+  position: relative;
+  flex-wrap: wrap;
+  align-content: center;
+  height: 74px;
+  padding: 6px 78px 6px 4px;
+  gap: 12px 6px;
+  align-items: center;
+  background: #c0c0c0;
+  border-top: 1px solid #ffffff;
+}
+.ow-doc-titlerow {
+  flex-basis: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+}
+.ow-address-label {
+  flex: 0 0 auto;
+  min-width: 108px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #000000;
+}
+/* Read-only "Document Title" field (sunken, like the URL field). */
+.ow-doctitle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 6px;
+  background: #ffffff;
+  font-size: 11px;
+  color: #000000;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-shadow:
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 #ffffff,
+    inset 2px 2px 0 #000000,
+    inset -2px -2px 0 #dfdfdf;
+}
+.ow-address-combo {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  background: #ffffff;
+  border: 0;
+  box-shadow:
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 #ffffff,
+    inset 2px 2px 0 #000000,
+    inset -2px -2px 0 #dfdfdf;
+}
+.ow-address-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-size: 11px;
+  font-family: var(--ow-font);
+  color: #000000;
+  padding: 0 6px;
+}
+.ow-address-favicon,
+.ow-address-dropdown,
+.ow-loc-bookmarks,
+.ow-loc-proxy,
+.ow-loc-related,
+.ow-loc-links {
+  display: none;
+}
+.ow-address-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 1px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #000000;
+  font-size: 11px;
+}
+.ow-address-item {
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.ow-address-item:hover {
+  background: #000080;
+  color: #ffffff;
+}
+/* The NCSA globe throbber, boxed at the right of the URL row (idle state,
+   like the reference). It doubles as the submit control. */
+.ow-go {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  padding: 0;
+  border: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px 0 #ffffff,
+    inset -1px -1px 0 #000000,
+    inset 2px 2px 0 #dfdfdf,
+    inset -2px -2px 0 #808080;
+  font-size: 0;
+  color: transparent;
+}
+.ow-go__icon {
+  display: inline-block;
+  width: 58px;
+  height: 52px;
+  background: url('assets/globe.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+/* ===================================================================== *
+ * Status bar — sunken pane, "Document: Done".
+ * ===================================================================== */
+.ow-statusbar {
+  height: 22px;
+  margin-top: 3px;
+  padding: 0;
+  gap: 3px;
+  align-items: stretch;
+  font-size: 11px;
+  background: #c0c0c0;
+}
+.ow-status-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  background: #c0c0c0;
+  box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #ffffff;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ow-progress {
+  width: 130px;
+  flex: 0 0 auto;
+  align-self: stretch;
+  background: #c0c0c0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 1px 1px 0 #808080, inset -1px -1px 0 #ffffff;
+  overflow: hidden;
+  margin: 0;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #000080;
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 40%;
+  animation: mosaic-progress 1.2s linear infinite;
+}
+@keyframes mosaic-progress {
+  0% {
+    width: 8%;
+  }
+  100% {
+    width: 92%;
+  }
+}
+.ow-zone {
+  display: none;
+}
+
+.ow-tabstrip {
+  display: none;
+}

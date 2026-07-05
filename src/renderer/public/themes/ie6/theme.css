@@ -1,0 +1,484 @@
+/*
+ * Internet Explorer 6.0 (2001) — Windows XP "Luna" chrome, recreated from the
+ * design handoff + the IE6 SP3 reference screenshot (ie_6_sp3_xp_screenshot.png).
+ *
+ * Flat Luna beige (#ece9d8) surfaces, no outer window frame, 11px Tahoma UI.
+ * The title bar is shared with the other Windows themes (IE5): base.css draws
+ * the Win95/98 navy bar or the Windows XP Luna bar per the user's menu-style
+ * setting — only the document "e" icon and white caption text are ours.
+ * Toolbar icons hot-track by PRESS only (no hover box, icon nudges on click).
+ * The loading throbber is the original 50-frame rippling Windows-flag sprite,
+ * animated purely in CSS (steps()), pinned to the right of the menu bar.
+ */
+
+body {
+  font-family: var(--ow-font);
+  font-size: 11px;
+  color: var(--ow-text);
+  background: #ece9d8;
+}
+
+/* Window body — flat beige inside a raised grey Windows 3D frame (same bevel
+   recipe as the IE5 theme). The extra bottom padding also gives the floating
+   function button its idle resting band below the status bar, so the page view
+   can't clip it. */
+.ow-root {
+  box-sizing: border-box;
+  background: #ece9d8;
+  padding: 4px 4px 8px;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #dfdfdf,
+    inset -2px -2px #808080,
+    inset 2px 2px #ffffff;
+}
+
+/* ===================================================================== *
+ * Title bar — identical to IE5: base.css (navy Win98 / XP Luna, per the
+ * menu-style setting) drives the bar + window buttons; only the document
+ * "e" icon and the white caption text are set here.
+ * ===================================================================== */
+.ow-titlebar__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 0;
+  background: url('assets/docicon.png') center / contain no-repeat;
+  box-shadow: none;
+}
+.ow-titlebar__text {
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 0 4px;
+}
+
+/* ===================================================================== *
+ * Menu bar (20px) — flat beige, Luna hot-track, sprite throbber at right.
+ * ===================================================================== */
+.ow-menubar {
+  height: 23px;
+  padding: 0 0 0 2px;
+  align-items: stretch;
+  background: #ece9d8;
+  border-bottom: 1px solid #d9d8cb;
+}
+.ow-menu {
+  display: flex;
+  align-items: center;
+}
+.ow-menu__label {
+  padding: 0 7px;
+  font-size: 11px;
+  color: #000000;
+  border: 1px solid transparent;
+  line-height: 21px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: linear-gradient(180deg, #e9f0fd, #cfe0fa);
+  border: 1px solid #7ea0d9;
+  color: #000000;
+}
+.ow-menu__dropdown {
+  background: #ffffff;
+  border: 1px solid #aca892;
+  border-radius: 0;
+  padding: 2px;
+  font-size: 11px;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+}
+.ow-menu__heading,
+.ow-menu__title {
+  padding: 3px 18px;
+  color: #808080;
+  font-size: 11px;
+}
+.ow-menu__item {
+  padding: 4px 22px 4px 20px;
+  border-radius: 0;
+  font-size: 11px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #316ac5;
+  color: #ffffff;
+}
+.ow-menu__item.is-disabled {
+  color: #aca892;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #d5d0bd;
+  border-bottom: 1px solid #ffffff;
+  margin: 3px 2px;
+}
+.ow-menu__check {
+  width: 14px;
+}
+
+/* Throbber lives in the menu bar (like Firefox); the toolbar slot is hidden. */
+.ow-toolbar .ow-throbber {
+  display: none;
+}
+.ow-menubar .ow-throbber {
+  align-self: stretch;
+  width: 30px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-left: 1px solid #cfcec0;
+  overflow: hidden;
+}
+/* The original 50-frame rippling Windows flag (38×38 frames stacked vertically),
+   scaled to 18px and stepped through in CSS. Frame 0 is the idle state. */
+.ow-menubar .ow-throbber::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: url('assets/throbber_sprite.png') 0 0 / 18px auto no-repeat;
+}
+.ow-menubar .ow-throbber.is-active::before {
+  animation: ie6-throb 1.6s steps(50) infinite;
+}
+@keyframes ie6-throb {
+  to {
+    background-position: 0 -900px;
+  }
+}
+.ow-throbber__dot {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Toolbar (42px) — flat beige, full-colour XP icons, PRESS-only hot-track.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 42px;
+  padding: 0 4px;
+  gap: 0;
+  align-items: center;
+  background: #ece9d8;
+  border-bottom: 1px solid #d9d8cb;
+}
+.ow-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+  height: 38px;
+  min-width: 0;
+  padding: 0 5px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #000000;
+  cursor: default;
+}
+/* No hover state at all. On press, only the ICON/LABEL nudges — never a box. */
+.ow-btn:active:not(:disabled) .ow-btn__icon,
+.ow-btn:active:not(:disabled) .ow-btn__label {
+  transform: translate(1px, 1px);
+}
+.ow-btn:disabled {
+  opacity: 0.42;
+}
+.ow-btn__icon {
+  width: 32px;
+  height: 27px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+/* Only Back, Search and Favorites carry a text label (per the reference). */
+.ow-btn__label {
+  display: none;
+  font-size: 11px;
+  color: #000000;
+  white-space: nowrap;
+}
+.ow-btn[data-action='back'] .ow-btn__label,
+.ow-btn[data-action='search'] .ow-btn__label,
+.ow-btn[data-action='favorites'] .ow-btn__label {
+  display: inline;
+}
+
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/back.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/fwd.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/refresh.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn[data-action='search'] .ow-btn__icon {
+  background-image: url('assets/search.png');
+}
+.ow-btn[data-action='favorites'] .ow-btn__icon {
+  background-image: url('assets/star.png');
+}
+.ow-btn[data-action='history'] .ow-btn__icon {
+  background-image: url('assets/media.png');
+}
+.ow-btn[data-action='mail'] .ow-btn__icon {
+  background-image: url('assets/mail.png');
+}
+.ow-btn[data-action='print'] .ow-btn__icon {
+  background-image: url('assets/printer.png');
+}
+.ow-btn[data-action='edit'] .ow-btn__icon {
+  background-image: url('assets/edit.png');
+}
+.ow-btn[data-action='messenger'] .ow-btn__icon {
+  background-image: url('assets/messenger.png');
+}
+
+/* Back / Forward / Mail carry a small dropdown caret. */
+.ow-btn[data-action='back']::after,
+.ow-btn[data-action='forward']::after,
+.ow-btn[data-action='mail']::after {
+  content: '';
+  margin-left: 3px;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #4b4b4b;
+}
+.ow-btn[data-action='forward']::after {
+  border-top-color: #9a9a90;
+}
+
+/* XP raised groove separator (1px dark + 1px light). */
+.ow-toolbar-sep {
+  align-self: center;
+  width: 0;
+  height: 26px;
+  margin: 0 4px;
+  background: transparent;
+  border-left: 1px solid #cfcec0;
+  border-right: 1px solid #ffffff;
+}
+.ow-toolbar__spacer {
+  flex: 1;
+}
+
+/* ===================================================================== *
+ * Address row — "Address" label, sunken white field (+10% larger input),
+ * Go pill, "Links »".
+ * ===================================================================== */
+.ow-addressbar {
+  height: 25px;
+  padding: 0 4px 0 6px;
+  gap: 5px;
+  align-items: center;
+  background: #ece9d8;
+  border-bottom: 1px solid #d9d8cb;
+}
+.ow-address-label {
+  font-size: 11px;
+  color: #5a5a52;
+}
+.ow-address-combo {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 21px;
+  background: #ffffff;
+  border: 1px solid;
+  border-color: #7f9db9 #ffffff #ffffff #7f9db9;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.18);
+}
+/* The document "e" icon inside the field. */
+.ow-address-combo::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 18px;
+  height: 16px;
+  margin: 0 3px 0 3px;
+  background: url('assets/docicon.png') center / contain no-repeat;
+}
+.ow-address-favicon {
+  display: none;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  height: 17px;
+  font-size: 12px;
+  font-family: var(--ow-font);
+  color: #000000;
+  padding: 0;
+}
+.ow-address-dropdown {
+  flex: 0 0 auto;
+  width: 18px;
+  align-self: stretch;
+  border: 0;
+  background: url('assets/dropdown.png') center / 17px no-repeat;
+}
+.ow-address-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 1px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #7f9db9;
+  font-size: 11px;
+}
+.ow-address-item {
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.ow-address-item:hover {
+  background: #316ac5;
+  color: #ffffff;
+}
+/* Green "Go" pill — press-only (no hover), like the toolbar buttons. */
+.ow-go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 21px;
+  padding: 0 6px 0 4px;
+  border: 0;
+  background: transparent;
+  color: #000000;
+  font-size: 11px;
+  cursor: default;
+}
+.ow-go:active .ow-go__icon,
+.ow-go:active {
+  transform: translate(1px, 1px);
+}
+.ow-go__icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background: url('assets/go.png') center / contain no-repeat;
+}
+/* "Links »" at the far right (base hides it by default — opt in here). */
+.ow-loc-links {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: #7a756a;
+  cursor: default;
+  padding-right: 2px;
+}
+.ow-loc-bookmarks,
+.ow-loc-proxy,
+.ow-loc-related {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Status bar (20px) — flat beige, sunken cells, segmented progress, zone.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 20px;
+  padding: 1px 0;
+  gap: 0;
+  align-items: stretch;
+  font-size: 11px;
+  color: #3a3a34;
+  background: #ece9d8;
+  border-top: 1px solid #d9d8cb;
+}
+.ow-status-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  background: #ece9d8;
+  border: 1px solid;
+  border-color: #cfcec0 #ffffff #ffffff #cfcec0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ow-progress {
+  width: 150px;
+  flex: 0 0 auto;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  background: #ece9d8;
+  border: 1px solid;
+  border-color: #cfcec0 #ffffff #ffffff #cfcec0;
+  border-radius: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.ow-progress__bar {
+  display: block;
+  height: 11px;
+  width: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #3f7bea 0,
+    #3f7bea 6px,
+    #ece9d8 6px,
+    #ece9d8 8px
+  );
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 60%;
+  animation: ie6-progress 1.2s linear infinite;
+}
+@keyframes ie6-progress {
+  0% {
+    width: 8%;
+  }
+  100% {
+    width: 96%;
+  }
+}
+.ow-zone {
+  width: 120px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  color: #3a3a34;
+  background: #ece9d8;
+  border: 1px solid;
+  border-color: #cfcec0 #ffffff #ffffff #cfcec0;
+}
+.ow-zone::before {
+  content: '';
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #bcd6ff 0%, #4f8be0 55%, #24589e 100%);
+}
+.ow-zone__lock {
+  display: none;
+}
+
+.ow-tabstrip {
+  display: none;
+}

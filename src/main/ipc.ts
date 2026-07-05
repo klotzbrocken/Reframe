@@ -55,33 +55,18 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
   handle('shell:zoomStep', (_e, id, dir) =>
     validId(id) && (dir === 1 || dir === -1) ? s()?.zoomStep(id, dir) : undefined
   )
-  handle('shell:periodRender', (_e, id, opts) => {
-    if (!validId(id) || !opts || typeof opts !== 'object') return { error: 'Bad request' }
-    const o = opts as Record<string, unknown>
-    const key = typeof o.key === 'string' ? o.key.trim() : ''
-    const year = Number(o.year)
-    const quality = o.quality === 'low' || o.quality === 'high' ? o.quality : 'medium'
-    const prompt = typeof o.prompt === 'string' ? o.prompt : undefined
-    if (!key) return { error: 'No OpenAI API key set (Settings).' }
-    if (!Number.isInteger(year)) return { error: 'Invalid year' }
-    return s()?.periodRender(id, { key, year, quality, prompt })
-  })
   handle('share:sources', (_e, id, opts) => {
     if (!validId(id) || !opts || typeof opts !== 'object') return { error: 'Bad request' }
     const o = opts as Record<string, unknown>
-    const source = o.source === 'wayback' ? 'wayback' : 'ai'
     const year = Number(o.year)
     if (!Number.isInteger(year)) return { error: 'Invalid year' }
     const m = Number(o.month)
     const month = Number.isInteger(m) && m >= 1 && m <= 12 ? m : undefined
-    const key = typeof o.key === 'string' ? o.key.trim() : undefined
-    const quality = o.quality === 'low' || o.quality === 'high' ? o.quality : 'medium'
-    const prompt = typeof o.prompt === 'string' ? o.prompt : undefined
     const originalUrl =
       typeof o.originalUrl === 'string' && /^https?:\/\//i.test(o.originalUrl)
         ? o.originalUrl
         : undefined
-    return s()?.shareSources(id, { source, year, month, key, quality, prompt, originalUrl })
+    return s()?.shareSources(id, { source: 'wayback', year, month, originalUrl })
   })
   handle('share:save', (_e, dataUrl, name) =>
     typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png;base64,')

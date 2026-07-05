@@ -56,23 +56,15 @@ export interface OldwebAPI {
   editCommand(id: number, cmd: 'cut' | 'copy' | 'paste' | 'selectAll'): Promise<void>
   /** Step the active page's zoom up (+1) or down (-1) — the Font +/- buttons. */
   zoomStep(id: number, dir: 1 | -1): Promise<void>
-  /** "Period Render": re-style the current page as a year-appropriate image via
-   *  the user's OpenAI key. Returns the live URL (for "back to live") or an error. */
-  periodRender(
-    id: number,
-    opts: { key: string; year: number; quality: 'low' | 'medium' | 'high'; prompt?: string }
-  ): Promise<{ liveUrl?: string; error?: string }>
-  /** "Today vs {year}" share: returns Today + {year} as base64 PNG data URLs. */
+  /** "Today vs {year}" share: returns Today + {year} as base64 PNG data URLs.
+   *  The {year} side is a real Wayback Machine capture (no AI). */
   shareSources(
     id: number,
     opts: {
-      source: 'ai' | 'wayback'
+      source: 'wayback'
       year: number
       /** Wayback month 1–12 (snapshot targeted mid-month); defaults to September. */
       month?: number
-      key?: string
-      quality?: 'low' | 'medium' | 'high'
-      prompt?: string
       originalUrl?: string
     }
   ): Promise<{

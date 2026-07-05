@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ShellEvent, TabState } from '../../shared/types'
 import { unwrapWayback, wrapWayback } from './wayback'
+import { normalizeInput, isWebSearchUrl } from '../../shared/url'
 
 export interface ShellState {
   tabs: TabState[]
@@ -75,9 +76,20 @@ export function useShell(onLoadStart?: () => void): {
     navigate: (input) => {
       const id = activeRef.current
       if (id == null) return
-      // "Old Web": route every address through the Wayback Machine at the
-      // theme's era date (banner-free `if_` snapshot). Off: load it as-is.
-      const target = oldWebRef.current ? wrapWayback(input, oldWebDateRef.current) : input
+      if (!oldWebRef.current) {
+        // Off: hand the raw input to the engine, which normalizes/searches it.
+        window.oldweb.navigate(id, input)
+        return
+      }
+      // "Old Web": normalize first, then route only a REAL destination URL
+      // through the Wayback Machine (banner-free `if_` snapshot). Free text like
+      // "cats" resolves to a live web search — wrapping it in Wayback would just
+      // archive the literal string, so it stays un-wrapped.
+      const normalized = normalizeInput(input)
+      if (!normalized) return
+      const target = isWebSearchUrl(normalized)
+        ? normalized
+        : wrapWayback(normalized, oldWebDateRef.current)
       window.oldweb.navigate(id, target)
     },
     back: () => activeRef.current != null && window.oldweb.goBack(activeRef.current),
@@ -118,7 +130,19 @@ export function useShell(onLoadStart?: () => void): {
       }
     },
     setOldWebDate: (date: string) => {
+      // Guard against no-op calls: the App effect re-runs this on every render,
+      // so only act when the era date actually changes — otherwise the
+      // re-navigation below would loop.
+      if (oldWebDateRef.current === date) return
       oldWebDateRef.current = date
+      // If Old Web is active, immediately reload the current page at the new
+      // snapshot (e.g. switching IE5 → IE6 changes the era), instead of waiting
+      // for the next manual navigation / Time-Travel press.
+      const id = activeRef.current
+      if (oldWebRef.current && id != null && currentUrlRef.current) {
+        const original = unwrapWayback(currentUrlRef.current)
+        window.oldweb.navigate(id, wrapWayback(original, date))
+      }
     }
   }
 
