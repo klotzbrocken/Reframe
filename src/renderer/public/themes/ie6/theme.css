@@ -58,7 +58,7 @@ body {
  * Menu bar (20px) — flat beige, Luna hot-track, sprite throbber at right.
  * ===================================================================== */
 .ow-menubar {
-  height: 20px;
+  height: 23px;
   padding: 0 0 0 2px;
   align-items: stretch;
   background: #ece9d8;
@@ -73,7 +73,7 @@ body {
   font-size: 11px;
   color: #000000;
   border: 1px solid transparent;
-  line-height: 18px;
+  line-height: 21px;
 }
 .ow-menu.is-open .ow-menu__label,
 .ow-menu__label:hover {

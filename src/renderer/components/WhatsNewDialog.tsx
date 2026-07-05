@@ -1,30 +1,22 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.4.0'
+export const WHATS_NEW_VERSION = '1.5.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'New theme — Internet Explorer 3.02',
-    body: 'The iconic 1997 browser on Windows 95: swirl-textured toolbar with hot-tracking icons (they light up in colour under the mouse), the original 46-frame spinning “e”, grippers, “Links »” and a three-pane status bar.'
+    title: 'New theme — Internet Explorer 6.0',
+    body: 'The 2001 classic in full Windows XP “Luna” dress: glossy full-colour toolbar buttons, the green Back orb, the original rippling Windows-flag throbber while pages load, and the grey Windows 3D window frame. Its own “About Internet Explorer 6.0” history page included.'
   },
   {
-    title: 'Every browser tells its story',
-    body: 'Help → “About {browser}” opens a designed history page for the active theme — with the lesser-known and curious bits (the Netscape lawn prank, who really wrote IE 1.0, why a firefox isn’t a fox…).'
+    title: 'Old Web understands searches again',
+    body: 'Typing words (not a web address) while time-travelling now runs a real search instead of trying to archive the literal text — and switching theme/era while Old Web is on reloads the page in the new year instantly.'
   },
   {
-    title: 'Time Machine: months + instant travel',
-    body: 'A second slider picks the month, moving either slider loads the archived page immediately, and the year range now reaches 2020. Clearing the address while time-travelling returns to today.'
-  },
-  {
-    title: 'Netscape extras',
-    body: 'The Security button opens a period-style “Security Info” dialog, and Back/Forward finally glow in colour when available.'
-  },
-  {
-    title: 'Smaller & smarter',
-    body: 'The app is ~20% smaller, the Mail button is configurable (webmail or your local mail app), Reframe can launch with a chosen theme (--theme=…), and sites behind bot protection (Cloudflare) load again.'
+    title: 'Leaner “Today vs {year}” sharing',
+    body: 'Sharing now builds the {year} side straight from a real Wayback snapshot — no OpenAI key or AI step involved. Simpler, free, and private.'
   }
 ]
 

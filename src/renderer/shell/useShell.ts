@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ShellEvent, TabState } from '../../shared/types'
 import { unwrapWayback, wrapWayback } from './wayback'
+import { normalizeInput, isWebSearchUrl } from '../../shared/url'
 
 export interface ShellState {
   tabs: TabState[]
@@ -75,9 +76,20 @@ export function useShell(onLoadStart?: () => void): {
     navigate: (input) => {
       const id = activeRef.current
       if (id == null) return
-      // "Old Web": route every address through the Wayback Machine at the
-      // theme's era date (banner-free `if_` snapshot). Off: load it as-is.
-      const target = oldWebRef.current ? wrapWayback(input, oldWebDateRef.current) : input
+      if (!oldWebRef.current) {
+        // Off: hand the raw input to the engine, which normalizes/searches it.
+        window.oldweb.navigate(id, input)
+        return
+      }
+      // "Old Web": normalize first, then route only a REAL destination URL
+      // through the Wayback Machine (banner-free `if_` snapshot). Free text like
+      // "cats" resolves to a live web search — wrapping it in Wayback would just
+      // archive the literal string, so it stays un-wrapped.
+      const normalized = normalizeInput(input)
+      if (!normalized) return
+      const target = isWebSearchUrl(normalized)
+        ? normalized
+        : wrapWayback(normalized, oldWebDateRef.current)
       window.oldweb.navigate(id, target)
     },
     back: () => activeRef.current != null && window.oldweb.goBack(activeRef.current),

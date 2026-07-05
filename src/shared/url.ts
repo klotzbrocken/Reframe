@@ -45,8 +45,18 @@ export function normalizeInput(input: string): string | null {
   return search(raw)
 }
 
+/** Base of the web-search URL normalizeInput() falls back to for free text. */
+const SEARCH_BASE = 'https://duckduckgo.com/?q='
+
 function search(q: string): string {
-  return 'https://duckduckgo.com/?q=' + encodeURIComponent(q)
+  return SEARCH_BASE + encodeURIComponent(q)
+}
+
+/** True if a normalized URL is a web-search fallback (free text), not a real
+ *  destination the user typed. Used by Old Web so a search like "cats" runs a
+ *  live search instead of being wrapped into a nonsensical Wayback URL. */
+export function isWebSearchUrl(url: string): boolean {
+  return typeof url === 'string' && url.startsWith(SEARCH_BASE)
 }
 
 /**

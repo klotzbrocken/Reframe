@@ -43,8 +43,8 @@ Authentic and free; may 404 or look broken, which is surfaced as an inline messa
 
 ## Composition (where the work happens)
 - Done in the **renderer** with an offscreen `<canvas>`: load both PNGs as data URLs,
-  draw stacked, add the label band + watermark, `canvas.toBlob()` → PNG. No new native
-  dependency.
+  draw stacked, add the label band + watermark, `canvas.toDataURL('image/png')` → PNG
+  data URL. No new native dependency.
 - Save / clipboard go through IPC to main (`share:save` → `dialog.showSaveDialog` +
   `shell.showItemInFolder`; `share:copy` → `clipboard.writeImage`).
 
