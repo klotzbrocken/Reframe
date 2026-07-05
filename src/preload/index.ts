@@ -13,7 +13,6 @@ const api: OldwebAPI = {
   stop: (id) => ipcRenderer.invoke('shell:stop', id),
   editCommand: (id, cmd) => ipcRenderer.invoke('shell:editCommand', id, cmd),
   zoomStep: (id, dir) => ipcRenderer.invoke('shell:zoomStep', id, dir),
-  periodRender: (id, opts) => ipcRenderer.invoke('shell:periodRender', id, opts),
   shareSources: (id, opts) => ipcRenderer.invoke('share:sources', id, opts),
   shareSave: (dataUrl, name) => ipcRenderer.invoke('share:save', dataUrl, name),
   shareCopy: (dataUrl) => ipcRenderer.invoke('share:copy', dataUrl),

@@ -118,7 +118,19 @@ export function useShell(onLoadStart?: () => void): {
       }
     },
     setOldWebDate: (date: string) => {
+      // Guard against no-op calls: the App effect re-runs this on every render,
+      // so only act when the era date actually changes — otherwise the
+      // re-navigation below would loop.
+      if (oldWebDateRef.current === date) return
       oldWebDateRef.current = date
+      // If Old Web is active, immediately reload the current page at the new
+      // snapshot (e.g. switching IE5 → IE6 changes the era), instead of waiting
+      // for the next manual navigation / Time-Travel press.
+      const id = activeRef.current
+      if (oldWebRef.current && id != null && currentUrlRef.current) {
+        const original = unwrapWayback(currentUrlRef.current)
+        window.oldweb.navigate(id, wrapWayback(original, date))
+      }
     }
   }
 

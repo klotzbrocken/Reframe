@@ -9,12 +9,11 @@ import {
   nativeImage,
   shell as electronShell
 } from 'electron'
-import { basename, join } from 'path'
+import { join } from 'path'
 import { writeFile } from 'fs/promises'
 import { pathToFileURL } from 'url'
 import type { ContentInsets, MenuCommand, ShellEvent, TabState } from '../shared/types'
 import { normalizeInput, isAllowedExternal } from '../shared/url'
-import { renderPeriodImage, pickSize, type PeriodQuality } from './period-render'
 import { pageUrl } from './page-url'
 
 /** Runs in a page: resolves once every <img> has loaded (or after 6s). */
@@ -309,66 +308,16 @@ export class BrowserShell {
     if (wc && !wc.isDestroyed()) wc.print()
   }
 
-  /** Period Render: screenshot the live viewport + text, ask OpenAI to re-style
-   *  it in {year}, then show the result (fit to window) in the same tab. Returns
-   *  the live URL so the UI can offer "back to live"; restores it on failure. */
-  async periodRender(
-    id: number,
-    opts: { key: string; year: number; quality: PeriodQuality; prompt?: string }
-  ): Promise<{ liveUrl?: string; error?: string }> {
-    const wc = this.tabs.get(id)?.view.webContents
-    if (!wc || wc.isDestroyed()) return { error: 'No active page' }
-    const liveUrl = wc.getURL()
-    try {
-      // Capture the live viewport + text BEFORE swapping to the placeholder.
-      const [w, h] = this.win.getContentSize()
-      const png = (await wc.capturePage()).toPNG()
-      const text = String(
-        await wc.executeJavaScript('document.body ? document.body.innerText : ""').catch(() => '')
-      )
-      const title = wc.getTitle() || ''
-
-      // Visible progress while the model works (can take up to ~2 min).
-      await wc.loadURL(placeholderPage(opts.year))
-
-      const out = await renderPeriodImage({
-        key: opts.key,
-        year: opts.year,
-        quality: opts.quality,
-        png,
-        text,
-        title,
-        size: pickSize(w, h),
-        prompt: opts.prompt
-      })
-
-      const stamp = Date.now()
-      const dir = app.getPath('temp')
-      const pngFile = join(dir, `reframe-period-${id}-${stamp}.png`)
-      const htmlFile = join(dir, `reframe-period-${id}-${stamp}.html`)
-      await writeFile(pngFile, out)
-      await writeFile(htmlFile, viewerPage(basename(pngFile), opts.year))
-      if (!wc.isDestroyed()) await wc.loadURL(pathToFileURL(htmlFile).toString())
-      return { liveUrl }
-    } catch (e) {
-      if (!wc.isDestroyed()) wc.loadURL(liveUrl).catch(() => {})
-      return { error: e instanceof Error ? e.message : 'Render failed' }
-    }
-  }
-
-  /** "Today vs {year}" share: capture the live viewport (Today) plus the {year}
-   *  side (AI Period Render of the same shot, or a real Wayback capture). Returns
-   *  both as base64 PNG data URLs; the renderer composes the final image. */
+  /** "Today vs {year}" share: capture the live viewport (Today) plus a real
+   *  Wayback Machine snapshot of the same page for {year}. Returns both as
+   *  base64 PNG data URLs; the renderer composes the final image. */
   async shareSources(
     id: number,
     opts: {
-      source: 'ai' | 'wayback'
+      source: 'wayback'
       year: number
       /** Wayback month 1–12 (snapshot targeted mid-month); defaults to September. */
       month?: number
-      key?: string
-      quality?: PeriodQuality
-      prompt?: string
       originalUrl?: string
     }
   ): Promise<{
@@ -385,57 +334,29 @@ export class BrowserShell {
       // archived snapshot (Time-Travel via the slider), capturePage() would grab
       // the OLD page — so load the live original off-screen for the Today shot.
       const onWayback = /(^|\/\/)web\.archive\.org\//i.test(wc.getURL())
-      let todayPng: Buffer
-      let todayText = ''
-      let todayTitle = ''
-      if (onWayback && opts.originalUrl) {
-        const live = await this.captureUrlFull(opts.originalUrl)
-        todayPng = live.png
-        todayText = live.text
-        todayTitle = live.title
-      } else {
-        todayPng = (await wc.capturePage()).toPNG()
-        todayText = String(
-          await wc.executeJavaScript('document.body ? document.body.innerText : ""').catch(() => '')
-        )
-        todayTitle = wc.getTitle() || ''
+      const todayPng =
+        onWayback && opts.originalUrl
+          ? (await this.captureUrlFull(opts.originalUrl)).png
+          : (await wc.capturePage()).toPNG()
+
+      if (!opts.originalUrl) return { error: 'No page URL' }
+      // Resolve a REAL snapshot via the availability API — loading a bare
+      // /web/{date}/ URL silently redirects to the nearest snapshot (often a
+      // modern year), which would look like "today".
+      const snap = await this.findSnapshot(opts.originalUrl, opts.year, opts.month)
+      if (!snap) {
+        return { error: 'No archive snapshot found for this page.' }
       }
-      let yearPng: Buffer
-      let snapYear: string | undefined
-      if (opts.source === 'ai') {
-        if (!opts.key) return { error: 'No OpenAI API key set (Settings).' }
-        const [w, h] = this.win.getContentSize()
-        yearPng = await renderPeriodImage({
-          key: opts.key,
-          year: opts.year,
-          quality: opts.quality ?? 'medium',
-          png: todayPng,
-          text: todayText,
-          title: todayTitle,
-          size: pickSize(w, h),
-          prompt: opts.prompt
-        })
-      } else {
-        if (!opts.originalUrl) return { error: 'No page URL' }
-        // Resolve a REAL snapshot via the availability API — loading a bare
-        // /web/{date}/ URL silently redirects to the nearest snapshot (often a
-        // modern year), which would look like "today".
-        const snap = await this.findSnapshot(opts.originalUrl, opts.year, opts.month)
-        if (!snap) {
-          return { error: 'No archive snapshot found for this page.' }
-        }
-        // Respect the chosen year: the availability API returns the closest
-        // snapshot across ALL time (1999 often resolves to 2015). Within ±1 year
-        // use it; otherwise don't silently jump — hand the closest back so the
-        // renderer can ASK the user to confirm it (one-click OK).
-        if (Math.abs(Number(snap.year) - opts.year) > 1) {
-          return { suggestYear: snap.year }
-        }
-        snapYear = snap.year
-        yearPng = await this.captureUrl(snap.url)
+      // Respect the chosen year: the availability API returns the closest
+      // snapshot across ALL time (1999 often resolves to 2015). Within ±1 year
+      // use it; otherwise don't silently jump — hand the closest back so the
+      // renderer can ASK the user to confirm it (one-click OK).
+      if (Math.abs(Number(snap.year) - opts.year) > 1) {
+        return { suggestYear: snap.year }
       }
+      const yearPng = await this.captureUrl(snap.url)
       const toUrl = (b: Buffer): string => 'data:image/png;base64,' + b.toString('base64')
-      return { today: toUrl(todayPng), year: toUrl(yearPng), snapYear }
+      return { today: toUrl(todayPng), year: toUrl(yearPng), snapYear: snap.year }
     } catch (e) {
       return { error: e instanceof Error ? e.message : 'Share failed' }
     }
@@ -761,47 +682,4 @@ function injectRetro(enabled: boolean): void {
   document.documentElement.appendChild(el)
 }
 
-/** A self-contained "rendering…" page shown while the Period Render runs; it
- *  cycles a few playful time-travel messages on a timer. */
-function placeholderPage(year: number): string {
-  const msgs = [
-    'Going back in time…',
-    'Spinning up the flux capacitor…',
-    'Accelerating to 88 mph…',
-    'Re-pixelating the photographs…',
-    'Dialing up a 56k connection…',
-    'Asking the archive nicely…'
-  ]
-  const html =
-    '<!doctype html><meta charset=utf-8><style>' +
-    'html,body{margin:0;height:100%;display:flex;flex-direction:column;align-items:center;' +
-    'justify-content:center;gap:18px;background:#0f1216;color:#cdd6e4;' +
-    'font:600 16px -apple-system,Segoe UI,Tahoma,sans-serif}' +
-    '.s{width:34px;height:34px;border:4px solid #2a3340;border-top-color:#4a86e8;border-radius:50%;' +
-    'animation:r 1s linear infinite}#m{min-height:20px}.y{font-size:12px;color:#7e8aa0}' +
-    '@keyframes r{to{transform:rotate(360deg)}}</style>' +
-    '<div class=s></div><div id=m>' +
-    msgs[0] +
-    '</div><div class=y>Rendering this page in ' +
-    year +
-    '</div><script>var m=' +
-    JSON.stringify(msgs) +
-    ',i=0,e=document.getElementById("m");' +
-    'setInterval(function(){i=(i+1)%m.length;e.textContent=m[i]},2400);</script>'
-  return 'data:text/html,' + encodeURIComponent(html)
-}
-
-/** The viewer page that shows the rendered image fit to the window. The image
- *  is referenced by basename (same temp dir → same file:// origin). */
-function viewerPage(imgName: string, year: number): string {
-  return (
-    '<!doctype html><meta charset=utf-8><title>Reframe · ' +
-    year +
-    '</title><style>html,body{margin:0;height:100%;background:#000}' +
-    'img{position:fixed;inset:0;width:100%;height:100%;object-fit:contain}</style>' +
-    '<img alt="" src="' +
-    imgName +
-    '">'
-  )
-}
 

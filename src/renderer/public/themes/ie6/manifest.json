@@ -1,0 +1,64 @@
+{
+  "id": "ie6",
+  "name": "Internet Explorer 6.0",
+  "era": "2001 · Windows XP",
+  "toolbar": [
+    "back",
+    "forward",
+    "|",
+    "stop",
+    "refresh",
+    "home",
+    "|",
+    "search",
+    "favorites",
+    "history",
+    "|",
+    "mail",
+    "print",
+    "edit",
+    "messenger"
+  ],
+  "menus": ["File", "Edit", "View", "Favorites", "Tools", "Help"],
+  "homeUrl": "https://www.myretromac.app",
+  "oldWebDate": "20030601",
+  "layout": {
+    "tabsPosition": "top",
+    "showStatusBar": true,
+    "showMenuBar": true,
+    "showTabs": false,
+    "showFavicon": false
+  },
+  "throbber": {
+    "kind": "css",
+    "label": "Working"
+  },
+  "labels": {
+    "address": "Address",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "search": "Search",
+    "favorites": "Favorites",
+    "history": "History",
+    "mail": "Mail",
+    "print": "Print",
+    "edit": "Edit",
+    "messenger": "Messenger"
+  },
+  "sounds": {},
+  "vars": {
+    "--ow-face": "#ece9d8",
+    "--ow-face-light": "#ffffff",
+    "--ow-face-dark": "#aca892",
+    "--ow-face-darker": "#808080",
+    "--ow-field": "#ffffff",
+    "--ow-text": "#000000",
+    "--ow-highlight": "#316ac5",
+    "--ow-titlebar": "#7c9ae1",
+    "--ow-font": "Tahoma, 'Segoe UI', Verdana, Geneva, sans-serif"
+  }
+}

@@ -40,7 +40,9 @@ export const TOOLBAR_ITEMS = [
   'cut',
   'paste',
   // Internet Explorer 4.01 (Mac) toolbar set
-  'preferences'
+  'preferences',
+  // Internet Explorer 6.0 (Windows XP) toolbar set
+  'messenger'
 ] as const
 
 /** Toolbar entries. Known actions render as buttons; '|' is a separator. */
@@ -119,6 +121,7 @@ export interface ThemeManifest {
     cut?: string
     paste?: string
     preferences?: string
+    messenger?: string
   }
   /** Event name -> sound file (relative to the theme's sounds/ dir). */
   sounds?: Record<string, string>
@@ -157,7 +160,8 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
   fontdown: 'Use Smaller Font',
   cut: 'Cut',
   paste: 'Paste',
-  preferences: 'Preferences'
+  preferences: 'Preferences',
+  messenger: 'Messenger'
 }
 
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']

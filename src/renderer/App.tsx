@@ -470,6 +470,13 @@ export function App() {
     preferences: {
       label: labels.preferences,
       onClick: () => setDialogOpen(true)
+    },
+    // Internet Explorer 6.0 (Windows XP): the Messenger toolbar button. Windows
+    // Messenger was a separate app we can't launch — kept for authenticity as an
+    // inert period button (see the "never delete theme elements" note).
+    messenger: {
+      label: labels.messenger,
+      onClick: () => {}
     }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
