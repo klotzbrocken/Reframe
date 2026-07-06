@@ -84,6 +84,8 @@ export interface OldwebAPI {
   setRetroContent(id: number, enabled: boolean): Promise<void>
   /** "Time Warp Modem": throttle the network to a period speed (full/isdn/56k/28.8k). */
   setNetworkSpeed(profile: string): Promise<void>
+  /** Toggle uBlock-Origin-style ad/tracker blocking (opt-in, default off). */
+  setAdblock(enabled: boolean): Promise<void>
   /** Open the print dialog for a tab's page. */
   print(id: number): Promise<void>
   /** Save a tab's page to a local HTML file (Opera "Save to file"). */

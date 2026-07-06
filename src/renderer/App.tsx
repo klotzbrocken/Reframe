@@ -275,6 +275,10 @@ export function App() {
   useEffect(() => {
     window.oldweb.setNetworkSpeed(settings.connectionSpeed || 'full')
   }, [settings.connectionSpeed])
+  // Apply the opt-in ad/tracker blocker on startup and whenever it's toggled.
+  useEffect(() => {
+    window.oldweb.setAdblock(settings.adblock ?? false)
+  }, [settings.adblock])
   useEffect(() => {
     actions.setOldWebDate(waybackDate)
   }, [waybackDate, actions])

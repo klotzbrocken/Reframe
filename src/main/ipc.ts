@@ -82,6 +82,7 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
     validId(id) ? s()?.setRetroContent(id, asBool(enabled)) : undefined
   )
   handle('shell:setNetworkSpeed', (_e, profile) => s()?.setNetworkSpeed(asString(profile)))
+  handle('shell:setAdblock', (_e, enabled) => s()?.setAdblock(asBool(enabled)))
   handle('shell:print', (_e, id) => (validId(id) ? s()?.print(id) : undefined))
   handle('shell:savePage', (_e, id) => (validId(id) ? s()?.savePage(id) : undefined))
   handle('shell:setImagesEnabled', (_e, id, enabled) =>

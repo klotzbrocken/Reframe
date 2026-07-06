@@ -15,6 +15,7 @@ import { pathToFileURL } from 'url'
 import type { ContentInsets, MenuCommand, ShellEvent, TabState } from '../shared/types'
 import { normalizeInput, isAllowedExternal } from '../shared/url'
 import { pageUrl } from './page-url'
+import { applyAdblock } from './adblock'
 
 /** Runs in a page: resolves once every <img> has loaded (or after 6s). */
 const WAIT_IMAGES_JS = `new Promise((resolve) => {
@@ -485,6 +486,14 @@ export class BrowserShell {
     } catch {
       /* debugger already in use (e.g. DevTools open) — skip throttling */
     }
+  }
+
+  /** Toggle uBlock-Origin-style ad/tracker blocking on the page session, then
+   *  reload the active tab so the change takes effect right away. */
+  async setAdblock(enabled: boolean): Promise<void> {
+    await applyAdblock(enabled)
+    const wc = this.activeId != null ? this.tabs.get(this.activeId)?.view.webContents : undefined
+    if (wc && !wc.isDestroyed()) wc.reload()
   }
 
   /** Opera "Save to file": save the page as a complete HTML file. */

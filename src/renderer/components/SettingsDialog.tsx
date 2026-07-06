@@ -27,6 +27,8 @@ export interface Settings {
   closeAction?: 'quit' | 'minimize'
   /** "Time Warp Modem" simulated connection speed. */
   connectionSpeed?: 'full' | 'isdn' | '56k' | '28.8k'
+  /** Block ads & trackers using uBlock-Origin-style filter lists (opt-in). */
+  adblock?: boolean
 }
 
 interface Props {
@@ -67,6 +69,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [menuFontSize, setMenuFontSize] = useState(settings.menuFontSize || 'normal')
   const [labelFontSize, setLabelFontSize] = useState(settings.labelFontSize || 'normal')
   const [closeAction, setCloseAction] = useState(settings.closeAction || 'quit')
+  const [adblock, setAdblock] = useState(settings.adblock ?? false)
 
   return (
     <div className="ow-dialog-backdrop" onMouseDown={onClose}>
@@ -204,6 +207,15 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               />
               <span>Show theme splash screens on switch</span>
             </label>
+
+            <label className="ow-field ow-field--check ow-field--wide">
+              <input
+                type="checkbox"
+                checked={adblock}
+                onChange={(e) => setAdblock(e.target.checked)}
+              />
+              <span>Block ads &amp; trackers (uBlock Origin filter lists)</span>
+            </label>
           </div>
 
           <p className="ow-dialog__legal">{LEGAL}</p>
@@ -241,7 +253,8 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 menuStyle: menuStyle as 'win98' | 'luna',
                 menuFontSize: menuFontSize as FontSize,
                 labelFontSize: labelFontSize as FontSize,
-                closeAction: closeAction as 'quit' | 'minimize'
+                closeAction: closeAction as 'quit' | 'minimize',
+                adblock: adblock || undefined
               })
               onClose()
             }}
