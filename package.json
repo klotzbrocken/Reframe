@@ -14,6 +14,8 @@
     "package:win": "electron-vite build && electron-builder --win",
     "release": "electron-vite build && electron-builder --mac --publish always",
     "release:win": "electron-vite build && electron-builder --win --publish always",
+    "package:linux": "electron-vite build && electron-builder --linux",
+    "release:linux": "electron-vite build && electron-builder --linux --publish always",
     "test": "vitest run"
   },
   "build": {
@@ -73,6 +75,16 @@
         },
         {
           "target": "portable"
+        }
+      ]
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Network",
+      "synopsis": "Today's web, yesterday's look — a retro-chrome browser.",
+      "target": [
+        {
+          "target": "AppImage"
         }
       ]
     },

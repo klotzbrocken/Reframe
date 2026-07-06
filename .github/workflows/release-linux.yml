@@ -1,0 +1,37 @@
+name: Release (Linux)
+
+# Builds the Linux AppImage and publishes it to the GitHub Release for the
+# pushed tag (e.g. v1.5.0). electron-updater reads the generated
+# latest-linux.yml, so installed AppImage copies auto-update from here.
+#
+# The macOS build stays a local `npm run release` (Developer ID keychain +
+# notarytool profile); Windows and Linux build in CI. All publish to the same
+# release.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & publish Linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run release:linux
