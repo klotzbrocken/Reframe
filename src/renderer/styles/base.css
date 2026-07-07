@@ -958,8 +958,9 @@ body,
   transform: translateX(-50%);
   /* Sit low in the footer/status-bar band: when idle the chrome is NOT floated
      above the page, so anything reaching into the .ow-content region would be
-     covered (clipped) by the page view. */
-  bottom: 2px;
+     covered (clipped) by the page view. The idle mark is sized to fit inside the
+     shortest theme footer (Safari's 20px status bar) so it is never clipped. */
+  bottom: 1px;
   z-index: 9000;
   font-family: -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
 }
@@ -969,8 +970,8 @@ body,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -983,13 +984,13 @@ body,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  font: italic 800 13px/1 -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  font: italic 800 10px/1 -apple-system, 'Segoe UI', Tahoma, sans-serif;
   color: #fff;
   background: linear-gradient(160deg, #3a90e8, #2467c4);
-  box-shadow: 0 0 0 2px rgba(47, 134, 224, 0.5), 0 3px 9px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 1px rgba(47, 134, 224, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 .ow-fab__mark i {
   position: absolute;
