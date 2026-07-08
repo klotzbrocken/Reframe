@@ -41,6 +41,16 @@ export type MenuCommand =
   | { cmd: 'reload-wayback'; id: number; url: string }
 
 /** The API exposed to the renderer via contextBridge as `window.oldweb`. */
+/** Density of real Wayback captures for a page, used by the Archive Timeline. */
+export interface WaybackTimeline {
+  /** Number of captured months per year (0–12). */
+  years: Record<number, number>
+  /** Capture COUNT per month, keyed "YYYYMM" (absent / 0 = no snapshot). */
+  months: Record<string, number>
+  /** Total captured months found across fetched years (0 = none yet). */
+  total: number
+}
+
 export interface OldwebAPI {
   createTab(url?: string): Promise<number>
   closeTab(id: number): Promise<void>
@@ -86,6 +96,9 @@ export interface OldwebAPI {
   setNetworkSpeed(profile: string): Promise<void>
   /** Toggle uBlock-Origin-style ad/tracker blocking (opt-in, default off). */
   setAdblock(enabled: boolean): Promise<void>
+  /** Archive Timeline: capture COUNT for each of the 12 months of `year` for `url`
+   *  (index 0 = Jan). Fetched per year from the Wayback calendar API. */
+  waybackMonths(url: string, year: number): Promise<number[]>
   /** Open the print dialog for a tab's page. */
   print(id: number): Promise<void>
   /** Save a tab's page to a local HTML file (Opera "Save to file"). */

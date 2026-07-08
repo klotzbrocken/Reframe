@@ -1076,8 +1076,29 @@ body,
   align-items: center;
   gap: 8px;
 }
-.ow-fab__close {
+/* Share button at the top of the panel (right of the title, before close). */
+.ow-fab__hdshare {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  padding: 0 9px;
+  border: 1px solid #c2c2c2;
+  border-radius: 6px;
+  background: #fbfbfb;
+  color: #23272e;
+  font: 700 10px/1 -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+.ow-fab__hdshare:hover {
+  background: #eef4ff;
+  border-color: #7ea6e6;
+}
+.ow-fab__close {
+  margin-left: 6px;
   width: 22px;
   height: 22px;
   border: 1px solid #c2c2c2;
@@ -1134,6 +1155,58 @@ body,
 }
 
 /* ---- Slider (no fill; full width; disabled in Today mode) ------------ */
+/* Archive Timeline — capture-density bars above the year / month sliders. */
+.ow-fab__hist {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 26px;
+  margin: 8px 0 1px;
+}
+.ow-fab__hist--month {
+  gap: 2px;
+  height: 15px;
+  margin-top: 10px;
+}
+.ow-fab__bar {
+  flex: 1 1 0;
+  min-width: 0;
+  align-self: flex-end;
+  padding: 0;
+  border: 0;
+  border-radius: 1px 1px 0 0;
+  background: #3a90e8;
+  cursor: pointer;
+  transition: background 0.1s ease, opacity 0.15s ease;
+}
+.ow-fab__bar:hover:not(:disabled) {
+  background: #5aa6f2;
+}
+.ow-fab__bar.is-empty {
+  background: rgba(0, 0, 0, 0.12);
+}
+/* Year not fetched yet (calendar is queried lazily as you scrub). */
+.ow-fab__bar.is-unknown {
+  background: rgba(0, 0, 0, 0.22);
+}
+.ow-fab__bar.is-sel {
+  background: #e6a400;
+}
+.ow-fab__hist.is-loading .ow-fab__bar {
+  animation: ow-fab-hist 1s ease-in-out infinite;
+}
+@keyframes ow-fab-hist {
+  50% {
+    opacity: 0.3;
+  }
+}
+.ow-fab__hint {
+  margin: 5px 0 0;
+  font-size: 10px;
+  text-align: center;
+  opacity: 0.65;
+}
+
 .ow-fab__range {
   -webkit-appearance: none;
   appearance: none;

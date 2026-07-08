@@ -1,26 +1,22 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.5.0'
+export const WHATS_NEW_VERSION = '1.6.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'New theme — NCSA Mosaic',
-    body: 'The 1993 browser that showed the world the Web: the black title bar with green caption text, silver Windows 3.1 bevel toolbar, the read-only “Document Title / Document URL” header with the spinning NCSA globe, and period-accurate menus. Its own “About NCSA Mosaic” history page included.'
+    title: 'New theme — Netscape Navigator 3.04 Gold',
+    body: 'The browser the early Web grew up on, rebuilt pixel-for-pixel: the silver Windows 95 chrome, the ten-button toolbar, the “Location:” bar with the globe, the Directory quick-links — and the spinning “N” throbber that spins only while a page is loading. Its own “About Netscape Navigator” history page included.'
   },
   {
-    title: 'New theme — Internet Explorer 6.0',
-    body: 'The 2001 classic in full Windows XP “Luna” dress: glossy full-colour toolbar buttons, the green Back orb, the original rippling Windows-flag throbber while pages load, and the grey Windows 3D window frame. Its own “About Internet Explorer 6.0” history page included.'
+    title: 'Archive Timeline',
+    body: 'Open the flyout to see how many times the page you’re on was captured, year by year and month by month, as little histograms. Click any bar to jump straight to that moment in the Web’s history.'
   },
   {
-    title: 'Old Web understands searches again',
-    body: 'Typing words (not a web address) while time-travelling now runs a real search instead of trying to archive the literal text — and switching theme/era while Old Web is on reloads the page in the new year instantly.'
-  },
-  {
-    title: 'Leaner “Today vs {year}” sharing',
-    body: 'Sharing now builds the {year} side straight from a real Wayback snapshot — no OpenAI key or AI step involved. Simpler, free, and private.'
+    title: 'Sharing & time-travel polish',
+    body: 'The “Share” button now lives at the top of the flyout, right where you look for it. Type a year like “1998://” in the address bar to jump straight there, and switching between years no longer flashes the old page first.'
   }
 ]
 

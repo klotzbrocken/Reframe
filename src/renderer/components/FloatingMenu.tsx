@@ -11,6 +11,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { requestChromeTop } from '../shell/chromeTop'
 import { WAYBACK_MIN_YEAR as MIN_YEAR, WAYBACK_MAX_YEAR as MAX_YEAR } from '../shell/wayback'
+import type { WaybackTimeline } from '../../shared/types'
 
 interface ThemeItem {
   id: string
@@ -51,7 +52,7 @@ interface Props {
   onWayback: (year: number, month: number) => void
   /** "Today" — back to today's live web. */
   onWaybackOff: () => void
-  /** "Today vs {year}" share/export. */
+  /** "Today vs {year}" share/export (icon at the top of the panel). */
   shareYear: string
   onShare: () => void
   /** Force the flyout open (used by the first-run coachmark tour). */
@@ -59,6 +60,12 @@ interface Props {
   speed: string
   speedOpts: SpeedItem[]
   onSpeed: (id: string) => void
+  /** Archive Timeline: real Wayback capture density for the current page. */
+  timeline: WaybackTimeline
+  /** True while the timeline for the current page is being fetched. */
+  timelineLoading?: boolean
+  /** Load the real captures for a given year (panel open + when the year changes). */
+  onYear?: (year: number) => void
 }
 
 export function FloatingMenu({
@@ -75,7 +82,10 @@ export function FloatingMenu({
   forceOpen,
   speed,
   speedOpts,
-  onSpeed
+  onSpeed,
+  timeline,
+  timelineLoading,
+  onYear
 }: Props) {
   const [open, setOpen] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
@@ -92,6 +102,34 @@ export function FloatingMenu({
   const monthRef = useRef(month)
   monthRef.current = month
   const travel = (): void => onWayback(yearRef.current, monthRef.current)
+
+  // Load a year's real captures when the panel opens and (debounced) whenever the
+  // selected year settles — the calendar API is queried one year at a time.
+  useEffect(() => {
+    if (!panelOpen) return
+    const t = setTimeout(() => onYear?.(yearRef.current), 250)
+    return () => clearTimeout(t)
+  }, [panelOpen, year, onYear])
+
+  // --- Archive Timeline helpers: click a bar to land on a real snapshot. ---
+  const YEARS = Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR + i)
+  const monthCount = (y: number, m: number): number =>
+    timeline.months[`${y}${String(m).padStart(2, '0')}`] ?? 0
+  const maxMonth = Math.max(1, ...Array.from({ length: 12 }, (_, i) => monthCount(year, i + 1)))
+  const firstMonth = (y: number): number => {
+    for (let m = 1; m <= 12; m++) if (monthCount(y, m) > 0) return m
+    return monthRef.current
+  }
+  const pickYear = (y: number): void => {
+    const m = firstMonth(y)
+    setYear(y)
+    setMonth(m)
+    onWayback(y, m)
+  }
+  const pickMonth = (m: number): void => {
+    setMonth(m)
+    onWayback(yearRef.current, m)
+  }
 
   // Derived "mode": where the page comes from.
   const mode: 'today' | 'travel' = oldWeb ? 'travel' : 'today'
@@ -151,6 +189,18 @@ export function FloatingMenu({
               <span className="ow-fab__title">Time Machine</span>
               <button
                 type="button"
+                className="ow-fab__hdshare"
+                title={`Share · Today vs ${shareYear}`}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  onShare()
+                  setOpen(false)
+                }}
+              >
+                <span aria-hidden>↗</span> Share
+              </button>
+              <button
+                type="button"
                 className="ow-fab__close"
                 aria-label="Close"
                 onMouseDown={(e) => {
@@ -172,6 +222,37 @@ export function FloatingMenu({
               </span>
             </div>
 
+            {/* Archive Timeline — real capture density per year. Click a bar to
+                jump to a year that actually has snapshots; empty years are dimmed. */}
+            <div className={'ow-fab__hist' + (timelineLoading ? ' is-loading' : '')}>
+              {YEARS.map((y) => {
+                const known = timeline.years[y] !== undefined
+                const n = timeline.years[y] ?? 0
+                const cls = y === year ? ' is-sel' : known ? (n ? '' : ' is-empty') : ' is-unknown'
+                const h = known ? (n ? 15 + Math.round((n / 12) * 85) : 8) : 22
+                return (
+                  <button
+                    key={y}
+                    type="button"
+                    className={'ow-fab__bar' + cls}
+                    style={{ height: h + '%' }}
+                    title={
+                      known
+                        ? n
+                          ? `${y} · ${n} month${n > 1 ? 's' : ''} archived`
+                          : `${y} · no snapshots`
+                        : String(y)
+                    }
+                    aria-label={String(y)}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      pickYear(y)
+                    }}
+                  />
+                )
+              })}
+            </div>
+
             {/* Year — selecting a value loads that archived page immediately. */}
             <input
               type="range"
@@ -187,6 +268,32 @@ export function FloatingMenu({
             <div className="ow-fab__years">
               <span>{MIN_YEAR}</span>
               <span>{MAX_YEAR}</span>
+            </div>
+
+            {/* Month timeline — which months of the selected year were archived. */}
+            <div className="ow-fab__hist ow-fab__hist--month">
+              {MONTHS.map((mn, i) => {
+                const m = i + 1
+                const c = monthCount(year, m)
+                const has = c > 0
+                return (
+                  <button
+                    key={mn}
+                    type="button"
+                    className={
+                      'ow-fab__bar' + (has ? '' : ' is-empty') + (m === month ? ' is-sel' : '')
+                    }
+                    style={{ height: has ? 15 + Math.round((c / maxMonth) * 85) + '%' : '8%' }}
+                    title={`${mn} ${year}${has ? ` · ${c} capture${c > 1 ? 's' : ''}` : ' · no snapshot'}`}
+                    aria-label={`${mn} ${year}${has ? '' : ' — no snapshot'}`}
+                    disabled={!has}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      pickMonth(m)
+                    }}
+                  />
+                )
+              })}
             </div>
 
             {/* Month — 12 discrete steps; release reloads that month's snapshot.
@@ -207,6 +314,10 @@ export function FloatingMenu({
               <span>Jan</span>
               <span>Dec</span>
             </div>
+
+            {timeline.years[year] === 0 && !timelineLoading && (
+              <div className="ow-fab__hint">No snapshots in {year} — try another year.</div>
+            )}
 
             {/* mode segment */}
             <div className="ow-fab__seg" role="group" aria-label="Page source">
@@ -231,18 +342,6 @@ export function FloatingMenu({
                 Time-Travel
               </button>
             </div>
-
-            <button
-              type="button"
-              className="ow-fab__share"
-              onMouseDown={(e) => {
-                e.preventDefault()
-                onShare()
-                setOpen(false)
-              }}
-            >
-              <span aria-hidden>↗</span> Share · Today vs {shareYear}
-            </button>
           </div>
 
           <div className="ow-fab__div" />

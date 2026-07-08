@@ -22,6 +22,7 @@ const api: OldwebAPI = {
     ipcRenderer.invoke('shell:setRetroContent', id, enabled),
   setNetworkSpeed: (profile) => ipcRenderer.invoke('shell:setNetworkSpeed', profile),
   setAdblock: (enabled) => ipcRenderer.invoke('shell:setAdblock', enabled),
+  waybackMonths: (url, year) => ipcRenderer.invoke('wayback:months', url, year),
   print: (id) => ipcRenderer.invoke('shell:print', id),
   savePage: (id) => ipcRenderer.invoke('shell:savePage', id),
   setImagesEnabled: (id, enabled) => ipcRenderer.invoke('shell:setImagesEnabled', id, enabled),

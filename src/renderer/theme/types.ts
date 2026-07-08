@@ -45,7 +45,11 @@ export const TOOLBAR_ITEMS = [
   'messenger',
   // NCSA Mosaic toolbar set
   'help',
-  'loaddisk'
+  'loaddisk',
+  // Netscape Navigator 3.04 toolbar set
+  'nsedit',
+  'find',
+  'images'
 ] as const
 
 /** Toolbar entries. Known actions render as buttons; '|' is a separator. */
@@ -129,6 +133,9 @@ export interface ThemeManifest {
     messenger?: string
     help?: string
     loaddisk?: string
+    nsedit?: string
+    find?: string
+    images?: string
   }
   /** Event name -> sound file (relative to the theme's sounds/ dir). */
   sounds?: Record<string, string>
@@ -170,7 +177,10 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
   preferences: 'Preferences',
   messenger: 'Messenger',
   help: 'Help',
-  loaddisk: 'Load to Disk'
+  loaddisk: 'Load to Disk',
+  nsedit: 'Edit',
+  find: 'Find',
+  images: 'Images'
 }
 
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']

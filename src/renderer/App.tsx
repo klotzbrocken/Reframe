@@ -23,7 +23,8 @@ import { WhatsNewDialog, WHATS_NEW_VERSION } from './components/WhatsNewDialog'
 import { UrlDialog } from './components/UrlDialog'
 import { DEFAULT_ENGINE_ID } from './shell/engines'
 import { useShell } from './shell/useShell'
-import { stripWaybackDisplay, unwrapWayback, waybackDisplay } from './shell/wayback'
+import { stripWaybackDisplay, unwrapWayback, waybackDisplay, wrapWayback } from './shell/wayback'
+import type { WaybackTimeline } from '../shared/types'
 import { themeEngine, safeThemeId } from './theme/loader'
 import {
   DEFAULT_LABELS,
@@ -109,6 +110,25 @@ export function App() {
     // live web instead of navigating to nothing.
     if (!input.trim()) {
       if (oldWeb) goToday()
+      return
+    }
+    // "2007://…" — an explicit year prefix time-travels to that year, for the
+    // page that follows it (or the current page if nothing follows). The year is
+    // applied here; the plain display form below just strips the prefix.
+    const ym = input.trim().match(/^(\d{4}):\/\/(.*)$/)
+    if (ym) {
+      const year = Number(ym[1])
+      const date = `${year}${String(waybackMonth).padStart(2, '0')}15`
+      actions.setOldWebDate(date)
+      saveSettings({ ...settings, waybackYear: year })
+      actions.setOldWebActive(true) // Old Web on at the chosen year
+      const rest = ym[2].trim()
+      if (rest) {
+        const target = stripWaybackDisplay(rest)
+        const full = /^[a-z][a-z0-9+.-]*:\/\//i.test(target) ? target : 'https://' + target
+        setAddrHistory((h) => [full, ...h.filter((x) => x !== full)].slice(0, 10))
+        if (activeTab) window.oldweb.navigate(activeTab.id, wrapWayback(full, date))
+      }
       return
     }
     // The field may show the friendly "1999://…" wayback form — turn it back
@@ -270,6 +290,7 @@ export function App() {
     saveSettings({ ...settings, waybackYear: year, waybackMonth: month })
     actions.setOldWebActive(true)
   }
+
   // Apply the saved "Time Warp Modem" speed on startup (and whenever it changes),
   // so it covers the initial tab and survives restarts.
   useEffect(() => {
@@ -322,6 +343,50 @@ export function App() {
   const hasSidePanel = layout.sidePanel === 'hotlist'
   const activeTab = state.tabs.find((t) => t.id === state.activeId) ?? null
   const loading = activeTab?.isLoading ?? false
+
+  // --- Archive Timeline: which Wayback snapshots really exist for this page. ---
+  // The Wayback calendar API is queried one year at a time, so the timeline fills
+  // in progressively as the user scrubs the year slider. It resets per page URL.
+  const [timeline, setTimeline] = useState<WaybackTimeline>({ years: {}, months: {}, total: 0 })
+  const [timelineLoading, setTimelineLoading] = useState(false)
+  const activeUrl = unwrapWayback(activeTab?.url ?? '')
+  // Reset only when the *page* changes — not when time-travel swaps the snapshot
+  // URL (which flaps trailing slash / http↔https on redirects). Normalise so
+  // scrubbing years keeps accumulating instead of clearing the bars each time.
+  const baseKey = activeUrl
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/+$/, '')
+    .toLowerCase()
+  useEffect(() => {
+    setTimeline({ years: {}, months: {}, total: 0 })
+  }, [baseKey])
+  const loadYear = useCallback(
+    async (year: number): Promise<void> => {
+      if (!/^https?:\/\//i.test(activeUrl) || !year) return
+      setTimelineLoading(true)
+      try {
+        const counts = await window.oldweb.waybackMonths(activeUrl, year)
+        setTimeline((prev) => {
+          const months = { ...prev.months }
+          let present = 0
+          for (let i = 0; i < 12; i++) {
+            const c = counts[i] ?? 0
+            if (c > 0) {
+              months[`${year}${String(i + 1).padStart(2, '0')}`] = c
+              present++
+            }
+          }
+          const years = { ...prev.years, [year]: present }
+          const total = Object.values(years).reduce((a, b) => a + b, 0)
+          return { years, months, total }
+        })
+      } finally {
+        setTimelineLoading(false)
+      }
+    },
+    [activeUrl]
+  )
   // Explicit user home > the theme's era-appropriate homeUrl (manifest) > default.
   const homeUrl = settings.home || manifest?.homeUrl || 'https://www.myretromac.app'
   const searchUrl = 'https://www.google.com'
@@ -495,7 +560,12 @@ export function App() {
       onClick: () => {
         if (activeTab) window.oldweb.savePage(activeTab.id)
       }
-    }
+    },
+    // Netscape 3.04: Edit (page editor) and Find are inert period buttons kept
+    // for authenticity; Images (auto-load) is permanently disabled, as in the app.
+    nsedit: { label: labels.nsedit, onClick: () => {} },
+    find: { label: labels.find, onClick: () => {} },
+    images: { label: labels.images, onClick: () => {}, disabled: true }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
   const menus = manifest?.menus ?? DEFAULT_MENUS
@@ -503,6 +573,117 @@ export function App() {
   // Menu dropdown contents. The Help menu hosts the Oldweb controls (theme
   // picker, CRT shader, Old Web/Wayback) — shaders will live here too.
   const buildMenu = (name: string): MenuItem[] => {
+    // Netscape Navigator 3.04 Gold — period-accurate menus. 'Help' falls through
+    // to the shared Help menu so the theme picker / Old Web controls stay reachable.
+    if (themeId === 'netscape3') {
+      const cut = () => activeTab && window.oldweb.editCommand(activeTab.id, 'cut')
+      const copy = () => activeTab && window.oldweb.editCommand(activeTab.id, 'copy')
+      const paste = () => activeTab && window.oldweb.editCommand(activeTab.id, 'paste')
+      switch (name) {
+        case 'File':
+          return [
+            { type: 'item', label: 'New Web Browser', onSelect: () => actions.newTab() },
+            { type: 'item', label: 'New Mail Message', disabled: true },
+            { type: 'item', label: 'Mail Document…', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Open Location…', onSelect: () => setUrlDialogOpen(true) },
+            { type: 'item', label: 'Open File…', onSelect: () => void window.oldweb.openLocalFile() },
+            {
+              type: 'item',
+              label: 'Save as…',
+              onSelect: () => activeTab && window.oldweb.savePage(activeTab.id)
+            },
+            { type: 'item', label: 'Upload File…', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Page Setup…', disabled: true },
+            { type: 'item', label: 'Print…', onSelect: () => actions.print() },
+            { type: 'sep' },
+            { type: 'item', label: 'Close', onSelect: () => window.oldweb.closeWindow() },
+            { type: 'item', label: 'Exit', onSelect: () => window.oldweb.quitApp() }
+          ]
+        case 'Edit':
+          return [
+            { type: 'item', label: 'Undo', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Cut', onSelect: cut },
+            { type: 'item', label: 'Copy', onSelect: copy },
+            { type: 'item', label: 'Paste', onSelect: paste },
+            { type: 'sep' },
+            {
+              type: 'item',
+              label: 'Select All',
+              onSelect: () => activeTab && window.oldweb.editCommand(activeTab.id, 'selectAll')
+            },
+            { type: 'sep' },
+            { type: 'item', label: 'Find…', disabled: true },
+            { type: 'item', label: 'Find Again', disabled: true }
+          ]
+        case 'View':
+          return [
+            { type: 'item', label: 'Reload', onSelect: () => actions.reload() },
+            { type: 'item', label: 'Load Images', disabled: true },
+            { type: 'item', label: 'Refresh', onSelect: () => actions.reload() },
+            { type: 'sep' },
+            { type: 'item', label: 'Document Source', disabled: true },
+            { type: 'item', label: 'Document Info', disabled: true }
+          ]
+        case 'Go':
+          return [
+            { type: 'item', label: 'Back', disabled: !activeTab?.canGoBack, onSelect: () => actions.back() },
+            {
+              type: 'item',
+              label: 'Forward',
+              disabled: !activeTab?.canGoForward,
+              onSelect: () => actions.forward()
+            },
+            { type: 'item', label: 'Home', onSelect: () => actions.navigate(homeUrl) },
+            { type: 'sep' },
+            { type: 'item', label: 'Stop Loading', disabled: !loading, onSelect: () => actions.stop() }
+          ]
+        case 'Bookmarks':
+          return [
+            { type: 'item', label: 'Add Bookmark', onSelect: addBookmark },
+            { type: 'sep' },
+            {
+              type: 'item',
+              label: 'Go to Bookmarks…',
+              onSelect: () => openPanel('bookmarks', '.ow-menu')
+            }
+          ]
+        case 'Options':
+          return [
+            { type: 'item', label: 'General Preferences…', onSelect: () => setDialogOpen(true) },
+            { type: 'item', label: 'Mail and News Preferences…', disabled: true },
+            { type: 'item', label: 'Network Preferences…', disabled: true },
+            { type: 'item', label: 'Security Preferences…', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Show Toolbar', checked: true, disabled: true },
+            { type: 'item', label: 'Show Location', checked: true, disabled: true },
+            { type: 'item', label: 'Show Directory Buttons', checked: true, disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Auto Load Images', checked: !imagesOff, onSelect: () => toggleImages() }
+          ]
+        case 'Directory':
+          return [
+            { type: 'item', label: "Netscape's Home", onSelect: () => actions.navigate(homeUrl) },
+            { type: 'item', label: "What's New?", onSelect: () => actions.navigate('https://www.mozilla.org/en-US/firefox/new/') },
+            { type: 'item', label: "What's Cool?", onSelect: () => actions.navigate('https://www.awwwards.com') },
+            { type: 'item', label: 'Netscape Destinations', onSelect: () => actions.navigate('https://www.timeout.com') },
+            { type: 'item', label: 'Internet Search', onSelect: () => actions.navigate('https://duckduckgo.com') },
+            { type: 'item', label: 'People', onSelect: () => actions.navigate('https://www.whitepages.com') },
+            { type: 'item', label: 'About the Internet', disabled: true }
+          ]
+        case 'Window':
+          return [
+            { type: 'item', label: 'Netscape Mail', disabled: true },
+            { type: 'item', label: 'Netscape News', disabled: true },
+            { type: 'item', label: 'Address Book', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Bookmarks', onSelect: () => openPanel('bookmarks', '.ow-menu') },
+            { type: 'item', label: 'History', onSelect: () => openPanel('history', '.ow-menu') }
+          ]
+      }
+    }
     // NCSA Mosaic has its own period-accurate menus (from the prototype spec).
     // 'Help' falls through to the shared Help menu so the theme picker / Old Web
     // controls stay reachable.
@@ -780,6 +961,7 @@ export function App() {
       className="ow-root"
       data-menu-style={settings.menuStyle || 'win98'}
       data-theme={themeId}
+      data-loading={loading ? '' : undefined}
       data-menu-size={settings.menuFontSize || 'normal'}
       data-label-size={settings.labelFontSize || 'normal'}
     >
@@ -934,6 +1116,9 @@ export function App() {
         speed={settings.connectionSpeed || 'full'}
         speedOpts={SPEED_OPTS}
         onSpeed={(id) => setConnectionSpeed(id as Settings['connectionSpeed'])}
+        timeline={timeline}
+        timelineLoading={timelineLoading}
+        onYear={loadYear}
       />
       {tourActive && <TourOverlay steps={TOUR_STEPS} onDone={() => setTourActive(false)} />}
       {shareOpen && (

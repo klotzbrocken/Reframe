@@ -17,6 +17,9 @@ import { normalizeInput, isAllowedExternal } from '../shared/url'
 import { pageUrl } from './page-url'
 import { applyAdblock } from './adblock'
 
+/** Cache of Archive-Timeline month lookups, keyed "url|year" (10 min TTL). */
+const timelineCache = new Map<string, { at: number; months: number[] }>()
+
 /** Runs in a page: resolves once every <img> has loaded (or after 6s). */
 const WAIT_IMAGES_JS = `new Promise((resolve) => {
   try {
@@ -385,6 +388,43 @@ export class BrowserShell {
       return { url: `https://web.archive.org/web/${c.timestamp}if_/${url}`, year: c.timestamp.slice(0, 4) }
     } catch {
       return null
+    }
+  }
+
+  /**
+   * Archive Timeline: which months of `year` actually have a Wayback snapshot of
+   * `url`. Uses the Wayback calendar API (`calendarcaptures/2`) — fast and bounded
+   * to a single year, unlike a CDX `collapse` query which scans every capture and
+   * routinely times out. Each `items[i][0]` encodes the capture time within the
+   * year as `MMDDhhmmss` (leading zero stripped), so the first two digits give the
+   * month. Cached per url+year; failures / non-http return no months.
+   */
+  async waybackMonths(url: string, year: number): Promise<number[]> {
+    if (!/^https?:\/\//i.test(url) || !Number.isInteger(year)) return []
+    const key = `${url}|${year}`
+    const hit = timelineCache.get(key)
+    if (hit && Date.now() - hit.at < 10 * 60_000) return hit.months
+    try {
+      const api =
+        'https://web.archive.org/__wb/calendarcaptures/2?date=' +
+        year +
+        '&url=' +
+        encodeURIComponent(url)
+      const res = await fetch(api, {
+        signal: AbortSignal.timeout(8000),
+        headers: { 'User-Agent': 'Mozilla/5.0 (Reframe)' }
+      })
+      if (!res.ok) return []
+      const j = (await res.json()) as { items?: Array<[number, ...unknown[]]> }
+      const counts = new Array(12).fill(0) as number[]
+      for (const it of j.items ?? []) {
+        const m = Number(String(it[0]).padStart(10, '0').slice(0, 2))
+        if (m >= 1 && m <= 12) counts[m - 1]++
+      }
+      timelineCache.set(key, { at: Date.now(), months: counts })
+      return counts
+    } catch {
+      return []
     }
   }
 

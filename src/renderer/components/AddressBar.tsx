@@ -46,9 +46,17 @@ export function AddressBar({
   const [listOpen, setListOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const comboRef = useRef<HTMLDivElement>(null)
+  const justSubmittedRef = useRef(false)
 
   // Sync from the engine only when the user isn't actively editing.
   useEffect(() => {
+    // Right after a submit the input blurs, but the engine URL prop is still the
+    // PREVIOUS page (navigation is async) — snapping to it here would briefly
+    // flash the old address. Keep the typed value until `url` actually changes.
+    if (justSubmittedRef.current) {
+      justSubmittedRef.current = false
+      return
+    }
     if (!focused) setValue(url)
   }, [url, focused])
 
@@ -74,12 +82,14 @@ export function AddressBar({
   const submit = (): void => {
     // Pass the (possibly empty) value through — an empty submit is meaningful
     // (it exits Old Web back to today), handled by the parent.
+    justSubmittedRef.current = true
     onSubmit(value.trim())
     setListOpen(false)
     inputRef.current?.blur()
   }
 
   const choose = (h: string): void => {
+    justSubmittedRef.current = true
     setValue(h)
     onSubmit(h)
     setListOpen(false)
