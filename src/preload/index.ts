@@ -38,6 +38,7 @@ const api: OldwebAPI = {
     ipcRenderer.on('menu-command', listener)
     return () => ipcRenderer.removeListener('menu-command', listener)
   },
+  setNativeMenu: (model) => ipcRenderer.invoke('menu:setNative', model),
   getTabs: () => ipcRenderer.invoke('shell:getTabs'),
   minimizeWindow: () => ipcRenderer.invoke('shell:minimizeWindow'),
   toggleMaximizeWindow: () => ipcRenderer.invoke('shell:toggleMaximizeWindow'),

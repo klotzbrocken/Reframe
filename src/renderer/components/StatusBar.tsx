@@ -1,9 +1,13 @@
+import type { ReactNode } from 'react'
+
 interface Props {
   text: string
   loading: boolean
+  /** Optional extra cell at the far right of the status bar (e.g. the Modem widget). */
+  right?: ReactNode
 }
 
-export function StatusBar({ text, loading }: Props) {
+export function StatusBar({ text, loading, right }: Props) {
   return (
     <div className="ow-statusbar">
       <span className="ow-status-text">
@@ -16,6 +20,7 @@ export function StatusBar({ text, loading }: Props) {
         <span className="ow-zone__lock" aria-hidden />
         Internet
       </span>
+      {right}
     </div>
   )
 }

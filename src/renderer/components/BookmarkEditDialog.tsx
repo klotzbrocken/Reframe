@@ -4,6 +4,8 @@ export interface BookmarkDraft {
   id: string
   label: string
   url: string
+  /** True → this entry is a folder: only the name is edited (no address). */
+  folder?: boolean
 }
 
 /** Rename / change-URL dialog for a user bookmark on the bookmark bar. */
@@ -24,16 +26,18 @@ export function BookmarkEditDialog({
   return (
     <div className="ow-dialog-backdrop" onMouseDown={onClose}>
       <div className="ow-dialog" onMouseDown={(e) => e.stopPropagation()} style={{ width: 380 }}>
-        <div className="ow-dialog__title">Edit bookmark</div>
+        <div className="ow-dialog__title">{draft.folder ? 'Edit folder' : 'Edit bookmark'}</div>
         <div className="ow-dialog__body">
           <label className="ow-field">
             <span>Name</span>
             <input value={label} onChange={(e) => setLabel(e.target.value)} autoFocus />
           </label>
-          <label className="ow-field">
-            <span>Address</span>
-            <input value={url} spellCheck={false} onChange={(e) => setUrl(e.target.value)} />
-          </label>
+          {!draft.folder && (
+            <label className="ow-field">
+              <span>Address</span>
+              <input value={url} spellCheck={false} onChange={(e) => setUrl(e.target.value)} />
+            </label>
+          )}
         </div>
         <div className="ow-dialog__buttons">
           <button
@@ -48,7 +52,8 @@ export function BookmarkEditDialog({
           <button
             onClick={() => {
               const u = url.trim()
-              if (u) onSave({ id: draft.id, label: label.trim() || u, url: u })
+              if (draft.folder) onSave({ id: draft.id, label: label.trim() || 'Folder', url: '', folder: true })
+              else if (u) onSave({ id: draft.id, label: label.trim() || u, url: u })
               onClose()
             }}
           >

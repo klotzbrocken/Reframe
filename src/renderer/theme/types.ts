@@ -65,8 +65,14 @@ export interface ThemeManifest {
   menus?: string[]
   /** Home / Search target for this theme (era-appropriate; archived if needed). */
   homeUrl?: string
-  /** Optional personal / bookmark toolbar (Netscape-style quick links). */
-  personalBar?: { label: string; icon?: string; url?: string }[]
+  /** Optional personal / bookmark toolbar (Netscape-style quick links). An entry
+   *  with `children` renders as a folder (its children open in a dropdown). */
+  personalBar?: {
+    label: string
+    icon?: string
+    url?: string
+    children?: { label: string; url?: string; icon?: string }[]
+  }[]
   /** Wayback Machine timestamp for the "Old Web" toggle — YYYY, YYYYMM or
    *  YYYYMMDD (theme era). Falls back to oldWebYear, then 2002. */
   oldWebDate?: string
@@ -92,6 +98,10 @@ export interface ThemeManifest {
     sidePanel?: 'hotlist'
     /** Show a live clock at the right of the toolbar (Opera 3.x). */
     showClock?: boolean
+    /** Render this theme's menus in the real macOS menu bar instead of an
+     *  in-window menu bar (Camino had no in-window menus). macOS only; other
+     *  platforms fall back to the in-window menu bar. */
+    nativeMenus?: boolean
   }
   throbber?: {
     /** 'css' = animated purely in theme.css; 'image' = animated background. */

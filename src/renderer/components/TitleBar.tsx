@@ -1,8 +1,12 @@
+import type { ReactNode } from 'react'
+
 interface Props {
   title: string
   maximized: boolean
   /** Override the close button (e.g. quit vs minimize per settings). */
   onClose?: () => void
+  /** Optional extra control on the right of the title bar (Camino's toolbar pill). */
+  rightExtra?: ReactNode
 }
 
 /**
@@ -11,11 +15,12 @@ interface Props {
  * Themes style .ow-titlebar however they like — the IE5 theme renders a Win98
  * navy gradient bar with raised control buttons.
  */
-export function TitleBar({ title, maximized, onClose }: Props) {
+export function TitleBar({ title, maximized, onClose, rightExtra }: Props) {
   return (
     <div className="ow-titlebar">
       <span className="ow-titlebar__icon" aria-hidden />
       <span className="ow-titlebar__text">{title}</span>
+      {rightExtra}
       <div className="ow-titlebar__controls">
         <button
           className="ow-winbtn"

@@ -8,6 +8,7 @@
   { "id": "netscape3", "name": "Netscape Navigator 3.04 Gold", "era": "1997 · Windows 95" },
   { "id": "netscape", "name": "Netscape Communicator 4.7", "era": "1999 · Windows 9x" },
   { "id": "safari", "name": "Safari 1.0", "era": "2003 · Mac OS X" },
+  { "id": "camino", "name": "Camino 2.0", "era": "2009 · Mac OS X" },
   { "id": "firefox", "name": "Firefox 1.0", "era": "2004 · cross-platform" },
   { "id": "netscape6", "name": "Netscape Communicator 6.0", "era": "2000 · Windows" },
   { "id": "opera", "name": "Opera 3.60", "era": "2000 · Windows" },

@@ -16,6 +16,8 @@ import { Clock } from './components/Clock'
 import { requestChromeTop } from './shell/chromeTop'
 import { SettingsDialog, type Settings } from './components/SettingsDialog'
 import { StatusBar } from './components/StatusBar'
+import { ModemStatus, type ModemPhase } from './components/ModemStatus'
+import { playDialup, dialupTimings, type DialupHandle, type ModemSpeed } from './shell/modem-sound'
 import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
 import { TitleBar } from './components/TitleBar'
@@ -127,7 +129,14 @@ export function App() {
         const target = stripWaybackDisplay(rest)
         const full = /^[a-z][a-z0-9+.-]*:\/\//i.test(target) ? target : 'https://' + target
         setAddrHistory((h) => [full, ...h.filter((x) => x !== full)].slice(0, 10))
-        if (activeTab) window.oldweb.navigate(activeTab.id, wrapWayback(full, date))
+        if (activeTab) {
+          const id = activeTab.id
+          const doNav = (): void => {
+            void window.oldweb.navigate(id, wrapWayback(full, date))
+          }
+          if (modemArmed && !connectedRef.current) startDial(doNav)
+          else doNav()
+        }
       }
       return
     }
@@ -136,7 +145,7 @@ export function App() {
     const original = stripWaybackDisplay(input.trim())
     const shown = /^[a-z][a-z0-9+.-]*:\/\//i.test(original) ? original : 'https://' + original
     setAddrHistory((h) => [shown, ...h.filter((x) => x !== shown)].slice(0, 10))
-    actions.navigate(original)
+    gatedNavigate(original)
   }
 
   const waybackMonth = settings.waybackMonth || 6
@@ -183,8 +192,11 @@ export function App() {
   interface BarBookmark {
     id: string
     label: string
-    url: string
+    url?: string
     favicon?: string
+    /** Present → this entry is a folder holding child bookmarks. */
+    type?: 'folder'
+    children?: BarBookmark[]
   }
   const [barBookmarks, setBarBookmarks] = useState<BarBookmark[]>(() => {
     try {
@@ -195,6 +207,10 @@ export function App() {
   })
   const [editBookmark, setEditBookmark] = useState<BarBookmark | null>(null)
   const [barMenuOpen, setBarMenuOpen] = useState(false)
+  // Bookmarks-bar visibility, toggled by the Camino toolbar bookmark button.
+  const [showBar, setShowBar] = useState(true)
+  // Toolbar collapse (Camino's Aqua "hide toolbar" pill, top-right of the titlebar).
+  const [toolbarCollapsed, setToolbarCollapsed] = useState(false)
   useEffect(
     () => localStorage.setItem('reframe.barBookmarks', JSON.stringify(barBookmarks)),
     [barBookmarks]
@@ -205,10 +221,49 @@ export function App() {
     const id = crypto.randomUUID()
     setBarBookmarks((b) => [...b, { id, label: title || url, url, favicon }])
   }
+  const addBarFolder = (): void =>
+    setBarBookmarks((b) => [
+      ...b,
+      { id: crypto.randomUUID(), label: 'New Folder', type: 'folder', children: [] }
+    ])
+  const dropIntoFolder = (folderId: string, url: string, title: string): void =>
+    setBarBookmarks((b) =>
+      b.map((x) =>
+        x.id === folderId && x.type === 'folder'
+          ? {
+              ...x,
+              children: [...(x.children ?? []), { id: crypto.randomUUID(), label: title || url, url }]
+            }
+          : x
+      )
+    )
+  // Remove a top-level entry (bookmark or folder) or a child inside any folder.
   const removeBarBookmark = (id: string): void =>
-    setBarBookmarks((b) => b.filter((x) => x.id !== id))
+    setBarBookmarks((b) =>
+      b
+        .filter((x) => x.id !== id)
+        .map((x) => (x.children ? { ...x, children: x.children.filter((c) => c.id !== id) } : x))
+    )
+  const findBarBookmark = (id: string): BarBookmark | null => {
+    for (const b of barBookmarks) {
+      if (b.id === id) return b
+      const c = b.children?.find((x) => x.id === id)
+      if (c) return c
+    }
+    return null
+  }
   const saveBarBookmark = (d: BookmarkDraft): void =>
-    setBarBookmarks((b) => b.map((x) => (x.id === d.id ? { ...x, label: d.label, url: d.url } : x)))
+    setBarBookmarks((b) =>
+      b.map((x) => {
+        if (x.id === d.id) return { ...x, label: d.label, ...(x.type === 'folder' ? {} : { url: d.url }) }
+        if (x.children)
+          return {
+            ...x,
+            children: x.children.map((c) => (c.id === d.id ? { ...c, label: d.label, url: d.url } : c))
+          }
+        return x
+      })
+    )
 
   // Opera HotList side panel — docked open by default.
   const [hotlistOpen, setHotlistOpen] = useState(true)
@@ -249,6 +304,8 @@ export function App() {
   // commands from the native app menu and the page context menu
   const waybackRef = useRef(waybackDate)
   waybackRef.current = waybackDate
+  // Live copy of the theme menus shown in the real macOS bar, for routing clicks.
+  const nativeMenuRef = useRef<Menu[]>([])
   useEffect(() => {
     return window.oldweb.onMenuCommand((m) => {
       if (m.cmd === 'about' || m.cmd === 'settings') setDialogOpen(true)
@@ -256,6 +313,9 @@ export function App() {
       else if (m.cmd === 'add-bookmark') addBookmarkEntry(m.title, m.url)
       else if (m.cmd === 'reload-wayback') {
         window.oldweb.navigate(m.id, `https://web.archive.org/web/${waybackRef.current}if_/${m.url}`)
+      } else if (m.cmd === 'theme-menu') {
+        const it = nativeMenuRef.current[m.menu]?.items[m.item]
+        if (it && it.type === 'item') it.onSelect?.()
       }
     })
   }, [])
@@ -394,6 +454,180 @@ export function App() {
   // "Today" in the flyout: return to today's live page (exit Wayback).
   const goToday = (): void => actions.setOldWebActive(false)
 
+  // --- Modem dial-up emulation ---------------------------------------------
+  // The first navigation of a session is gated behind a synthesized dial-up
+  // handshake (sound + LED widget). The actual slow paint comes from the
+  // existing connectionSpeed CDP throttle; this only delays the start and, when
+  // armed, boots "offline" until the user dials in (audio needs a user gesture).
+  const modemArmed = !!settings.modemExtension && (settings.connectionSpeed ?? 'full') !== 'full'
+  const modemSpeed = (settings.connectionSpeed ?? 'full') as ModemSpeed | 'full'
+  const [modemPhase, setModemPhase] = useState<ModemPhase>('off')
+  const connectedRef = useRef(false)
+  const dialRef = useRef<DialupHandle | null>(null)
+  const dialTimersRef = useRef<number[]>([])
+  const bootHandledRef = useRef(false)
+  const bootStoppedRef = useRef(false)
+
+  const clearDialTimers = (): void => {
+    dialTimersRef.current.forEach((t) => clearTimeout(t))
+    dialTimersRef.current = []
+  }
+
+  // Bundled real dial-up recordings (served from public/sounds). Durations are
+  // known, so the phase transitions + connect fire in sync with the audio.
+  const MODEM_SAMPLES: Record<'us' | 'europe', { url: string; duration: number }> = {
+    us: { url: '/sounds/dialup-us.m4a', duration: 17 },
+    europe: { url: '/sounds/dialup-eu.m4a', duration: 17.5 }
+  }
+
+  // Run the dial-up handshake (call from a user gesture so AudioContext is
+  // allowed), then run `then` (the real navigation) once "connected". The phase
+  // offsets track the synth TL table, or the chosen recording's length.
+  const startDial = (then: () => void): void => {
+    if (modemSpeed === 'full') {
+      then()
+      return
+    }
+    clearDialTimers()
+    dialRef.current?.stop()
+    bootStoppedRef.current = false
+    setModemPhase('dialing')
+
+    const sound = settings.modemSound ?? 'us'
+    const volume = (settings.modemVolume ?? 70) / 100
+    const sampleUrl =
+      sound === 'us'
+        ? MODEM_SAMPLES.us.url
+        : sound === 'europe'
+          ? MODEM_SAMPLES.europe.url
+          : sound === 'custom'
+            ? settings.modemSampleUrl || ''
+            : '' // 'synth'
+
+    let ring: number
+    let handshake: number
+    let total: number
+    if (sampleUrl) {
+      total =
+        sound === 'us'
+          ? MODEM_SAMPLES.us.duration
+          : sound === 'europe'
+            ? MODEM_SAMPLES.europe.duration
+            : 18 // custom recording — unknown length
+      // Real recordings: dial tone/dialing first, ringing ~30% in, then the
+      // carrier handshake screech to the end. LED phases approximate that shape.
+      ring = total * 0.28
+      handshake = total * 0.46
+      dialRef.current = playDialup(modemSpeed, { volume, sampleUrl })
+    } else {
+      dialRef.current = playDialup(modemSpeed, { volume })
+      const tm = dialupTimings(modemSpeed)
+      ring = tm.ring
+      handshake = tm.handshake
+      total = tm.duration
+    }
+
+    dialTimersRef.current.push(
+      window.setTimeout(() => setModemPhase('ring'), ring * 1000),
+      window.setTimeout(() => setModemPhase('handshake'), handshake * 1000),
+      window.setTimeout(() => {
+        connectedRef.current = true
+        setModemPhase('online')
+        then()
+      }, total * 1000)
+    )
+  }
+
+  // Every user navigation passes through here; the first one (when armed) dials.
+  const gatedNavigate = (url: string): void => {
+    if (modemArmed && !connectedRef.current) startDial(() => actions.navigate(url))
+    else actions.navigate(url)
+  }
+
+  // Widget click: dial up when offline, hang up when connected.
+  const handleModemToggle = (): void => {
+    if (!modemArmed) return
+    if (connectedRef.current) {
+      clearDialTimers()
+      dialRef.current?.stop()
+      dialRef.current = null
+      connectedRef.current = false
+      setModemPhase('offline')
+    } else if (modemPhase === 'offline') {
+      startDial(() => actions.navigate(homeUrl))
+    }
+  }
+
+  const showModemOffline =
+    modemArmed &&
+    !connectedRef.current &&
+    (modemPhase === 'offline' ||
+      modemPhase === 'dialing' ||
+      modemPhase === 'ring' ||
+      modemPhase === 'handshake')
+
+  // Raise the chrome over the page view while the offline/dialing screen shows.
+  useEffect(() => {
+    requestChromeTop('modem', showModemOffline)
+  }, [showModemOffline])
+
+  // Boot "offline": when armed, cancel the auto-loaded home page and wait for
+  // the user to dial in. Runs once, when the first tab + manifest are ready.
+  useEffect(() => {
+    if (bootHandledRef.current) return
+    if (!manifest || !activeTab) return
+    bootHandledRef.current = true
+    if (modemArmed && !connectedRef.current) {
+      window.oldweb.stop(activeTab.id)
+      bootStoppedRef.current = true
+      setModemPhase('offline')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manifest, activeTab])
+
+  // Once connected, mirror page streaming on the LEDs (RX/TX blink while loading).
+  useEffect(() => {
+    if (!connectedRef.current) return
+    setModemPhase(loading ? 'loading' : 'online')
+  }, [loading])
+
+  // Turning the extension off (or speed → full) tears the modem down and, if we
+  // were sitting on the stopped/blank boot page, resumes normal browsing.
+  useEffect(() => {
+    if (modemArmed) return
+    clearDialTimers()
+    dialRef.current?.stop()
+    dialRef.current = null
+    connectedRef.current = false
+    setModemPhase('off')
+    if (bootStoppedRef.current && activeTab) {
+      bootStoppedRef.current = false
+      actions.navigate(homeUrl)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modemArmed])
+
+  // "Not connected / dialing" screen shown over the page area while offline.
+  const modemOverlay = showModemOffline ? (
+    <div className="ow-modem-offline" role="button" tabIndex={0} onClick={handleModemToggle}>
+      <div className="ow-modem-offline__title">
+        {modemPhase === 'offline' ? 'Not connected' : 'Connecting…'}
+      </div>
+      <div className="ow-modem-offline__hint">
+        {modemPhase === 'offline'
+          ? 'Click to dial up'
+          : modemPhase === 'dialing'
+            ? 'Dialing…'
+            : modemPhase === 'ring'
+              ? 'Ringing…'
+              : 'Handshaking…'}
+      </div>
+      <div className="ow-modem-offline__spinner">
+        ▚▚▚ {(settings.connectionSpeed ?? '').toUpperCase()}
+      </div>
+    </div>
+  ) : null
+
   // "Today vs {year}" share/export (real Wayback snapshot vs the live page).
   const [shareOpen, setShareOpen] = useState(false)
   const [shareBusy, setShareBusy] = useState(false)
@@ -453,8 +687,8 @@ export function App() {
     forward: { label: labels.forward, onClick: actions.forward, disabled: !activeTab?.canGoForward },
     stop: { label: labels.stop, onClick: actions.stop, disabled: !loading },
     refresh: { label: labels.reload, onClick: actions.reload },
-    home: { label: labels.home, onClick: () => actions.navigate(homeUrl) },
-    search: { label: labels.search, onClick: () => actions.navigate(searchUrl) },
+    home: { label: labels.home, onClick: () => gatedNavigate(homeUrl) },
+    search: { label: labels.search, onClick: () => gatedNavigate(searchUrl) },
     favorites: {
       label: labels.favorites,
       onClick: () => openPanel('bookmarks', '.ow-btn[data-action="favorites"]')
@@ -473,9 +707,9 @@ export function App() {
     },
     print: { label: labels.print, onClick: actions.print },
     edit: { label: labels.edit, onClick: () => {}, disabled: true },
-    netscape: { label: labels.netscape, onClick: () => actions.navigate(homeUrl) },
+    netscape: { label: labels.netscape, onClick: () => gatedNavigate(homeUrl) },
     security: { label: labels.security, onClick: () => setSecurityOpen(true) },
-    shop: { label: labels.shop, onClick: () => actions.navigate('https://www.amazon.com') },
+    shop: { label: labels.shop, onClick: () => gatedNavigate('https://www.amazon.com') },
     // Opera 3.x toolbar actions (period MDI features map to the closest action).
     new: { label: labels.new, onClick: actions.newTab },
     open: {
@@ -573,6 +807,104 @@ export function App() {
   // Menu dropdown contents. The Help menu hosts the Oldweb controls (theme
   // picker, CRT shader, Old Web/Wayback) — shaders will live here too.
   const buildMenu = (name: string): MenuItem[] => {
+    // Camino 2.0 — Mac-native menu bar. 'Help' falls through to the shared Help
+    // menu so the theme picker / Old Web controls stay reachable.
+    if (themeId === 'camino') {
+      const cut = () => activeTab && window.oldweb.editCommand(activeTab.id, 'cut')
+      const copy = () => activeTab && window.oldweb.editCommand(activeTab.id, 'copy')
+      const paste = () => activeTab && window.oldweb.editCommand(activeTab.id, 'paste')
+      switch (name) {
+        case 'Camino':
+          return [
+            {
+              type: 'item',
+              label: 'About Camino',
+              onSelect: () => {
+                if (activeTab) void window.oldweb.openAbout(activeTab.id, themeId)
+              }
+            },
+            { type: 'sep' },
+            { type: 'item', label: 'Preferences…', onSelect: () => setDialogOpen(true) },
+            { type: 'sep' },
+            { type: 'item', label: 'Quit Camino', onSelect: () => window.oldweb.quitApp() }
+          ]
+        case 'File':
+          return [
+            { type: 'item', label: 'New Window', onSelect: () => actions.newTab() },
+            { type: 'item', label: 'New Tab', onSelect: () => actions.newTab() },
+            { type: 'sep' },
+            { type: 'item', label: 'Open Location…', onSelect: () => setUrlDialogOpen(true) },
+            { type: 'item', label: 'Open File…', onSelect: () => void window.oldweb.openLocalFile() },
+            { type: 'sep' },
+            {
+              type: 'item',
+              label: 'Save Page As…',
+              onSelect: () => activeTab && window.oldweb.savePage(activeTab.id)
+            },
+            { type: 'item', label: 'Print…', onSelect: () => actions.print() },
+            { type: 'sep' },
+            { type: 'item', label: 'Close Tab', onSelect: () => window.oldweb.closeWindow() }
+          ]
+        case 'Edit':
+          return [
+            { type: 'item', label: 'Undo', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Cut', onSelect: cut },
+            { type: 'item', label: 'Copy', onSelect: copy },
+            { type: 'item', label: 'Paste', onSelect: paste },
+            { type: 'sep' },
+            {
+              type: 'item',
+              label: 'Select All',
+              onSelect: () => activeTab && window.oldweb.editCommand(activeTab.id, 'selectAll')
+            }
+          ]
+        case 'View':
+          return [
+            { type: 'item', label: 'Reload', onSelect: () => actions.reload() },
+            { type: 'item', label: 'Stop', disabled: !loading, onSelect: () => actions.stop() },
+            { type: 'sep' },
+            { type: 'item', label: 'View Page Source', disabled: true }
+          ]
+        case 'History':
+          return [
+            {
+              type: 'item',
+              label: 'Back',
+              disabled: !activeTab?.canGoBack,
+              onSelect: () => actions.back()
+            },
+            {
+              type: 'item',
+              label: 'Forward',
+              disabled: !activeTab?.canGoForward,
+              onSelect: () => actions.forward()
+            },
+            { type: 'sep' },
+            { type: 'item', label: 'Home', onSelect: () => actions.navigate(homeUrl) },
+            { type: 'sep' },
+            { type: 'item', label: 'Show All History', onSelect: () => openPanel('history', '.ow-menu') }
+          ]
+        case 'Bookmarks':
+          return [
+            { type: 'item', label: 'Bookmark This Page', onSelect: addBookmark },
+            { type: 'sep' },
+            {
+              type: 'item',
+              label: 'Show All Bookmarks',
+              onSelect: () => openPanel('bookmarks', '.ow-menu')
+            }
+          ]
+        case 'Window':
+          return [
+            { type: 'item', label: 'Minimize', disabled: true },
+            { type: 'item', label: 'Zoom', disabled: true },
+            { type: 'sep' },
+            { type: 'item', label: 'Bookmarks', onSelect: () => openPanel('bookmarks', '.ow-menu') },
+            { type: 'item', label: 'History', onSelect: () => openPanel('history', '.ow-menu') }
+          ]
+      }
+    }
     // Netscape Navigator 3.04 Gold — period-accurate menus. 'Help' falls through
     // to the shared Help menu so the theme picker / Old Web controls stay reachable.
     if (themeId === 'netscape3') {
@@ -856,6 +1188,29 @@ export function App() {
   }
   const menuModel: Menu[] = menus.map((name) => ({ name, items: buildMenu(name) }))
 
+  // Themes with no in-window menu bar (Camino) render their menus in the real
+  // macOS menu bar. Serialize the model (minus the redundant app menu) and hand
+  // it to the main process; clicks route back by (menu,item) via onMenuCommand.
+  const isMac = navigator.userAgent.includes('Macintosh')
+  const nativeMenus = isMac && layout.nativeMenus === true
+  const nativeMenuList = nativeMenus ? menuModel.filter((m) => m.name !== 'Camino') : []
+  nativeMenuRef.current = nativeMenuList
+  const nativeMenuJson = JSON.stringify(
+    nativeMenuList.map((m) => ({
+      label: m.name,
+      items: m.items.map((it) =>
+        it.type === 'item'
+          ? { type: 'item', label: it.label, disabled: it.disabled ?? false, checked: it.checked }
+          : it.type === 'title'
+            ? { type: 'title', label: it.label }
+            : { type: 'sep' }
+      )
+    }))
+  )
+  useEffect(() => {
+    void window.oldweb.setNativeMenu(nativeMenus ? { menus: JSON.parse(nativeMenuJson) } : null)
+  }, [nativeMenus, nativeMenuJson])
+
   const tabStrip = (
     <TabStrip
       tabs={state.tabs}
@@ -877,6 +1232,8 @@ export function App() {
   // Firefox-era layout: the address field + search box sit on the nav-button
   // row itself, and the throbber lives in the menu bar (not the toolbar).
   const unified = layout.unifiedToolbar === true
+  // Camino's Aqua pill collapses the toolbar row; only meaningful for that theme.
+  const toolbarHidden = toolbarCollapsed && themeId === 'camino'
   const addressAtBottom = layout.addressPosition === 'bottom'
   const toggleImages = (): void => {
     if (!activeTab) return
@@ -906,15 +1263,35 @@ export function App() {
     />
   )
   const barItems: PersonalBarItem[] = [
-    ...(manifest?.personalBar ?? []),
-    ...barBookmarks.map((b) => ({
-      label: b.label,
-      url: b.url,
-      favicon: b.favicon,
-      id: b.id,
-      user: true,
-      icon: 'doc'
-    }))
+    // Theme defaults — folders (with children) render as dropdowns.
+    ...(manifest?.personalBar ?? []).map(
+      (p): PersonalBarItem => ({
+        label: p.label,
+        url: p.url,
+        icon: p.icon,
+        children: p.children?.map((c) => ({ label: c.label, url: c.url, icon: c.icon }))
+      })
+    ),
+    // The user's own bookmarks and folders.
+    ...barBookmarks.map(
+      (b): PersonalBarItem =>
+        b.type === 'folder'
+          ? {
+              label: b.label,
+              id: b.id,
+              user: true,
+              icon: 'folder',
+              children: (b.children ?? []).map((c) => ({
+                label: c.label,
+                url: c.url,
+                favicon: c.favicon,
+                id: c.id,
+                user: true,
+                icon: 'doc'
+              }))
+            }
+          : { label: b.label, url: b.url, favicon: b.favicon, id: b.id, user: true, icon: 'doc' }
+    )
   ]
   // Entries for the Opera HotList tree/list — bookmarks with last-visited dates + history folder.
   const historyMap = new Map(history.map((h) => [h.url, h.last]))
@@ -933,7 +1310,7 @@ export function App() {
             children: barBookmarks.map((b) => ({
               title: b.label,
               url: b.url,
-              last: historyMap.get(b.url)
+              last: historyMap.get(b.url ?? '')
             }))
           }
         ]
@@ -952,7 +1329,7 @@ export function App() {
     <SearchBox
       engineId={settings.searchEngine || DEFAULT_ENGINE_ID}
       onEngineChange={(id) => saveSettings({ ...settings, searchEngine: id })}
-      onSearch={(url) => actions.navigate(url)}
+      onSearch={(url) => gatedNavigate(url)}
     />
   )
 
@@ -962,6 +1339,7 @@ export function App() {
       data-menu-style={settings.menuStyle || 'win98'}
       data-theme={themeId}
       data-loading={loading ? '' : undefined}
+      data-toolbar-collapsed={toolbarHidden ? '' : undefined}
       data-menu-size={settings.menuFontSize || 'normal'}
       data-label-size={settings.labelFontSize || 'normal'}
     >
@@ -973,9 +1351,21 @@ export function App() {
             ? window.oldweb.minimizeWindow()
             : window.oldweb.quitApp()
         }
+        rightExtra={
+          themeId === 'camino' ? (
+            <button
+              type="button"
+              className="ow-titlebar-pill"
+              title={toolbarHidden ? 'Show Toolbar' : 'Hide Toolbar'}
+              aria-label="Toggle toolbar"
+              aria-pressed={toolbarHidden}
+              onClick={() => setToolbarCollapsed((v) => !v)}
+            />
+          ) : undefined
+        }
       />
 
-      {layout.showMenuBar !== false && (
+      {layout.showMenuBar !== false && !nativeMenus && (
         <MenuBar model={menuModel} right={<Throbber active={loading} />} />
       )}
 
@@ -1002,7 +1392,22 @@ export function App() {
         {unified ? (
           <>
             {addressBarEl}
+            {/* Small dot separator between the location and search fields
+                (Camino). Hidden by default in base.css. */}
+            <span className="ow-toolbar-dot" aria-hidden />
             {searchBoxEl}
+            {/* Bookmarks-bar toggle (Camino: sits right of the search field).
+                Hidden by default in base.css; themes opt in by styling it. */}
+            {manifest?.personalBar && (
+              <button
+                type="button"
+                className="ow-bmtoggle"
+                title="Show/Hide Bookmarks Bar"
+                aria-label="Toggle bookmarks bar"
+                aria-pressed={showBar}
+                onClick={() => setShowBar((v) => !v)}
+              />
+            )}
             {/* Netscape 6 animates its "N" logo here, over the toolbar artwork;
                 Firefox hides this (.ow-toolbar .ow-throbber) and uses the menu bar. */}
             <Throbber active={loading} />
@@ -1018,12 +1423,14 @@ export function App() {
 
       {!unified && !addressAtBottom && addressBarEl}
 
-      {manifest?.personalBar && (
+      {manifest?.personalBar && showBar && (
         <PersonalBar
           items={barItems}
           onItem={actions.navigate}
           onDropUrl={dropBarBookmark}
-          onEdit={(id) => setEditBookmark(barBookmarks.find((b) => b.id === id) ?? null)}
+          onDropIntoFolder={dropIntoFolder}
+          onNewFolder={addBarFolder}
+          onEdit={(id) => setEditBookmark(findBarBookmark(id))}
           onRemove={removeBarBookmark}
           onMenuToggle={setBarMenuOpen}
         />
@@ -1041,10 +1448,14 @@ export function App() {
             onNavigate={actions.navigate}
             onClose={() => setHotlistOpen(false)}
           />
-          <div className="ow-content" ref={contentRef} />
+          <div className="ow-content" ref={contentRef}>
+            {modemOverlay}
+          </div>
         </div>
       ) : (
-        <div className="ow-content" ref={contentRef} />
+        <div className="ow-content" ref={contentRef}>
+          {modemOverlay}
+        </div>
       )}
 
       {layout.showTabs !== false && layout.tabsPosition === 'bottom' && tabStrip}
@@ -1053,7 +1464,20 @@ export function App() {
       {addressAtBottom && <div className="ow-bottombar">{addressBarEl}</div>}
 
       {layout.showStatusBar !== false && (
-        <StatusBar text={state.statusText} loading={loading} />
+        <StatusBar
+          text={state.statusText}
+          loading={loading}
+          right={
+            settings.modemExtension ? (
+              <ModemStatus
+                active={modemArmed}
+                phase={modemPhase}
+                speed={settings.connectionSpeed ?? 'full'}
+                onToggle={handleModemToggle}
+              />
+            ) : undefined
+          }
+        />
       )}
 
       {panel && (
@@ -1094,7 +1518,12 @@ export function App() {
 
       {editBookmark && (
         <BookmarkEditDialog
-          draft={{ id: editBookmark.id, label: editBookmark.label, url: editBookmark.url }}
+          draft={{
+            id: editBookmark.id,
+            label: editBookmark.label,
+            url: editBookmark.url ?? '',
+            folder: editBookmark.type === 'folder'
+          }}
           onSave={saveBarBookmark}
           onRemove={removeBarBookmark}
           onClose={() => setEditBookmark(null)}

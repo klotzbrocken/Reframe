@@ -270,6 +270,7 @@ body,
 .ow-content {
   flex: 1 1 auto;
   min-height: 0;
+  position: relative; /* anchor the modem "offline" overlay (inset: 0) */
 }
 
 /* A horizontal band holding a docked side panel + the content. .ow-content
@@ -375,6 +376,79 @@ body,
   color: #fff;
 }
 
+/* Bookmark-bar folders — functional in any theme with a bookmark bar. */
+.ow-pbar-folder {
+  position: relative;
+  display: inline-flex;
+}
+.ow-pbar-btn--folder.is-dropover {
+  outline: 1px dashed #1a4ea8;
+  outline-offset: -2px;
+}
+.ow-pbar-caret {
+  width: 0;
+  height: 0;
+  margin-left: 4px;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid currentColor;
+  opacity: 0.55;
+}
+.ow-pbar-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 2500;
+  min-width: 168px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 2px 0;
+  background: #fff;
+  color: #000;
+  border: 1px solid #6f6f6f;
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.35);
+  font-size: 12px;
+}
+.ow-pbar-ditem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 12px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: default;
+}
+.ow-pbar-ditem:hover {
+  background: #1a4ea8;
+  color: #fff;
+}
+.ow-pbar-ditem__icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.ow-pbar-empty {
+  padding: 4px 12px;
+  color: #888;
+  font-style: italic;
+}
+/* Toolbar bookmark-bar toggle — opt-in per theme (Camino styles it visible). */
+.ow-bmtoggle {
+  display: none;
+}
+/* Dot separator between address + search fields — opt-in per theme. */
+.ow-toolbar-dot {
+  display: none;
+}
+
 /* Global settings / about dialog */
 .ow-dialog-backdrop {
   position: fixed;
@@ -437,6 +511,16 @@ body,
 }
 .ow-field--wide {
   grid-column: 1 / -1;
+}
+/* Section heading inside the settings grid. */
+.ow-field--sep {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #c8c8c8;
+  font-weight: 700;
+  font-size: 12px;
+  color: #444;
 }
 .ow-dialog__body {
   padding: 14px;
@@ -597,19 +681,19 @@ body,
  * ======================================================================== */
 
 /* ---- Windows 95/98 (IE template) -------------------------------------- */
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-titlebar {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar {
   background: linear-gradient(90deg, #000080 0%, #1084d0 100%) !important;
   height: 22px !important;
   padding: 2px 3px 2px 4px !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-titlebar__text {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: none !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn {
   width: 16px !important;
   height: 14px !important;
   min-width: 16px !important;
@@ -620,29 +704,29 @@ body,
   border-color: #fff #808080 #808080 #fff !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn:active {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn:active {
   border-color: #808080 #fff #fff #808080 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='minimize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E") !important;
   background-position: bottom 3px left 4px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='maximize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='restore'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='close'] {
   margin-left: 2px !important;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 3px left 4px !important;
 }
 
 /* ---- Windows XP Luna --------------------------------------------------- */
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-titlebar {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar {
   /* XP Luna Blue — the glossy active caption: bright top edge, deep blue body,
      a lighter sheen band near the bottom. cornerRadius 0 (no rounding). */
   background: linear-gradient(
@@ -664,13 +748,13 @@ body,
     inset 0 -1px 0 #0a246a !important;
   border-top: 1px solid #0c3b94 !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-titlebar__text {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: 1px 1px 2px rgba(0, 0, 40, 0.6) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn {
   width: 22px !important;
   height: 21px !important;
   min-width: 22px !important;
@@ -683,25 +767,25 @@ body,
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn:active {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn:active {
   background-color: #173f9c !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='minimize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='3' y='8' width='6' height='2' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='maximize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='2' y='2' width='8' height='8' fill='none' stroke='%23fff' stroke-width='1.4'/%3E%3Crect x='2' y='2' width='8' height='2.6' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='restore'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='4' y='2' width='6' height='6' fill='none' stroke='%23fff' stroke-width='1.3'/%3E%3Crect x='2' y='4' width='6' height='6' fill='%232a5fce' stroke='%23fff' stroke-width='1.3'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='close'] {
   margin-left: 3px !important;
   border-color: #a52a18 !important;
   background-color: #e0512f !important;
@@ -709,7 +793,7 @@ body,
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath stroke='%23fff' stroke-width='1.9' d='M3 3l6 6M9 3l-6 6'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 45%, rgba(80, 0, 0, 0.3)) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']) .ow-winbtn[data-control='close']:active {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='close']:active {
   background-color: #c23e22 !important;
 }
 
@@ -1437,4 +1521,172 @@ body,
 .ow-fab__ddlist::-webkit-scrollbar-thumb {
   background: #bfbfbf;
   border-radius: 4px;
+}
+
+/* =========================================================================
+ * Modem-Emulation extension (status-bar widget + LEDs + offline overlay).
+ * Structural + LED semantics only, theme-neutral; themes may override
+ * .ow-modem chrome like they do .ow-zone. LED colours are intentionally
+ * theme-independent — a modem's LEDs looked the same on every OS.
+ * ========================================================================= */
+
+@keyframes ow-led-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.ow-modem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 20px;
+  padding: 0 8px;
+  margin-left: 2px;
+  border: 0;
+  cursor: pointer;
+  opacity: 0.7; /* dim while disabled */
+  filter: grayscale(1) brightness(0.85);
+}
+.ow-modem.is-on {
+  opacity: 1;
+  filter: none;
+}
+
+/* --- variant: slim inline (default) — sunken field, like .ow-zone --------- */
+.ow-modem--slim {
+  background: #c0c0c0;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #fff;
+}
+.ow-modem__label {
+  font: 10px/1 Tahoma, Geneva, sans-serif;
+  color: #333;
+}
+
+/* --- variant: sportster — dark external-modem box, LED labels + 56K badge - */
+.ow-modem--sportster {
+  gap: 6px;
+  background: linear-gradient(#3a3a3a, #232323);
+  box-shadow: inset 0 1px 0 #565656, inset 0 -1px 0 #111;
+}
+.ow-modem--sportster .ow-modem__leds {
+  gap: 7px;
+}
+.ow-modem--sportster .ow-modem__led {
+  flex-direction: column;
+}
+.ow-modem--sportster .ow-modem__led em {
+  font: 700 7px/1 'Courier New', monospace;
+  color: #b9b4a8;
+  font-style: normal;
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.ow-modem__badge {
+  font: 700 8px/1 'Courier New', monospace;
+  color: #7fe0ff;
+  letter-spacing: 0.06em;
+}
+
+/* --- variant: compact — pill, 3 LEDs, no labels -------------------------- */
+.ow-modem--compact {
+  border-radius: 10px;
+  background: linear-gradient(#4a4a4a, #2b2b2b);
+  box-shadow: inset 0 1px 0 #626262;
+}
+
+/* --- LEDs ----------------------------------------------------------------- */
+.ow-modem__leds {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.ow-modem__led {
+  position: relative;
+  display: inline-flex;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  background: #0d3a18; /* dark green = off */
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.7);
+}
+
+/* PWR: lit green whenever the extension is on (any phase but off) */
+.ow-modem.is-on .ow-modem__led--pwr {
+  background: radial-gradient(circle at 35% 30%, #fff, #4dff6a 60%);
+  box-shadow: 0 0 5px 1px rgba(70, 255, 110, 0.85);
+}
+
+/* CD red — no carrier / dialing / ringing / handshake */
+.ow-modem[data-phase='offline'] .ow-modem__led--cd,
+.ow-modem[data-phase='dialing'] .ow-modem__led--cd,
+.ow-modem[data-phase='ring'] .ow-modem__led--cd,
+.ow-modem[data-phase='handshake'] .ow-modem__led--cd {
+  background: radial-gradient(circle at 35% 30%, #fff, #ff4b3e 60%);
+  box-shadow: 0 0 5px 1px rgba(255, 70, 60, 0.85);
+}
+.ow-modem[data-phase='dialing'] .ow-modem__led--cd,
+.ow-modem[data-phase='handshake'] .ow-modem__led--cd {
+  animation: ow-led-blink 0.34s steps(2, jump-none) infinite;
+}
+/* CD green — connected */
+.ow-modem[data-phase='loading'] .ow-modem__led--cd,
+.ow-modem[data-phase='online'] .ow-modem__led--cd {
+  background: radial-gradient(circle at 35% 30%, #fff, #4dff6a 60%);
+  box-shadow: 0 0 5px 1px rgba(70, 255, 110, 0.85);
+}
+
+/* TX amber — sending (dialing, handshake, and while a page uploads requests) */
+.ow-modem[data-phase='dialing'] .ow-modem__led--tx,
+.ow-modem[data-phase='handshake'] .ow-modem__led--tx,
+.ow-modem[data-phase='loading'] .ow-modem__led--tx {
+  background: radial-gradient(circle at 35% 30%, #fff, #ffc233 60%);
+  box-shadow: 0 0 5px 1px rgba(255, 190, 60, 0.85);
+  animation: ow-led-blink 0.3s steps(2, jump-none) infinite;
+}
+
+/* RX green — receiving (handshake + page streaming) */
+.ow-modem[data-phase='handshake'] .ow-modem__led--rx,
+.ow-modem[data-phase='loading'] .ow-modem__led--rx {
+  background: radial-gradient(circle at 35% 30%, #fff, #4dff6a 60%);
+  box-shadow: 0 0 5px 1px rgba(70, 255, 110, 0.85);
+  animation: ow-led-blink 0.18s steps(2, jump-none) infinite;
+}
+
+/* --- "Not connected" overlay over the page area while dialing ------------- */
+.ow-modem-offline {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  color: #dfe4ea;
+  background: radial-gradient(120% 120% at 50% 40%, #2b2f36, #16181c);
+  font: 13px/1.5 Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
+  user-select: none;
+}
+.ow-modem-offline__title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.ow-modem-offline__hint {
+  font-size: 12px;
+  color: #9aa2ad;
+}
+.ow-modem-offline__spinner {
+  font: 700 12px/1 'Courier New', monospace;
+  color: #7fe0ff;
 }

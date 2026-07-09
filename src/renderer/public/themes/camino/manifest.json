@@ -1,0 +1,67 @@
+{
+  "id": "camino",
+  "name": "Camino 2.0",
+  "era": "2009 · Mac OS X",
+  "toolbar": ["back", "forward", "refresh", "stop"],
+  "menus": ["Camino", "File", "Edit", "View", "History", "Bookmarks", "Window", "Help"],
+  "homeUrl": "https://www.google.com",
+  "oldWebDate": "20091101",
+  "layout": {
+    "tabsPosition": "top",
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": true,
+    "showFavicon": true,
+    "unifiedToolbar": true,
+    "nativeMenus": true
+  },
+  "personalBar": [
+    {
+      "label": "Camino Info",
+      "icon": "folder",
+      "children": [
+        { "label": "Camino Project", "url": "https://caminobrowser.org" },
+        { "label": "Release Notes", "url": "https://caminobrowser.org/releases/" },
+        { "label": "The Mozilla Project", "url": "https://www.mozilla.org" }
+      ]
+    },
+    {
+      "label": "News",
+      "icon": "folder",
+      "children": [
+        { "label": "Google News", "url": "https://news.google.com" },
+        { "label": "MacRumors", "url": "https://www.macrumors.com" },
+        { "label": "Slashdot", "url": "https://slashdot.org" }
+      ]
+    },
+    { "label": "Google", "icon": "google", "url": "https://www.google.com" },
+    { "label": "Amazon.com", "icon": "amazon", "url": "https://www.amazon.com" },
+    { "label": "Translate this Page", "icon": "translate", "url": "https://translate.google.com" }
+  ],
+  "throbber": {
+    "kind": "css",
+    "label": "Camino"
+  },
+  "labels": {
+    "address": "",
+    "go": "",
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "stop": "Stop"
+  },
+  "sounds": {},
+  "vars": {
+    "--cm-title-top": "#ececec",
+    "--cm-title-mid": "#dedede",
+    "--cm-title-bot": "#cfcfcf",
+    "--cm-title-line": "#b6b6b6",
+    "--cm-toolbar-top": "#c5c5c5",
+    "--cm-toolbar-bot": "#a7a7a7",
+    "--cm-field": "#ffffff",
+    "--cm-field-line": "#7f7f7f",
+    "--cm-text": "#111111",
+    "--cm-accent": "#3b78e0",
+    "--cm-font": "'Lucida Grande', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+  }
+}

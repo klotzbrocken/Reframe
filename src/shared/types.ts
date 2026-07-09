@@ -39,6 +39,20 @@ export type MenuCommand =
   | { cmd: 'whats-new' }
   | { cmd: 'add-bookmark'; title: string; url: string }
   | { cmd: 'reload-wayback'; id: number; url: string }
+  | { cmd: 'theme-menu'; menu: number; item: number }
+
+/** A serializable menu the renderer hands to the main process to render in the
+ *  real macOS menu bar (themes like Camino that had no in-window menu bar).
+ *  Clicks route back by (menu, item) index via a `theme-menu` MenuCommand. */
+export interface NativeMenuItem {
+  type: 'item' | 'sep' | 'title'
+  label?: string
+  disabled?: boolean
+  checked?: boolean
+}
+export interface NativeMenuModel {
+  menus: { label: string; items: NativeMenuItem[] }[]
+}
 
 /** The API exposed to the renderer via contextBridge as `window.oldweb`. */
 /** Density of real Wayback captures for a page, used by the Archive Timeline. */
@@ -121,6 +135,9 @@ export interface OldwebAPI {
   showThemeSplash(themeId: string): void
   /** Subscribe to commands from the native app menu / page context menu. */
   onMenuCommand(handler: (cmd: MenuCommand) => void): () => void
+  /** Render the given menus in the real macOS menu bar (or clear with null,
+   *  restoring the default app menu). Used by themes with no in-window menu. */
+  setNativeMenu(model: NativeMenuModel | null): Promise<void>
   /** Get the current full state (used on UI startup). */
   getTabs(): Promise<{ tabs: TabState[]; activeId: number | null }>
   // Window controls (the chrome is frameless; the title bar owns these).

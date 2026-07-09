@@ -15,9 +15,11 @@ import { join } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { dirname, relative, isAbsolute } from 'path'
 import electronUpdater from 'electron-updater'
+import type { MenuItemConstructorOptions } from 'electron'
 import { BrowserShell } from './browser-shell'
 import { registerIpc } from './ipc'
 import { pageUrl } from './page-url'
+import type { NativeMenuModel } from '../shared/types'
 import { isAllowedExternal } from '../shared/url'
 
 const { autoUpdater } = electronUpdater
@@ -277,41 +279,68 @@ function setupAutoUpdate(): void {
   if (app.isPackaged) autoUpdater.checkForUpdates().catch(() => {})
 }
 
+// Menus a theme wants shown in the real macOS menu bar (Camino has no in-window
+// menu bar). Cleared to null → the default built-in Edit/Window menus are used.
+let themeMenuModel: NativeMenuModel | null = null
+
 // Native application menu — Settings live here (global), not in the theme menus.
+// When a theme supplies `themeMenuModel`, its menus replace the default
+// Edit/Window entries and route clicks back to the renderer by (menu, item).
 function buildAppMenu(): void {
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'Reframe',
-      submenu: [
-        { label: 'About Reframe', click: () => shell?.sendMenuCommand({ cmd: 'about' }) },
-        { label: 'What’s New', click: () => shell?.sendMenuCommand({ cmd: 'whats-new' }) },
-        { type: 'separator' },
-        {
-          label: 'Settings…',
-          accelerator: 'Cmd+,',
-          click: () => shell?.sendMenuCommand({ cmd: 'settings' })
-        },
-        { label: 'Check for Updates…', click: () => checkForUpdates(true) },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'quit' }
-      ]
-    },
-    {
-      label: 'Edit',
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'selectAll' }
-      ]
-    },
-    { label: 'Window', submenu: [{ role: 'minimize' }, { role: 'zoom' }, { role: 'close' }] }
-  ])
-  Menu.setApplicationMenu(menu)
+  const appMenu: MenuItemConstructorOptions = {
+    label: 'Reframe',
+    submenu: [
+      { label: 'About Reframe', click: () => shell?.sendMenuCommand({ cmd: 'about' }) },
+      { label: 'What’s New', click: () => shell?.sendMenuCommand({ cmd: 'whats-new' }) },
+      { type: 'separator' },
+      {
+        label: 'Settings…',
+        accelerator: 'Cmd+,',
+        click: () => shell?.sendMenuCommand({ cmd: 'settings' })
+      },
+      { label: 'Check for Updates…', click: () => checkForUpdates(true) },
+      { type: 'separator' },
+      { role: 'hide' },
+      { role: 'quit' }
+    ]
+  }
+  const template: MenuItemConstructorOptions[] = [appMenu]
+
+  if (themeMenuModel) {
+    themeMenuModel.menus.forEach((m, mi) => {
+      template.push({
+        label: m.label,
+        submenu: m.items.map((it, ii): MenuItemConstructorOptions => {
+          if (it.type === 'sep') return { type: 'separator' }
+          if (it.type === 'title') return { label: it.label ?? '', enabled: false }
+          return {
+            label: it.label ?? '',
+            enabled: !it.disabled,
+            type: it.checked !== undefined ? 'checkbox' : 'normal',
+            checked: it.checked === true,
+            click: () => shell?.sendMenuCommand({ cmd: 'theme-menu', menu: mi, item: ii })
+          }
+        })
+      })
+    })
+  } else {
+    template.push(
+      {
+        label: 'Edit',
+        submenu: [
+          { role: 'undo' },
+          { role: 'redo' },
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          { role: 'selectAll' }
+        ]
+      },
+      { label: 'Window', submenu: [{ role: 'minimize' }, { role: 'zoom' }, { role: 'close' }] }
+    )
+  }
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 
 function createWindow(): void {
@@ -381,6 +410,11 @@ app.whenReady().then(() => {
   buildAppMenu()
   setupAutoUpdate()
   ipcMain.handle('app:setIcon', () => {})
+  // A theme (e.g. Camino) asks to render its menus in the real macOS menu bar.
+  ipcMain.handle('menu:setNative', (_e, model: NativeMenuModel | null) => {
+    themeMenuModel = model && Array.isArray(model.menus) ? model : null
+    buildAppMenu()
+  })
   ipcMain.handle('app:openExternal', (_e, url: unknown) => {
     // Only hand http/https/mailto to the OS default handler; reject everything
     // else (file:, smb:, custom protocol handlers, malformed bookmarks, …).

@@ -29,7 +29,25 @@ export interface Settings {
   connectionSpeed?: 'full' | 'isdn' | '56k' | '28.8k'
   /** Block ads & trackers using uBlock-Origin-style filter lists (opt-in). */
   adblock?: boolean
+  /** Modem dial-up emulation: play a dial-up handshake before the first page
+   *  of a session loads, and show the status-bar modem widget. */
+  modemExtension?: boolean
+  /** Dial-up volume, 0–100 (default 70). */
+  modemVolume?: number
+  /** Which dial-up sound to play (default the US recording). */
+  modemSound?: 'us' | 'europe' | 'synth' | 'custom'
+  /** Custom dial-up recording (mp3/ogg/m4a) URL, used when modemSound='custom'. */
+  modemSampleUrl?: string
 }
+
+// Mirrors SPEED_OPTS in App.tsx (the connection-speed control is surfaced here
+// alongside the modem toggle so speed + modem sit together).
+const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string }[] = [
+  { id: 'full', label: 'Off (full speed)' },
+  { id: 'isdn', label: 'ISDN (64 kbit/s)' },
+  { id: '56k', label: '56K Modem' },
+  { id: '28.8k', label: '28.8 Modem' }
+]
 
 interface Props {
   settings: Settings
@@ -70,6 +88,13 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [labelFontSize, setLabelFontSize] = useState(settings.labelFontSize || 'normal')
   const [closeAction, setCloseAction] = useState(settings.closeAction || 'quit')
   const [adblock, setAdblock] = useState(settings.adblock ?? false)
+  const [modemExtension, setModemExtension] = useState(settings.modemExtension ?? false)
+  const [connectionSpeed, setConnectionSpeed] = useState(settings.connectionSpeed || 'full')
+  const [modemVolume, setModemVolume] = useState(settings.modemVolume ?? 70)
+  const [modemSound, setModemSound] = useState<'us' | 'europe' | 'synth' | 'custom'>(
+    settings.modemSound || (settings.modemSampleUrl ? 'custom' : 'us')
+  )
+  const [modemSampleUrl, setModemSampleUrl] = useState(settings.modemSampleUrl || '')
 
   return (
     <div className="ow-dialog-backdrop" onMouseDown={onClose}>
@@ -216,6 +241,70 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               />
               <span>Block ads &amp; trackers (uBlock Origin filter lists)</span>
             </label>
+
+            <div className="ow-field--sep ow-field--wide">Modem-Emulation</div>
+
+            <label className="ow-field ow-field--check ow-field--wide">
+              <input
+                type="checkbox"
+                checked={modemExtension}
+                onChange={(e) => setModemExtension(e.target.checked)}
+              />
+              <span>Modem dial-up emulation (sound + status-bar modem widget)</span>
+            </label>
+
+            <label className="ow-field">
+              <span>Connection speed</span>
+              <select
+                value={connectionSpeed}
+                onChange={(e) =>
+                  setConnectionSpeed(e.target.value as NonNullable<Settings['connectionSpeed']>)
+                }
+              >
+                {SPEED_OPTS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="ow-field">
+              <span>Dial-up volume ({modemVolume}%)</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={modemVolume}
+                onChange={(e) => setModemVolume(Number(e.target.value))}
+              />
+            </label>
+
+            <label className="ow-field">
+              <span>Dial-up sound</span>
+              <select
+                value={modemSound}
+                onChange={(e) =>
+                  setModemSound(e.target.value as 'us' | 'europe' | 'synth' | 'custom')
+                }
+              >
+                <option value="us">US — “The Sound of dial-up” (real)</option>
+                <option value="europe">Europe — real recording</option>
+                <option value="synth">Synthesized (no file)</option>
+                <option value="custom">Custom recording (URL)</option>
+              </select>
+            </label>
+            {modemSound === 'custom' && (
+              <label className="ow-field ow-field--wide">
+                <span>Custom dial-up recording URL (mp3/ogg/m4a)</span>
+                <input
+                  value={modemSampleUrl}
+                  spellCheck={false}
+                  placeholder="https://…/dialup.mp3"
+                  onChange={(e) => setModemSampleUrl(e.target.value)}
+                />
+              </label>
+            )}
           </div>
 
           <p className="ow-dialog__legal">{LEGAL}</p>
@@ -254,7 +343,18 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 menuFontSize: menuFontSize as FontSize,
                 labelFontSize: labelFontSize as FontSize,
                 closeAction: closeAction as 'quit' | 'minimize',
-                adblock: adblock || undefined
+                adblock: adblock || undefined,
+                modemExtension: modemExtension || undefined,
+                // Enabling the modem with speed "off" would be a no-op — give it
+                // a period speed so the dial-up actually gates a slow load.
+                connectionSpeed:
+                  modemExtension && connectionSpeed === 'full' ? '56k' : connectionSpeed,
+                modemVolume: modemVolume === 70 ? undefined : modemVolume,
+                modemSound,
+                modemSampleUrl:
+                  modemSound === 'custom' && modemSampleUrl.trim()
+                    ? modemSampleUrl.trim()
+                    : undefined
               })
               onClose()
             }}

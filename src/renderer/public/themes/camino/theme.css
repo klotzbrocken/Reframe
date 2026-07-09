@@ -1,0 +1,593 @@
+/*
+ * Camino 2.0 (2009) — the Mozilla community's Mac-native browser. Recreated from
+ * the design handoff: a smooth Leopard-era Aqua title bar with left-side traffic
+ * lights, the unified metal toolbar carrying the authentic glossy Back/Forward/
+ * Reload/Stop cluster (sliced from toolbar-btns.png), a rounded location field
+ * with a favicon well, the pill-shaped Google search field, and the bookmarks
+ * bar. Chrome greys and geometry are taken verbatim from the handoff tokens.
+ */
+
+body {
+  font-family: var(--cm-font);
+  font-size: 12px;
+  color: var(--cm-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.ow-root {
+  background: #fff;
+  border: 1px solid #2c2c2c;
+}
+
+/* --- 1. Title bar: Aqua gradient, traffic lights (left), centred title ----- */
+.ow-titlebar {
+  position: relative;
+  height: 23px;
+  padding: 0 11px 0 9px;
+  /* Title bar and toolbar form one continuous chrome block: the title bar sits
+     at the top of the #d0d0d0 → #a7a7a7 gradient (no seam, no bottom border). */
+  background: #d0d0d0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4a4a4a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 120px;
+  pointer-events: none;
+}
+/* Aqua "hide toolbar" lozenge, top-right of the title bar. Clicking it collapses
+   the toolbar row (and back), exactly like Mac OS X's toolbar button. */
+.ow-titlebar-pill {
+  position: absolute;
+  top: 6px;
+  right: 11px;
+  width: 24px;
+  height: 11px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid #9a9a9a;
+  background: linear-gradient(180deg, #f7f7f7, #dcdcdc);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  cursor: default;
+  z-index: 3;
+  /* The title bar is a window-drag region; opt this control out so clicks land. */
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+.ow-titlebar-pill:hover {
+  background: linear-gradient(180deg, #ffffff, #e4e4e4);
+}
+.ow-titlebar-pill[aria-pressed='true'] {
+  background: linear-gradient(180deg, #c8c8c8, #d8d8d8);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+/* Collapsed state: hide the toolbar row (the page reflows up automatically). */
+.ow-root[data-toolbar-collapsed] .ow-toolbar {
+  display: none;
+}
+/* traffic lights — reorder the shared window controls to close/min/zoom, left */
+.ow-titlebar__controls {
+  order: -1;
+  gap: 8px;
+  align-items: center;
+}
+.ow-winbtn {
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  /* Aqua depth: dark rim + a soft shadow pooling at the bottom of the orb. */
+  box-shadow:
+    inset 0 0 0 0.5px rgba(0, 0, 0, 0.32),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+    0 0.5px 0.5px rgba(255, 255, 255, 0.4);
+}
+/* Each orb = a colour lit from below (radial at 118%) with a tight, bright Aqua
+   sheen near the top — the glossy Mac OS X "gel" look. */
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% 26%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 120%, #ffb4ac, #e14237 58%, #a01d14);
+}
+.ow-winbtn[data-control='minimize'] {
+  order: 1;
+  background:
+    radial-gradient(circle at 50% 26%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 120%, #ffecaa, #f2ba38 58%, #bd830a);
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 2;
+  background:
+    radial-gradient(circle at 50% 26%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 120%, #d4f4a8, #7dc242 58%, #43871a);
+}
+
+/* --- menu bar (kept slim for theme access; Camino's is really at screen top) */
+.ow-menubar {
+  height: 19px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #f4f4f4, #e4e4e4);
+  border-bottom: 1px solid #c4c4c4;
+}
+.ow-menu__label {
+  padding: 2px 8px;
+  font-size: 12px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 3px;
+  color: #1a1a1a;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--cm-accent);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #fff;
+  border: 1px solid #888;
+  border-radius: 5px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  padding: 3px;
+  font-size: 12px;
+}
+.ow-menu__heading,
+.ow-menu__title {
+  padding: 3px 18px;
+  color: #888;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ow-menu__item {
+  padding: 4px 18px 4px 8px;
+  border-radius: 3px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--cm-accent);
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #aaa;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #ddd;
+  margin: 3px 6px;
+}
+.ow-menu__check {
+  width: 14px;
+}
+
+/* --- 2. Toolbar (unified): nav cluster + location + search ----------------- */
+.ow-toolbar {
+  height: 42px;
+  padding: 0 11px 0 7px;
+  gap: 9px;
+  align-items: center;
+  background: linear-gradient(180deg, #d0d0d0 0%, #a7a7a7 100%);
+}
+
+/* Back / Forward / Reload / Stop — the original Camino toolbar icons (32px app
+   resources), each with transparent surroundings. */
+.ow-btn {
+  flex-direction: row;
+  min-width: 0;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: no-repeat center / 30px 30px;
+}
+/* No rollover box on the toolbar icons — Camino's cluster has none. Just a hair
+   of brightness on hover/press; kill the UA button frame and focus ring. */
+.ow-btn:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.ow-btn:active:not(:disabled) {
+  filter: brightness(0.9);
+}
+.ow-btn,
+.ow-btn:hover,
+.ow-btn:focus,
+.ow-btn:focus-visible,
+.ow-btn:active {
+  outline: none;
+  box-shadow: none;
+  background-color: transparent;
+}
+.ow-btn:disabled {
+  opacity: 0.4;
+}
+.ow-btn__label,
+.ow-btn__icon {
+  display: none;
+}
+.ow-btn[data-action='back'] {
+  background-image: url('assets/cam-back.png');
+}
+.ow-btn[data-action='forward'] {
+  background-image: url('assets/cam-forward.png');
+}
+.ow-btn[data-action='refresh'] {
+  background-image: url('assets/cam-reload.png');
+  margin-left: 2px;
+}
+.ow-btn[data-action='stop'] {
+  background-image: url('assets/cam-stop.png');
+  opacity: 0.6;
+}
+.ow-root[data-loading] .ow-btn[data-action='stop'] {
+  opacity: 1;
+}
+.ow-throbber {
+  display: none;
+}
+
+/* Location field — flex:1, 24px white capsule with a favicon well */
+.ow-addressbar {
+  flex: 1;
+  height: 24px;
+  min-width: 0;
+  margin-left: 4px;
+  padding: 0;
+  gap: 0;
+  align-items: center;
+  background: var(--cm-field);
+  border: 1px solid var(--cm-field-line);
+  border-top-color: #6a6a6a;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+.ow-address-label {
+  display: none;
+}
+.ow-address-combo {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  align-items: center;
+}
+/* The 16px page favicon is painted as the input's own left background; the live
+   favicon (when present) overrides it via an inline style. This overlay is a
+   transparent drag handle for dropping the page onto the bookmarks bar. */
+.ow-address-favicon {
+  display: block;
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 21px;
+  z-index: 2;
+  background: transparent;
+  cursor: grab;
+}
+.ow-address-favicon:active {
+  cursor: grabbing;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px 0 23px;
+  font-size: 13.5px;
+  color: #111;
+  border: 0;
+  outline: 0;
+  background: url('assets/fav-globe.png') 5px center / 16px 16px no-repeat;
+  background-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.ow-address-input::selection {
+  background: var(--cm-accent);
+  color: #fff;
+}
+.ow-address-dropdown,
+.ow-go {
+  display: none;
+}
+/* auto-complete suggestions — white panel, blue-highlighted rows */
+.ow-address-list {
+  position: absolute;
+  top: 100%;
+  left: -1px;
+  right: -1px;
+  z-index: 20;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #7d7d7d;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+  font-size: 13px;
+}
+.ow-address-item {
+  padding: 3px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ow-address-item:hover {
+  background: var(--cm-accent);
+  color: #fff;
+}
+
+/* Google search pill — fixed 152×22, full-radius capsule with the "Q▾" glyph */
+.ow-searchbox {
+  flex: 0 0 152px;
+  width: 152px;
+  height: 22px;
+  padding: 0 8px;
+  gap: 4px;
+  background: var(--cm-field);
+  border: 1px solid var(--cm-field-line);
+  border-top-color: #6a6a6a;
+  border-radius: 11px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14);
+  align-items: center;
+}
+/* Search magnifier: a black glass in a blue #b8cfe4 pill — no square frame. */
+.ow-searchbox__engine {
+  width: 26px;
+  height: 16px;
+  border: 0;
+  border-radius: 8px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg fill='none' stroke='%23111' stroke-width='1.7'%3E%3Ccircle cx='6.6' cy='6.6' r='4'/%3E%3Cpath d='M9.6 9.6 14 14' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E")
+      center / 13px 13px no-repeat,
+    #b8cfe4;
+}
+.ow-searchbox__monogram,
+.ow-searchbox__caret {
+  display: none;
+}
+.ow-searchbox__input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-size: 13.5px;
+  color: #111;
+}
+.ow-searchbox__input::placeholder {
+  color: #8a8a8a;
+}
+.ow-searchbox__menu {
+  background: #fff;
+  border: 1px solid #7d7d7d;
+  border-radius: 5px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  font-size: 12px;
+}
+.ow-searchbox__option.is-active,
+.ow-searchbox__option:hover {
+  background: var(--cm-accent);
+  color: #fff;
+}
+
+/* --- 3. Bookmarks bar ------------------------------------------------------ */
+.ow-personalbar {
+  height: 22px;
+  padding: 0 10px;
+  gap: 14px;
+  align-items: center;
+  background: linear-gradient(180deg, #dadada, #c7c7c7);
+  border-bottom: 1px solid #9c9c9c;
+  box-shadow: inset 0 1px 0 #efefef;
+}
+.ow-pbar-btn {
+  height: 18px;
+  padding: 0;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+  color: #2b2b2b;
+  align-items: center;
+}
+.ow-pbar-btn:hover {
+  color: #000;
+}
+.ow-pbar-btn__icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('assets/fav-globe.png');
+}
+.ow-pbar-btn[data-icon='folder'] .ow-pbar-btn__icon {
+  background-image: url('assets/ordner.png');
+}
+.ow-pbar-btn[data-icon='google'] .ow-pbar-btn__icon {
+  background-image: url('assets/fav-googlecolor.png');
+}
+.ow-pbar-btn[data-icon='amazon'] .ow-pbar-btn__icon {
+  background-image: url('assets/fav-amazonbk.png');
+}
+.ow-pbar-btn[data-icon='translate'] .ow-pbar-btn__icon {
+  background-image: url('assets/fav-translate.png');
+}
+
+/* Bookmark-bar toggle, right of the search field — the original Camino
+   bookmark-manager icon, shown large and frameless (no box or border). */
+.ow-bmtoggle {
+  display: block;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  background: url('assets/manager.png') center / 30px 30px no-repeat;
+  cursor: default;
+}
+.ow-bmtoggle:hover {
+  filter: brightness(1.08);
+}
+.ow-bmtoggle[aria-pressed='false'] {
+  opacity: 0.55;
+}
+
+/* Folder dropdowns on the bookmark bar. */
+.ow-pbar-caret {
+  border-top-color: #444;
+}
+.ow-pbar-dropdown {
+  border: 1px solid #7d7d7d;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+}
+.ow-pbar-ditem:hover {
+  background: var(--cm-accent);
+}
+.ow-pbar-ditem__icon {
+  background-image: url('assets/fav-globe.png');
+}
+
+/* Dot separator between the location field and the search pill. */
+.ow-toolbar-dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  flex: 0 0 3px;
+  margin: 0 1px;
+  border-radius: 50%;
+  background: #8b8b8b;
+}
+
+/* --- 4. Tab bar (grey band, below the bookmarks bar) --------------------- */
+.ow-tabstrip {
+  height: 24px;
+  padding: 0 3px;
+  gap: 0;
+  align-items: stretch;
+  background: linear-gradient(180deg, #c2c2c2, #b4b4b4);
+  border-bottom: 1px solid #9a9a9a;
+}
+.ow-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  max-width: 160px;
+  padding: 0 9px;
+  border: 0;
+  border-right: 1px solid #a0a0a0;
+  background: linear-gradient(180deg, #b9b9b9, #c9c9c9);
+  font-size: 11.5px;
+  color: #2b2b2b;
+}
+.ow-tab.is-active {
+  background: linear-gradient(180deg, #dfdfdf, #cfcfcf);
+  box-shadow: inset 0 1px 0 #f2f2f2;
+}
+/* Close button sits at the START of the tab (original Camino placement). */
+.ow-tab__close {
+  order: -1;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 0;
+  background: transparent;
+  color: #6a6a6a;
+  font-size: 12px;
+  line-height: 1;
+  cursor: default;
+}
+.ow-tab__close:hover {
+  color: #1a1a1a;
+}
+.ow-tab__favicon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+.ow-tab__spinner {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+}
+.ow-tab__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ow-tab-new {
+  width: 24px;
+  border: 0;
+  border-right: 1px solid #a0a0a0;
+  background: linear-gradient(180deg, #b9b9b9, #c9c9c9);
+  color: #4a4a4a;
+  font-size: 15px;
+  line-height: 1;
+  cursor: default;
+}
+
+/* --- status bar ------------------------------------------------------------ */
+.ow-statusbar {
+  height: 20px;
+  padding: 0 12px;
+  gap: 10px;
+  font-size: 11px;
+  color: #333;
+  background: linear-gradient(180deg, #e0e0e0, #cfcfcf);
+  border-top: 1px solid #9c9c9c;
+}
+.ow-progress {
+  width: 120px;
+  height: 9px;
+  flex: 0 0 auto;
+  background: #fff;
+  border: 1px solid #9a9a9a;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--cm-accent);
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 40%;
+  animation: cm-slide 1s ease-in-out infinite;
+}
+@keyframes cm-slide {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(330%);
+  }
+}
+.ow-zone {
+  color: #666;
+}
+.ow-zone__lock {
+  display: none;
+}
