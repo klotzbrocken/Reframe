@@ -164,10 +164,28 @@ export function App() {
       return []
     }
   }
-  const RETROMAC: PanelEntry = { title: 'RetroMac', url: 'https://www.myretromac.app' }
+  // Default bookmarks seeded into every theme: shown in the bookmark bar where a
+  // theme has one (see defaultBarItems), and always reachable via the
+  // Favorites/Bookmarks panel — so they're available in every theme.
+  const DEFAULT_LINKS: { label: string; url: string }[] = [
+    { label: 'Weather Channel', url: 'https://weather.com/retro/' },
+    { label: 'RetroMac', url: 'https://myretromac.app/' },
+    { label: 'Hamsterdance', url: 'https://originalhampster.ytmnd.com/' },
+    { label: 'reddit', url: 'https://old.reddit.com/' }
+  ]
+  const normUrl = (u: string): string =>
+    u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/+$/, '')
   const [bookmarks, setBookmarks] = useState<PanelEntry[]>(() => {
     const stored = loadStore('reframe.bookmarks')
-    return stored.length ? stored : [RETROMAC]
+    const defaults = DEFAULT_LINKS.map((d) => ({ title: d.label, url: d.url }))
+    // One-time top-up so existing installs also get the default links (deduped by
+    // host+path). The flag makes it run once, so later user deletions stick.
+    if (!localStorage.getItem('reframe.defaultLinks.v1')) {
+      localStorage.setItem('reframe.defaultLinks.v1', '1')
+      const have = new Set(stored.map((b) => normUrl(b.url)))
+      return [...defaults.filter((d) => !have.has(normUrl(d.url))), ...stored]
+    }
+    return stored.length ? stored : defaults
   })
   const [history, setHistory] = useState<PanelEntry[]>(() => loadStore('reframe.history'))
   const [panel, setPanel] = useState<{
@@ -1375,7 +1393,24 @@ export function App() {
       return { label, url: barOverrides.urls[fid] ?? p.url, icon: p.icon, id: fid, user: true }
     })
     .filter((x): x is PersonalBarItem => x !== null)
+  // App-wide default links, shown at the head of every theme's bookmark bar.
+  // They carry stable "m:__default:<i>" ids so the existing rename/hide override
+  // system treats them exactly like theme-default entries (Edit/Remove work).
+  const defaultBarItems: PersonalBarItem[] = DEFAULT_LINKS.map(
+    (d, i): PersonalBarItem | null => {
+      const id = `m:__default:${i}`
+      if (barOverrides.hidden.includes(id)) return null
+      return {
+        label: barOverrides.labels[id] ?? d.label,
+        url: barOverrides.urls[id] ?? d.url,
+        icon: 'doc',
+        id,
+        user: true
+      }
+    }
+  ).filter((x): x is PersonalBarItem => x !== null)
   const barItems: PersonalBarItem[] = [
+    ...defaultBarItems,
     ...manifestItems,
     // The user's own top-level bookmarks and folders.
     ...barBookmarks
