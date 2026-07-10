@@ -9,6 +9,7 @@ import {
   dialog,
   protocol,
   net,
+  session,
   shell as electronShell
 } from 'electron'
 import { join } from 'path'
@@ -40,6 +41,53 @@ app.setAboutPanelOptions({ applicationName: 'Reframe' })
 app.userAgentFallback = app.userAgentFallback
   .replace(/\sElectron\/[\d.]+/i, '')
   .replace(/\s(?:reframe|Reframe)\/[\d.]+/, '')
+
+// Give that Chrome UA its matching User-Agent Client Hints. Editing the UA
+// *string* (above) is not enough for Google sign-in — worse, overriding the UA
+// makes Chromium DROP the Sec-CH-UA* headers entirely (verified: a request then
+// carries a Chrome user-agent but zero client hints). Google's sign-in reads the
+// hints, not just the UA: the first (identifier) page loads, but its response
+// asks — via Accept-CH — for the full high-entropy set (Arch, Bitness,
+// Full-Version[-List], Model, Platform[-Version], …). A real Chrome answers those
+// on the next request; Reframe, sending none, is flagged on the password step as
+// an unsupported/embedded browser ("This browser or app may not be secure"). So
+// we present the complete hint set a genuine Chrome would, brand list included.
+const CH_MAJOR = process.versions.chrome.split('.')[0]
+const CH_FULL = process.versions.chrome
+const SEC_CH_UA = `"Chromium";v="${CH_MAJOR}", "Google Chrome";v="${CH_MAJOR}", "Not?A_Brand";v="99"`
+const SEC_CH_UA_FVL = `"Chromium";v="${CH_FULL}", "Google Chrome";v="${CH_FULL}", "Not?A_Brand";v="99.0.0.0"`
+const SEC_CH_UA_PLATFORM =
+  process.platform === 'darwin'
+    ? '"macOS"'
+    : process.platform === 'win32'
+      ? '"Windows"'
+      : '"Linux"'
+const SEC_CH_UA_PLATFORM_VERSION = `"${process.getSystemVersion()}"`
+const SEC_CH_UA_ARCH = process.arch === 'arm64' ? '"arm"' : '"x86"'
+// Full client-hint set. Sent on every secure request — like a Chrome that has
+// already answered a site's Accept-CH — so the high-entropy hints Google asks for
+// after the identifier page are present when the password step checks them.
+const CLIENT_HINTS: Record<string, string> = {
+  'Sec-CH-UA': SEC_CH_UA,
+  'Sec-CH-UA-Mobile': '?0',
+  'Sec-CH-UA-Platform': SEC_CH_UA_PLATFORM,
+  'Sec-CH-UA-Platform-Version': SEC_CH_UA_PLATFORM_VERSION,
+  'Sec-CH-UA-Arch': SEC_CH_UA_ARCH,
+  'Sec-CH-UA-Bitness': '"64"',
+  'Sec-CH-UA-Full-Version': `"${CH_FULL}"`,
+  'Sec-CH-UA-Full-Version-List': SEC_CH_UA_FVL,
+  'Sec-CH-UA-Model': '""',
+  'Sec-CH-UA-WoW64': '?0',
+  'Sec-CH-UA-Form-Factors': '"Desktop"'
+}
+function applyClientHints(ses: Electron.Session): void {
+  ses.webRequest.onBeforeSendHeaders((details, cb) => {
+    const h = details.requestHeaders
+    // Only https origins, matching where Chrome itself attaches these hints.
+    if (/^https:/i.test(details.url)) Object.assign(h, CLIENT_HINTS)
+    cb({ requestHeaders: h })
+  })
+}
 
 // Optional launch parameter: start with a specific theme for THIS run, e.g.
 //   Reframe --theme=netscape        (packaged: open -a Reframe --args --theme=netscape)
@@ -409,6 +457,7 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   registerAppProtocol()
+  applyClientHints(session.defaultSession)
   setDockIcon()
   buildAppMenu()
   setupAutoUpdate()

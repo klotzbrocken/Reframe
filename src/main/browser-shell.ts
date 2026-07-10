@@ -17,6 +17,43 @@ import { normalizeInput, isAllowedExternal } from '../shared/url'
 import { pageUrl } from './page-url'
 import { applyAdblock } from './adblock'
 
+/** SSO / OAuth provider hosts whose window.open popups must stay real popups
+ *  (with an intact window.opener) instead of being rerouted to a tab. */
+const AUTH_HOSTS =
+  /(^|\.)(accounts\.google\.com|appleid\.apple\.com|login\.microsoftonline\.com|login\.live\.com|github\.com|www\.facebook\.com|login\.yahoo\.com|www\.linkedin\.com|www\.dropbox\.com|slack\.com)$/i
+function isAuthPopup(u: string): boolean {
+  try {
+    return AUTH_HOSTS.test(new URL(u).hostname)
+  } catch {
+    return false
+  }
+}
+
+// Real Chrome exposes window.chrome.{app,csi,loadTimes}; an embedded Chromium
+// leaves window.chrome an empty object. Google's sign-in bot-check reads exactly
+// those, so with the honest empty object it rejects the login as an "insecure /
+// embedded browser" — even with a spotless Chrome user-agent and client hints
+// (verified: adding this shim is what turns Google's "browser may not be secure"
+// page into the normal sign-in flow). Injected into every document at start.
+const CHROME_SHIM = `(() => { try {
+  if (!window.chrome) window.chrome = {};
+  if (!window.chrome.app) window.chrome.app = { isInstalled: false,
+    InstallState: { DISABLED: 'disabled', INSTALLED: 'installed', NOT_INSTALLED: 'not_installed' },
+    RunningState: { CANNOT_RUN: 'cannot_run', READY_TO_RUN: 'ready_to_run', RUNNING: 'running' },
+    getDetails: function getDetails() { return null; },
+    getIsInstalled: function getIsInstalled() { return false; },
+    runningState: function runningState() { return 'cannot_run'; } };
+  if (!window.chrome.csi) window.chrome.csi = function csi() {
+    return { onloadT: Date.now(), startE: Date.now(), pageT: performance.now(), tran: 15 }; };
+  if (!window.chrome.loadTimes) window.chrome.loadTimes = function loadTimes() {
+    var t = performance.timing || {}; var s = function (x) { return (x || Date.now()) / 1000; };
+    return { requestTime: s(t.navigationStart), startLoadTime: s(t.navigationStart),
+      commitLoadTime: s(t.responseStart), finishDocumentLoadTime: s(t.domContentLoadedEventEnd),
+      finishLoadTime: s(t.loadEventEnd), firstPaintTime: s(t.responseStart), firstPaintAfterLoadTime: 0,
+      navigationType: 'Other', wasFetchedViaSpdy: true, wasNpnNegotiated: true,
+      npnNegotiatedProtocol: 'h2', wasAlternateProtocolAvailable: false, connectionInfo: 'h2' }; };
+} catch (e) {} })();`
+
 /** Cache of Archive-Timeline month lookups, keyed "url|year" (10 min TTL). */
 const timelineCache = new Map<string, { at: number; months: number[] }>()
 
@@ -182,6 +219,8 @@ export class BrowserShell {
     this.order.push(id)
     this.win.contentView.addChildView(view)
     this.wire(tab)
+    // Register the Chrome shim before the first navigation commits.
+    if (this.ensureDebugger(view.webContents)) tab.dbgAttached = true
     void this.applySpeed(tab)
 
     this.emit({ type: 'tab-created', tab: this.stateOf(tab) })
@@ -504,19 +543,37 @@ export class BrowserShell {
     for (const tab of this.tabs.values()) void this.applySpeed(tab)
   }
 
+  /** Attach the CDP debugger (idempotent) and register the window.chrome shim so
+   *  it runs at the start of every future document. Also enables the Network
+   *  domain so speed throttling reuses the same attachment. Returns false when the
+   *  debugger can't be attached (e.g. DevTools is open) so callers degrade. */
+  ensureDebugger(wc: WebContents): boolean {
+    if (wc.isDestroyed()) return false
+    try {
+      if (!wc.debugger.isAttached()) {
+        wc.debugger.attach('1.3')
+        void wc.debugger.sendCommand('Page.enable')
+        void wc.debugger.sendCommand('Network.enable')
+        void wc.debugger.sendCommand('Page.addScriptToEvaluateOnNewDocument', {
+          source: CHROME_SHIM
+        })
+      }
+      return true
+    } catch {
+      return false
+    }
+  }
+
   private async applySpeed(tab: Tab): Promise<void> {
     const wc = tab.view.webContents
     if (wc.isDestroyed()) return
     const p = SPEEDS[this.speed] ?? SPEEDS.full
-    // At full speed with no debugger yet, do nothing — never attach the CDP
-    // debugger unless a period speed is actually selected.
-    if (this.speed === 'full' && !tab.dbgAttached) return
+    // The debugger is attached up front (for the Chrome shim); reuse it here.
+    // `full` maps to down/up = -1, which clears throttling, so this is a no-op at
+    // full speed rather than a special case.
+    if (!this.ensureDebugger(wc)) return
+    tab.dbgAttached = true
     try {
-      if (!tab.dbgAttached) {
-        wc.debugger.attach('1.3')
-        tab.dbgAttached = true
-        await wc.debugger.sendCommand('Network.enable')
-      }
       await wc.debugger.sendCommand('Network.emulateNetworkConditions', {
         offline: false,
         latency: p.latency,
@@ -524,7 +581,7 @@ export class BrowserShell {
         uploadThroughput: p.up
       })
     } catch {
-      /* debugger already in use (e.g. DevTools open) — skip throttling */
+      /* debugger unavailable — skip throttling */
     }
   }
 
@@ -690,10 +747,32 @@ export class BrowserShell {
     // right-click "Send to" menu
     wc.on('context-menu', () => this.showPageMenu(tab))
 
-    // target=_blank / window.open -> open as a new tab instead of a new window.
+    // target=_blank / window.open -> open as a new tab instead of a new window,
+    // EXCEPT single-sign-on popups. Providers like Google open their sign-in in a
+    // real popup and hand the result back through window.opener.postMessage; if we
+    // reroute that to a plain tab the opener link is lost and the login can't
+    // complete. So auth-provider popups are allowed as genuine child windows
+    // (they inherit the Chrome UA + client-hint headers from the shared session).
     wc.setWindowOpenHandler(({ url }) => {
+      if (isAuthPopup(url)) {
+        return {
+          action: 'allow',
+          overrideBrowserWindowOptions: {
+            width: 500,
+            height: 650,
+            autoHideMenuBar: true,
+            webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true }
+          }
+        }
+      }
       this.createTab(url)
       return { action: 'deny' }
+    })
+
+    // An allowed auth popup is its own window, so give it the Chrome shim too —
+    // Google's bot-check runs inside the sign-in popup as well.
+    wc.on('did-create-window', (win) => {
+      this.ensureDebugger(win.webContents)
     })
   }
 
