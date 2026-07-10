@@ -1,6 +1,9 @@
 import { resolve } from 'path'
+import { readFileSync } from 'fs'
 import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
+
+const pkgVersion = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8')).version
 
 export default defineConfig({
   main: {
@@ -25,6 +28,7 @@ export default defineConfig({
   },
   renderer: {
     root: resolve(__dirname, 'src/renderer'),
+    define: { __APP_VERSION__: JSON.stringify(pkgVersion) },
     build: {
       rollupOptions: {
         input: resolve(__dirname, 'src/renderer/index.html')

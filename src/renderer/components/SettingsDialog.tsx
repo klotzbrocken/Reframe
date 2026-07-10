@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { DEFAULT_ENGINE_ID, SEARCH_ENGINES } from '../shell/engines'
 
+// Injected at build time from package.json (see electron.vite.config.ts).
+declare const __APP_VERSION__: string
+
 export type FontSize = 'normal' | 'medium' | 'large' | 'xlarge'
 
 export interface Settings {
@@ -284,6 +287,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
 
           <details className="ow-dialog__legal-details">
             <summary>About &amp; legal</summary>
+            <p className="ow-dialog__legal">Reframe {__APP_VERSION__}</p>
             <p className="ow-dialog__legal">{LEGAL}</p>
           </details>
 
