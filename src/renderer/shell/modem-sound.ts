@@ -55,11 +55,48 @@ export function playDialup(
   const duration = T.dialtone + T.dtmf + T.ring + T.handshake + 1
 
   // --- real-recording branch ---------------------------------------------
+  // Play the recording through the Web Audio API (fetch → decodeAudioData →
+  // AudioBufferSourceNode) rather than an <audio> element. In the packaged app
+  // the renderer is served over the custom `app://` scheme, and Chromium's
+  // HTMLMediaElement pipeline refuses to play the bundled .m4a from it
+  // (MediaError code 4) even though decodeAudioData decodes the very same bytes
+  // fine — so a plain `new Audio(url)` stayed silent and only the synth was
+  // heard. Web Audio sidesteps that pipeline entirely.
   if (opts.sampleUrl) {
-    const el = new Audio(opts.sampleUrl)
-    el.volume = opts.volume ?? 0.7
-    void el.play().catch(() => {})
-    return { stop: () => el.pause(), duration }
+    const AC =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const ctx = new AC()
+    const gain = ctx.createGain()
+    gain.gain.value = opts.volume ?? 0.7
+    gain.connect(ctx.destination)
+    let src: AudioBufferSourceNode | null = null
+    let stopped = false
+    void (async () => {
+      try {
+        const resp = await fetch(opts.sampleUrl as string)
+        const audioBuf = await ctx.decodeAudioData(await resp.arrayBuffer())
+        if (stopped) return
+        src = ctx.createBufferSource()
+        src.buffer = audioBuf
+        src.connect(gain)
+        src.start()
+      } catch {
+        /* recording unavailable/undecodable — stay silent rather than crash */
+      }
+    })()
+    return {
+      stop: () => {
+        stopped = true
+        try {
+          src?.stop()
+        } catch {
+          /* not started yet */
+        }
+        void ctx.close()
+      },
+      duration
+    }
   }
 
   // --- synthesized branch -------------------------------------------------
