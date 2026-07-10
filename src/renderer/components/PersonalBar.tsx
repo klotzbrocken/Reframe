@@ -45,19 +45,41 @@ export function PersonalBar({
   onDropUrl?: (url: string, title: string) => void
   onDropIntoFolder?: (folderId: string, url: string, title: string) => void
   onNewFolder?: () => void
-  onEdit?: (id: string) => void
+  onEdit?: (item: { id: string; label: string; url?: string; folder?: boolean }) => void
   onRemove?: (id: string) => void
   /** Notifies the host when a right-click menu / folder is open (to float chrome). */
   onMenuToggle?: (open: boolean) => void
 }) {
-  const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(null)
+  const [menu, setMenu] = useState<{
+    id: string
+    label: string
+    url?: string
+    folder?: boolean
+    x: number
+    y: number
+  } | null>(null)
   const [barMenu, setBarMenu] = useState<{ x: number; y: number } | null>(null)
   const [openFolder, setOpenFolder] = useState<string | null>(null)
+  // The bookmarks bar clips overflow, so the folder dropdown is positioned
+  // `fixed` at the button's screen coordinates to escape that clipping.
+  const [folderPos, setFolderPos] = useState<{ left: number; top: number } | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [dropFolder, setDropFolder] = useState<string | null>(null)
 
   const anyOpen = menu !== null || barMenu !== null || openFolder !== null
   useEffect(() => onMenuToggle?.(anyOpen), [anyOpen, onMenuToggle])
+
+  // Always clear the drag highlight when any drag ends (dragend fires on the
+  // drag source and bubbles to window even when a drop stops propagation), so
+  // the bar never gets stuck in its dotted "drag-over" state.
+  useEffect(() => {
+    const reset = (): void => {
+      setDragOver(false)
+      setDropFolder(null)
+    }
+    window.addEventListener('dragend', reset)
+    return () => window.removeEventListener('dragend', reset)
+  }, [])
 
   useEffect(() => {
     if (!menu && !barMenu && openFolder === null) return
@@ -78,11 +100,11 @@ export function PersonalBar({
   }
 
   const openCtx = (
-    id: string,
+    item: { id: string; label: string; url?: string; folder?: boolean },
     e: { clientX: number; clientY: number; preventDefault: () => void }
   ): void => {
     e.preventDefault()
-    setMenu({ id, x: Math.min(e.clientX, window.innerWidth - 150), y: e.clientY })
+    setMenu({ ...item, x: Math.min(e.clientX, window.innerWidth - 150), y: e.clientY })
   }
 
   return (
@@ -119,10 +141,17 @@ export function PersonalBar({
                 data-icon={it.icon}
                 title={it.label}
                 onMouseDown={(e) => {
+                  if (e.button !== 0) return // right-click opens the context menu, not the folder
                   e.stopPropagation() // don't let the document-close fire first
+                  const r = e.currentTarget.getBoundingClientRect()
+                  setFolderPos({ left: Math.round(r.left), top: Math.round(r.bottom) })
                   setOpenFolder((o) => (o === fid ? null : fid))
                 }}
-                onContextMenu={it.user && it.id ? (e) => openCtx(it.id as string, e) : undefined}
+                onContextMenu={
+                  it.user && it.id
+                    ? (e) => openCtx({ id: it.id as string, label: it.label, folder: true }, e)
+                    : undefined
+                }
                 onDragOver={
                   it.id && onDropIntoFolder
                     ? (e) => {
@@ -139,6 +168,7 @@ export function PersonalBar({
                         e.preventDefault()
                         e.stopPropagation()
                         setDropFolder(null)
+                        setDragOver(false) // the bar's onDrop is skipped (stopPropagation)
                         const d = readDropUrl(e)
                         if (d) onDropIntoFolder(it.id as string, d.url, d.title)
                       }
@@ -150,7 +180,15 @@ export function PersonalBar({
                 <span className="ow-pbar-caret" aria-hidden />
               </button>
               {isOpen && (
-                <div className="ow-pbar-dropdown" onMouseDown={(e) => e.stopPropagation()}>
+                <div
+                  className="ow-pbar-dropdown"
+                  style={
+                    folderPos
+                      ? { position: 'fixed', left: folderPos.left, top: folderPos.top }
+                      : undefined
+                  }
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
                   {it.children.length === 0 && <div className="ow-pbar-empty">(empty)</div>}
                   {it.children.map((c, ci) => (
                     <button
@@ -165,7 +203,11 @@ export function PersonalBar({
                             }
                           : undefined
                       }
-                      onContextMenu={c.user && c.id ? (e) => openCtx(c.id as string, e) : undefined}
+                      onContextMenu={
+                        c.user && c.id
+                          ? (e) => openCtx({ id: c.id as string, label: c.label, url: c.url }, e)
+                          : undefined
+                      }
                     >
                       <span
                         className="ow-pbar-ditem__icon"
@@ -187,7 +229,11 @@ export function PersonalBar({
             data-icon={it.icon}
             title={it.label}
             onClick={it.url ? () => onItem?.(it.url as string) : undefined}
-            onContextMenu={it.user && it.id ? (e) => openCtx(it.id as string, e) : undefined}
+            onContextMenu={
+              it.user && it.id
+                ? (e) => openCtx({ id: it.id as string, label: it.label, url: it.url }, e)
+                : undefined
+            }
           >
             <span
               className="ow-pbar-btn__icon"
@@ -205,7 +251,7 @@ export function PersonalBar({
             className="ow-ctxmenu__item"
             onMouseDown={(e) => {
               e.preventDefault()
-              onEdit?.(menu.id)
+              onEdit?.({ id: menu.id, label: menu.label, url: menu.url, folder: menu.folder })
               setMenu(null)
             }}
           >

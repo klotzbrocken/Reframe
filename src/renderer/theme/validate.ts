@@ -82,7 +82,17 @@ export function sanitizeManifest(raw: unknown, fallbackId: string): ThemeManifes
         .map((it) => ({
           label: typeof it.label === 'string' ? it.label : '',
           icon: typeof it.icon === 'string' ? it.icon : undefined,
-          url: safeUrl(it.url)
+          url: safeUrl(it.url),
+          // A folder entry: keep its child links (each validated the same way).
+          children: Array.isArray(it.children)
+            ? (it.children as unknown[])
+                .filter((c): c is Record<string, unknown> => !!c && typeof c === 'object')
+                .map((c) => ({
+                  label: typeof c.label === 'string' ? c.label : '',
+                  icon: typeof c.icon === 'string' ? c.icon : undefined,
+                  url: safeUrl(c.url)
+                }))
+            : undefined
         }))
     : undefined
 

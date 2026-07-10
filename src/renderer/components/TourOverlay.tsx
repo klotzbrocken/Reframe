@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import { requestChromeTop } from '../shell/chromeTop'
 
 /** Bump to re-show the tour after a future update (once per version). */
-export const TOUR_VERSION = '1.3.0'
+export const TOUR_VERSION = '1.4.0'
 
 export interface TourStep {
   /** CSS selector of the chrome element to point at. */
@@ -29,8 +29,14 @@ export const TOUR_STEPS: TourStep[] = [
   {
     target: '[data-tour="theme"]',
     title: 'Switch theme',
-    body: 'Pick a retro browser skin from the dropdown — now including Internet Explorer 4.01 for Mac (Mac OS 9).',
+    body: 'Pick a retro browser skin from the dropdown — now including Camino 2.0, the Mac-native browser with a real macOS menu bar.',
     color: '#2f6fed'
+  },
+  {
+    target: '.ow-statusbar',
+    title: 'Dial-up modem (new)',
+    body: 'Turn on Modem-Emulation in Settings and a modem widget with blinking LEDs appears down here — the first page of each session connects with an authentic dial-up handshake before it loads.',
+    color: '#12b886'
   }
 ]
 
@@ -43,6 +49,7 @@ interface Rect {
 
 const ARROW_LEN = 62
 const CARD_W = 230
+const CARD_H = 112 // estimate for placing wide-target cards above/below
 const GAP = 10
 const PAD = 12
 
@@ -87,25 +94,46 @@ export function TourOverlay({ steps, onDone }: { steps: TourStep[]; onDone: () =
   const next = (): void => (last ? onDone() : setI((n) => n + 1))
 
   // Lay the arrow + label to the left of the target if there's room, else right.
+  // For a target too wide for either side (e.g. the full-width status bar), drop
+  // the side arrow and place the card centred above (or below) it instead.
+  let showArrow = true
   let pointLeft = false // arrow points left (target is to our left)
   let arrowLeft = PAD
   let arrowTop = PAD
   let cardLeft = PAD
-  let cardTop = PAD
+  let cardTop: number | undefined = PAD
+  // For a wide target we anchor the card's BOTTOM just above it and let it grow
+  // upward, so a tall (multi-line) card never overflows the viewport.
+  let cardBottom: number | undefined
   if (rect) {
+    const cx = rect.left + rect.width / 2
     const cy = rect.top + rect.height / 2
     const roomLeft = rect.left - (CARD_W + ARROW_LEN + GAP * 2) > 8
-    if (roomLeft) {
-      pointLeft = false
-      arrowLeft = rect.left - GAP - ARROW_LEN
-      cardLeft = arrowLeft - GAP - CARD_W
+    const roomRight =
+      rect.left + rect.width + ARROW_LEN + GAP * 2 + CARD_W < window.innerWidth - 8
+    if (roomLeft || roomRight) {
+      if (roomLeft) {
+        pointLeft = false
+        arrowLeft = rect.left - GAP - ARROW_LEN
+        cardLeft = arrowLeft - GAP - CARD_W
+      } else {
+        pointLeft = true
+        arrowLeft = rect.left + rect.width + GAP
+        cardLeft = arrowLeft + ARROW_LEN + GAP
+      }
+      arrowTop = cy - 17
+      cardTop = Math.max(PAD, Math.min(cy - 52, window.innerHeight - 132))
     } else {
-      pointLeft = true
-      arrowLeft = rect.left + rect.width + GAP
-      cardLeft = arrowLeft + ARROW_LEN + GAP
+      showArrow = false
+      cardLeft = Math.max(PAD, Math.min(cx - CARD_W / 2, window.innerWidth - CARD_W - PAD))
+      const roomAbove = rect.top - GAP - CARD_H > 8
+      if (roomAbove) {
+        cardTop = undefined
+        cardBottom = window.innerHeight - (rect.top - GAP) // bottom edge above the target
+      } else {
+        cardTop = rect.top + rect.height + GAP
+      }
     }
-    arrowTop = cy - 17
-    cardTop = Math.max(PAD, Math.min(cy - 52, window.innerHeight - 132))
   }
 
   return (
@@ -121,26 +149,35 @@ export function TourOverlay({ steps, onDone }: { steps: TourStep[]; onDone: () =
               height: rect.height + 10
             }}
           />
-          <svg
-            className={'ow-tour__arrow' + (pointLeft ? ' is-left' : '')}
-            style={{ top: arrowTop, left: arrowLeft }}
-            width={ARROW_LEN}
-            height="34"
-            viewBox="0 0 62 34"
-            aria-hidden
-          >
-            <path
-              d="M3 17 H46 M46 17 L33 6 M46 17 L33 28"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          {showArrow && (
+            <svg
+              className={'ow-tour__arrow' + (pointLeft ? ' is-left' : '')}
+              style={{ top: arrowTop, left: arrowLeft }}
+              width={ARROW_LEN}
+              height="34"
+              viewBox="0 0 62 34"
+              aria-hidden
+            >
+              <path
+                d="M3 17 H46 M46 17 L33 6 M46 17 L33 28"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
         </>
       )}
-      <div className="ow-tour__card" style={{ top: cardTop, left: cardLeft, width: CARD_W }}>
+      <div
+        className="ow-tour__card"
+        style={{
+          left: cardLeft,
+          width: CARD_W,
+          ...(cardBottom !== undefined ? { bottom: cardBottom } : { top: cardTop })
+        }}
+      >
         <div className="ow-tour__title">{step.title}</div>
         <div className="ow-tour__body">{step.body}</div>
         <div className="ow-tour__row">

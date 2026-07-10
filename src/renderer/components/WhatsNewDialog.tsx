@@ -1,22 +1,22 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.6.0'
+export const WHATS_NEW_VERSION = '1.7.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'New theme — Netscape Navigator 3.04 Gold',
-    body: 'The browser the early Web grew up on, rebuilt pixel-for-pixel: the silver Windows 95 chrome, the ten-button toolbar, the “Location:” bar with the globe, the Directory quick-links — and the spinning “N” throbber that spins only while a page is loading. Its own “About Netscape Navigator” history page included.'
+    title: 'New theme — Camino 2.0',
+    body: 'The Mozilla community’s Mac-native browser (2009), rebuilt in full Aqua: glossy traffic-light window controls, the original toolbar icons, the “hide toolbar” pill, and — because Camino had no in-window menus — its File/View/History/Bookmarks menus live in the real macOS menu bar. Bookmark-bar folders and its own “About Camino” page are included too.'
   },
   {
-    title: 'Archive Timeline',
-    body: 'Open the flyout to see how many times the page you’re on was captured, year by year and month by month, as little histograms. Click any bar to jump straight to that moment in the Web’s history.'
+    title: 'Modem dial-up emulation',
+    body: 'Switch it on in Settings for the full 1990s ritual: the browser boots “not connected”, and the first page of each session waits behind an authentic dial-up handshake — pick the classic US recording, a European one, or a synthesized tone. A little modem widget with blinking PWR/CD/TX/RX LEDs sits in the status bar, and the page then crawls in at your chosen connection speed.'
   },
   {
-    title: 'Sharing & time-travel polish',
-    body: 'The “Share” button now lives at the top of the flyout, right where you look for it. Type a year like “1998://” in the address bar to jump straight there, and switching between years no longer flashes the old page first.'
+    title: 'Bookmark-bar folders',
+    body: 'Right-click the bookmarks bar to make a New Folder, then drag pages into it — folders open as a dropdown. Works in every theme that has a bookmarks bar.'
   }
 ]
 

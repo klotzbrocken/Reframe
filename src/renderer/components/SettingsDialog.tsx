@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { DEFAULT_ENGINE_ID, SEARCH_ENGINES } from '../shell/engines'
-import { WAYBACK_MIN_YEAR, WAYBACK_MAX_YEAR } from '../shell/wayback'
 
 export type FontSize = 'normal' | 'medium' | 'large' | 'xlarge'
 
@@ -68,19 +67,11 @@ const LEGAL =
   'The bundled “Charcoal” font (Apple’s classic Mac OS system typeface) and a pixel “MS Sans Serif” ' +
   'are used for period-accurate text; all font rights remain with their respective owners.'
 
-// 0 = "off" (today); the rest is the shared Wayback range, so this dropdown and
-// the floating control offer exactly the same years.
-const YEARS = [
-  0,
-  ...Array.from({ length: WAYBACK_MAX_YEAR - WAYBACK_MIN_YEAR + 1 }, (_, i) => WAYBACK_MIN_YEAR + i)
-]
-
 export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExternal }: Props) {
   const [home, setHome] = useState(settings.home || SITE)
   const [mailUseLocal, setMailUseLocal] = useState(settings.mailUseLocal ?? false)
   const [mailUrl, setMailUrl] = useState(settings.mailUrl || 'https://mail.google.com')
   const [theme, setTheme] = useState(settings.defaultTheme || 'ie5')
-  const [year, setYear] = useState(settings.waybackYear || 0)
   const [engine, setEngine] = useState(settings.searchEngine || DEFAULT_ENGINE_ID)
   const [splash, setSplash] = useState(settings.themeSplash !== false)
   const [menuStyle, setMenuStyle] = useState(settings.menuStyle || 'win98')
@@ -88,7 +79,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [labelFontSize, setLabelFontSize] = useState(settings.labelFontSize || 'normal')
   const [closeAction, setCloseAction] = useState(settings.closeAction || 'quit')
   const [adblock, setAdblock] = useState(settings.adblock ?? false)
-  const [modemExtension, setModemExtension] = useState(settings.modemExtension ?? false)
+  const [modemExtension, setModemExtension] = useState(settings.modemExtension !== false)
   const [connectionSpeed, setConnectionSpeed] = useState(settings.connectionSpeed || 'full')
   const [modemVolume, setModemVolume] = useState(settings.modemVolume ?? 70)
   const [modemSound, setModemSound] = useState<'us' | 'europe' | 'synth' | 'custom'>(
@@ -125,32 +116,48 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
           </p>
 
           <div className="ow-dialog__grid">
-            <label className="ow-field ow-field--wide">
-              <span>Home page</span>
-              <input value={home} spellCheck={false} onChange={(e) => setHome(e.target.value)} />
-            </label>
-
-            <label className="ow-field">
-              <span>Mail button opens</span>
-              <select
-                value={mailUseLocal ? 'local' : 'web'}
-                onChange={(e) => setMailUseLocal(e.target.value === 'local')}
-              >
-                <option value="web">A website (webmail)</option>
-                <option value="local">Local mail app (mailto:)</option>
-              </select>
-            </label>
-            {!mailUseLocal && (
-              <label className="ow-field ow-field--wide">
-                <span>Webmail URL</span>
-                <input
-                  value={mailUrl}
-                  spellCheck={false}
-                  placeholder="https://mail.google.com"
-                  onChange={(e) => setMailUrl(e.target.value)}
-                />
+            <div className="ow-field-row">
+              <label className="ow-field" style={{ flex: 3 }}>
+                <span>Home page</span>
+                <input value={home} spellCheck={false} onChange={(e) => setHome(e.target.value)} />
               </label>
-            )}
+              <label className="ow-field" style={{ flex: 2 }}>
+                <span>Default search engine</span>
+                <select value={engine} onChange={(e) => setEngine(e.target.value)}>
+                  {SEARCH_ENGINES.map((en) => (
+                    <option key={en.id} value={en.id}>
+                      {en.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="ow-field-row">
+              <label className="ow-field" style={{ flex: 2 }}>
+                <span>Mail button opens</span>
+                <select
+                  value={mailUseLocal ? 'local' : 'web'}
+                  onChange={(e) => setMailUseLocal(e.target.value === 'local')}
+                >
+                  <option value="web">A website (webmail)</option>
+                  <option value="local">Local mail app (mailto:)</option>
+                </select>
+              </label>
+              {!mailUseLocal ? (
+                <label className="ow-field" style={{ flex: 3 }}>
+                  <span>Webmail URL</span>
+                  <input
+                    value={mailUrl}
+                    spellCheck={false}
+                    placeholder="https://mail.google.com"
+                    onChange={(e) => setMailUrl(e.target.value)}
+                  />
+                </label>
+              ) : (
+                <div style={{ flex: 3 }} aria-hidden />
+              )}
+            </div>
 
           <label className="ow-field">
             <span>Default theme at start</span>
@@ -158,28 +165,6 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               {themes.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="ow-field">
-            <span>Wayback year (mid-month snapshot; month via Time Machine)</span>
-            <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
-              {YEARS.map((y) => (
-                <option key={y} value={y}>
-                  {y === 0 ? 'Per theme (default)' : y}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="ow-field">
-            <span>Default search engine</span>
-            <select value={engine} onChange={(e) => setEngine(e.target.value)}>
-              {SEARCH_ENGINES.map((en) => (
-                <option key={en.id} value={en.id}>
-                  {en.name}
                 </option>
               ))}
             </select>
@@ -213,33 +198,23 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             </select>
           </label>
 
-          <label className="ow-field">
-            <span>When closing the window</span>
-            <select
-              value={closeAction}
-              onChange={(e) => setCloseAction(e.target.value as 'quit' | 'minimize')}
-            >
-              <option value="quit">Quit Reframe completely</option>
-              <option value="minimize">Just minimize to the Dock</option>
-            </select>
-          </label>
-
-            <label className="ow-field ow-field--check ow-field--wide">
-              <input
-                type="checkbox"
-                checked={splash}
-                onChange={(e) => setSplash(e.target.checked)}
-              />
-              <span>Show theme splash screens on switch</span>
+            <label className="ow-field ow-field--check">
+              <input type="checkbox" checked={splash} onChange={(e) => setSplash(e.target.checked)} />
+              <span>Show theme splash on switch</span>
             </label>
 
-            <label className="ow-field ow-field--check ow-field--wide">
+            <label className="ow-field ow-field--check">
+              <input type="checkbox" checked={adblock} onChange={(e) => setAdblock(e.target.checked)} />
+              <span>Block ads &amp; trackers</span>
+            </label>
+
+            <label className="ow-field ow-field--check">
               <input
                 type="checkbox"
-                checked={adblock}
-                onChange={(e) => setAdblock(e.target.checked)}
+                checked={closeAction === 'minimize'}
+                onChange={(e) => setCloseAction(e.target.checked ? 'minimize' : 'quit')}
               />
-              <span>Block ads &amp; trackers (uBlock Origin filter lists)</span>
+              <span>Minimize to Dock on close (don’t quit)</span>
             </label>
 
             <div className="ow-field--sep ow-field--wide">Modem-Emulation</div>
@@ -307,7 +282,10 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             )}
           </div>
 
-          <p className="ow-dialog__legal">{LEGAL}</p>
+          <details className="ow-dialog__legal-details">
+            <summary>About &amp; legal</summary>
+            <p className="ow-dialog__legal">{LEGAL}</p>
+          </details>
 
           <a
             className="ow-kofi"
@@ -336,7 +314,6 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 mailUseLocal: mailUseLocal || undefined,
                 mailUrl: mailUrl.trim() || undefined,
                 defaultTheme: theme,
-                waybackYear: year || undefined,
                 searchEngine: engine,
                 themeSplash: splash,
                 menuStyle: menuStyle as 'win98' | 'luna',
@@ -344,7 +321,8 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 labelFontSize: labelFontSize as FontSize,
                 closeAction: closeAction as 'quit' | 'minimize',
                 adblock: adblock || undefined,
-                modemExtension: modemExtension || undefined,
+                // Default-on: persist `false` only when explicitly turned off.
+                modemExtension: modemExtension ? undefined : false,
                 // Enabling the modem with speed "off" would be a no-op — give it
                 // a period speed so the dial-up actually gates a slow load.
                 connectionSpeed:

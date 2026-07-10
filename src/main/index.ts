@@ -102,7 +102,10 @@ function registerAppProtocol(): void {
 // switching to these themes — sized to each image's aspect ratio.
 const THEME_SPLASH: Record<string, { img: string; w: number; h: number }> = {
   ie5: { img: 'splash/ie5.png', w: 540, h: 322 },
-  netscape: { img: 'splash/netscape.png', w: 500, h: 375 }
+  netscape: { img: 'splash/netscape.png', w: 500, h: 375 },
+  // Netscape Navigator Gold 3 splash — shown at the image's native 211×318 (1:1)
+  // so it stays crisp and period-authentic (no upscaling, no distortion).
+  netscape3: { img: 'splash/netscape3.png', w: 211, h: 318 }
 }
 
 function newSplashWindow(w: number, h: number): BrowserWindow {

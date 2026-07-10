@@ -48,7 +48,10 @@ const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string 
 export function App() {
   const loadSettings = (): Settings => {
     try {
-      return JSON.parse(localStorage.getItem('reframe.settings') || '{}') as Settings
+      const s = JSON.parse(localStorage.getItem('reframe.settings') || '{}') as Settings
+      // Connection speed always starts at "full" (off): the dial-up is a
+      // per-session choice and never carries a slow speed across restarts.
+      return { ...s, connectionSpeed: 'full' }
     } catch {
       return {}
     }
@@ -194,9 +197,12 @@ export function App() {
     label: string
     url?: string
     favicon?: string
-    /** Present → this entry is a folder holding child bookmarks. */
+    /** Present → this entry is a folder. */
     type?: 'folder'
-    children?: BarBookmark[]
+    /** Id of the folder this entry lives in; top-level entries have none. The
+     *  folder can be a user folder OR a theme/manifest folder ("m:<index>"), so
+     *  a page can be dropped into either. */
+    parentId?: string
   }
   const [barBookmarks, setBarBookmarks] = useState<BarBookmark[]>(() => {
     try {
@@ -205,7 +211,12 @@ export function App() {
       return []
     }
   })
-  const [editBookmark, setEditBookmark] = useState<BarBookmark | null>(null)
+  const [editBookmark, setEditBookmark] = useState<{
+    id: string
+    label: string
+    url?: string
+    folder?: boolean
+  } | null>(null)
   const [barMenuOpen, setBarMenuOpen] = useState(false)
   // Bookmarks-bar visibility, toggled by the Camino toolbar bookmark button.
   const [showBar, setShowBar] = useState(true)
@@ -215,55 +226,76 @@ export function App() {
     () => localStorage.setItem('reframe.barBookmarks', JSON.stringify(barBookmarks)),
     [barBookmarks]
   )
-  const dropBarBookmark = (url: string, title: string): void => {
+  // Local overrides for the theme's DEFAULT bookmark-bar entries, so the user can
+  // rename or remove them without editing the theme. Keyed by a stable "m:…" id.
+  const [barOverrides, setBarOverrides] = useState<{
+    hidden: string[]
+    labels: Record<string, string>
+    urls: Record<string, string>
+  }>(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('reframe.barOverrides') || '{}')
+      return {
+        hidden: Array.isArray(s.hidden) ? s.hidden : [],
+        labels: s.labels && typeof s.labels === 'object' ? s.labels : {},
+        urls: s.urls && typeof s.urls === 'object' ? s.urls : {}
+      }
+    } catch {
+      return { hidden: [], labels: {}, urls: {} }
+    }
+  })
+  useEffect(
+    () => localStorage.setItem('reframe.barOverrides', JSON.stringify(barOverrides)),
+    [barOverrides]
+  )
+  const isManifestId = (id: string): boolean => id.startsWith('m:')
+  const activeFavicon = (url: string): string | undefined => {
     const at = state.tabs.find((t) => t.id === state.activeId)
-    const favicon = at && unwrapWayback(at.url) === url ? at.favicon ?? undefined : undefined
-    const id = crypto.randomUUID()
-    setBarBookmarks((b) => [...b, { id, label: title || url, url, favicon }])
+    return at && unwrapWayback(at.url) === url ? at.favicon ?? undefined : undefined
   }
-  const addBarFolder = (): void =>
+  const dropBarBookmark = (url: string, title: string): void =>
     setBarBookmarks((b) => [
       ...b,
-      { id: crypto.randomUUID(), label: 'New Folder', type: 'folder', children: [] }
+      { id: crypto.randomUUID(), label: title || url, url, favicon: activeFavicon(url) }
     ])
+  const addBarFolder = (): void =>
+    setBarBookmarks((b) => [...b, { id: crypto.randomUUID(), label: 'New Folder', type: 'folder' }])
+  // File a dropped page inside a folder (user OR manifest folder id).
   const dropIntoFolder = (folderId: string, url: string, title: string): void =>
+    setBarBookmarks((b) => [
+      ...b,
+      {
+        id: crypto.randomUUID(),
+        label: title || url,
+        url,
+        favicon: activeFavicon(url),
+        parentId: folderId
+      }
+    ])
+  // Remove an entry. Theme-default ("m:…") entries are hidden via an override;
+  // user entries (and, if a folder, their children) are dropped from storage.
+  const removeBarBookmark = (id: string): void => {
+    if (isManifestId(id)) {
+      setBarOverrides((o) => ({ ...o, hidden: [...o.hidden, id] }))
+      return
+    }
+    setBarBookmarks((b) => b.filter((x) => x.id !== id && x.parentId !== id))
+  }
+  const saveBarBookmark = (d: BookmarkDraft): void => {
+    if (isManifestId(d.id)) {
+      setBarOverrides((o) => ({
+        ...o,
+        labels: { ...o.labels, [d.id]: d.label },
+        urls: d.folder ? o.urls : { ...o.urls, [d.id]: d.url }
+      }))
+      return
+    }
     setBarBookmarks((b) =>
       b.map((x) =>
-        x.id === folderId && x.type === 'folder'
-          ? {
-              ...x,
-              children: [...(x.children ?? []), { id: crypto.randomUUID(), label: title || url, url }]
-            }
-          : x
+        x.id === d.id ? { ...x, label: d.label, ...(x.type === 'folder' ? {} : { url: d.url }) } : x
       )
     )
-  // Remove a top-level entry (bookmark or folder) or a child inside any folder.
-  const removeBarBookmark = (id: string): void =>
-    setBarBookmarks((b) =>
-      b
-        .filter((x) => x.id !== id)
-        .map((x) => (x.children ? { ...x, children: x.children.filter((c) => c.id !== id) } : x))
-    )
-  const findBarBookmark = (id: string): BarBookmark | null => {
-    for (const b of barBookmarks) {
-      if (b.id === id) return b
-      const c = b.children?.find((x) => x.id === id)
-      if (c) return c
-    }
-    return null
   }
-  const saveBarBookmark = (d: BookmarkDraft): void =>
-    setBarBookmarks((b) =>
-      b.map((x) => {
-        if (x.id === d.id) return { ...x, label: d.label, ...(x.type === 'folder' ? {} : { url: d.url }) }
-        if (x.children)
-          return {
-            ...x,
-            children: x.children.map((c) => (c.id === d.id ? { ...c, label: d.label, url: d.url } : c))
-          }
-        return x
-      })
-    )
 
   // Opera HotList side panel — docked open by default.
   const [hotlistOpen, setHotlistOpen] = useState(true)
@@ -351,8 +383,8 @@ export function App() {
     actions.setOldWebActive(true)
   }
 
-  // Apply the saved "Time Warp Modem" speed on startup (and whenever it changes),
-  // so it covers the initial tab and survives restarts.
+  // Apply the "Time Warp Modem" speed on startup (and whenever it changes) so it
+  // covers the initial tab. (Speed resets to "full" each launch — see loadSettings.)
   useEffect(() => {
     window.oldweb.setNetworkSpeed(settings.connectionSpeed || 'full')
   }, [settings.connectionSpeed])
@@ -459,14 +491,19 @@ export function App() {
   // handshake (sound + LED widget). The actual slow paint comes from the
   // existing connectionSpeed CDP throttle; this only delays the start and, when
   // armed, boots "offline" until the user dials in (audio needs a user gesture).
-  const modemArmed = !!settings.modemExtension && (settings.connectionSpeed ?? 'full') !== 'full'
+  // Modem widget is on by default (opt-out); at the default "full" speed it just
+  // shows as always-online, so it's visible without forcing a dial-up.
+  const modemOn = settings.modemExtension !== false
+  const modemArmed = modemOn && (settings.connectionSpeed ?? 'full') !== 'full'
   const modemSpeed = (settings.connectionSpeed ?? 'full') as ModemSpeed | 'full'
   const [modemPhase, setModemPhase] = useState<ModemPhase>('off')
   const connectedRef = useRef(false)
   const dialRef = useRef<DialupHandle | null>(null)
   const dialTimersRef = useRef<number[]>([])
-  const bootHandledRef = useRef(false)
   const bootStoppedRef = useRef(false)
+  // Active tab id, read inside effects that must not re-run once per tab.
+  const activeTabIdRef = useRef<number | null>(null)
+  activeTabIdRef.current = activeTab?.id ?? null
 
   const clearDialTimers = (): void => {
     dialTimersRef.current.forEach((t) => clearTimeout(t))
@@ -480,9 +517,9 @@ export function App() {
     europe: { url: '/sounds/dialup-eu.m4a', duration: 17.5 }
   }
 
-  // Run the dial-up handshake (call from a user gesture so AudioContext is
-  // allowed), then run `then` (the real navigation) once "connected". The phase
-  // offsets track the synth TL table, or the chosen recording's length.
+  // Run the dial-up (call from a user gesture so AudioContext is allowed), then
+  // `then` (the real navigation) once "connected". ISDN was a digital line — it
+  // never had dial tones or the carrier screech, so it connects quickly + silent.
   const startDial = (then: () => void): void => {
     if (modemSpeed === 'full') {
       then()
@@ -490,41 +527,48 @@ export function App() {
     }
     clearDialTimers()
     dialRef.current?.stop()
+    dialRef.current = null
     bootStoppedRef.current = false
     setModemPhase('dialing')
-
-    const sound = settings.modemSound ?? 'us'
-    const volume = (settings.modemVolume ?? 70) / 100
-    const sampleUrl =
-      sound === 'us'
-        ? MODEM_SAMPLES.us.url
-        : sound === 'europe'
-          ? MODEM_SAMPLES.europe.url
-          : sound === 'custom'
-            ? settings.modemSampleUrl || ''
-            : '' // 'synth'
 
     let ring: number
     let handshake: number
     let total: number
-    if (sampleUrl) {
-      total =
-        sound === 'us'
-          ? MODEM_SAMPLES.us.duration
-          : sound === 'europe'
-            ? MODEM_SAMPLES.europe.duration
-            : 18 // custom recording — unknown length
-      // Real recordings: dial tone/dialing first, ringing ~30% in, then the
-      // carrier handshake screech to the end. LED phases approximate that shape.
-      ring = total * 0.28
-      handshake = total * 0.46
-      dialRef.current = playDialup(modemSpeed, { volume, sampleUrl })
+    if (modemSpeed === 'isdn') {
+      // ISDN: no analog tones — a short, silent digital connect.
+      ring = 0.4
+      handshake = 0.8
+      total = 1.4
     } else {
-      dialRef.current = playDialup(modemSpeed, { volume })
-      const tm = dialupTimings(modemSpeed)
-      ring = tm.ring
-      handshake = tm.handshake
-      total = tm.duration
+      const sound = settings.modemSound ?? 'us'
+      const volume = (settings.modemVolume ?? 70) / 100
+      const sampleUrl =
+        sound === 'us'
+          ? MODEM_SAMPLES.us.url
+          : sound === 'europe'
+            ? MODEM_SAMPLES.europe.url
+            : sound === 'custom'
+              ? settings.modemSampleUrl || ''
+              : '' // 'synth'
+      if (sampleUrl) {
+        total =
+          sound === 'us'
+            ? MODEM_SAMPLES.us.duration
+            : sound === 'europe'
+              ? MODEM_SAMPLES.europe.duration
+              : 18 // custom recording — unknown length
+        // Real recordings: dial tone/dialing first, ringing ~30% in, then the
+        // carrier handshake screech to the end. LED phases approximate that.
+        ring = total * 0.28
+        handshake = total * 0.46
+        dialRef.current = playDialup(modemSpeed, { volume, sampleUrl })
+      } else {
+        dialRef.current = playDialup(modemSpeed, { volume })
+        const tm = dialupTimings(modemSpeed)
+        ring = tm.ring
+        handshake = tm.handshake
+        total = tm.duration
+      }
     }
 
     dialTimersRef.current.push(
@@ -544,19 +588,37 @@ export function App() {
     else actions.navigate(url)
   }
 
-  // Widget click: dial up when offline, hang up when connected.
+  // Cancel an in-progress dial (or hang up): stop the sound + timers, back offline.
+  const abortDial = (): void => {
+    clearDialTimers()
+    dialRef.current?.stop()
+    dialRef.current = null
+    connectedRef.current = false
+    setModemPhase('offline')
+  }
+
+  // Widget click / overlay click: dial up when offline; while dialing, cancel;
+  // when connected, hang up. (Armed only — at full speed the modem is always on.)
   const handleModemToggle = (): void => {
     if (!modemArmed) return
-    if (connectedRef.current) {
-      clearDialTimers()
-      dialRef.current?.stop()
-      dialRef.current = null
-      connectedRef.current = false
-      setModemPhase('offline')
-    } else if (modemPhase === 'offline') {
-      startDial(() => actions.navigate(homeUrl))
-    }
+    if (modemPhase === 'offline') startDial(() => actions.navigate(homeUrl))
+    else abortDial()
   }
+
+  // Escape cancels an in-progress dial-up.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if (
+        e.key === 'Escape' &&
+        (modemPhase === 'dialing' || modemPhase === 'ring' || modemPhase === 'handshake')
+      ) {
+        abortDial()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modemPhase])
 
   const showModemOffline =
     modemArmed &&
@@ -571,41 +633,53 @@ export function App() {
     requestChromeTop('modem', showModemOffline)
   }, [showModemOffline])
 
-  // Boot "offline": when armed, cancel the auto-loaded home page and wait for
-  // the user to dial in. Runs once, when the first tab + manifest are ready.
+  // Reconcile the modem on mount and whenever the extension or speed changes:
+  //  • off            → widget dark
+  //  • full speed     → always "connected"/online (LEDs live, no dial-up)
+  //  • a period speed → disconnect and require a fresh dial, so changing speed
+  //                     re-dials on the next page load.
   useEffect(() => {
-    if (bootHandledRef.current) return
-    if (!manifest || !activeTab) return
-    bootHandledRef.current = true
-    if (modemArmed && !connectedRef.current) {
+    clearDialTimers()
+    dialRef.current?.stop()
+    dialRef.current = null
+    const wasStopped = bootStoppedRef.current
+    bootStoppedRef.current = false
+    if (!modemOn) {
+      connectedRef.current = false
+      setModemPhase('off')
+      if (wasStopped && activeTabIdRef.current != null) actions.navigate(homeUrl)
+      return
+    }
+    if (!modemArmed) {
+      // Full speed: no dial-up — the modem is simply always online.
+      connectedRef.current = true
+      setModemPhase(loading ? 'loading' : 'online')
+      if (wasStopped && activeTabIdRef.current != null) actions.navigate(homeUrl)
+      return
+    }
+    // Period speed: (re)connect required — go offline; the next navigation dials.
+    connectedRef.current = false
+    bootStoppedRef.current = true
+    setModemPhase('offline')
+    const id = activeTabIdRef.current
+    if (id != null) window.oldweb.stop(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modemOn, settings.connectionSpeed])
+
+  // The boot page may arrive a moment after mount; stop it while we wait offline.
+  useEffect(() => {
+    if (modemArmed && !connectedRef.current && bootStoppedRef.current && activeTab) {
       window.oldweb.stop(activeTab.id)
-      bootStoppedRef.current = true
-      setModemPhase('offline')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [manifest, activeTab])
+  }, [activeTab?.id])
 
-  // Once connected, mirror page streaming on the LEDs (RX/TX blink while loading).
+  // Once connected (including full-speed "always online"), mirror page streaming
+  // on the LEDs — RX/TX blink while loading, steady when idle.
   useEffect(() => {
     if (!connectedRef.current) return
     setModemPhase(loading ? 'loading' : 'online')
   }, [loading])
-
-  // Turning the extension off (or speed → full) tears the modem down and, if we
-  // were sitting on the stopped/blank boot page, resumes normal browsing.
-  useEffect(() => {
-    if (modemArmed) return
-    clearDialTimers()
-    dialRef.current?.stop()
-    dialRef.current = null
-    connectedRef.current = false
-    setModemPhase('off')
-    if (bootStoppedRef.current && activeTab) {
-      bootStoppedRef.current = false
-      actions.navigate(homeUrl)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modemArmed])
 
   // "Not connected / dialing" screen shown over the page area while offline.
   const modemOverlay = showModemOffline ? (
@@ -1262,36 +1336,62 @@ export function App() {
       }}
     />
   )
-  const barItems: PersonalBarItem[] = [
-    // Theme defaults — folders (with children) render as dropdowns.
-    ...(manifest?.personalBar ?? []).map(
-      (p): PersonalBarItem => ({
-        label: p.label,
-        url: p.url,
-        icon: p.icon,
-        children: p.children?.map((c) => ({ label: c.label, url: c.url, icon: c.icon }))
-      })
-    ),
-    // The user's own bookmarks and folders.
-    ...barBookmarks.map(
-      (b): PersonalBarItem =>
-        b.type === 'folder'
-          ? {
-              label: b.label,
-              id: b.id,
-              user: true,
-              icon: 'folder',
-              children: (b.children ?? []).map((c) => ({
-                label: c.label,
-                url: c.url,
-                favicon: c.favicon,
-                id: c.id,
-                user: true,
-                icon: 'doc'
-              }))
+  // User bookmarks filed inside a given folder id, as dropdown child items.
+  const folderChildren = (folderId: string): PersonalBarItem[] =>
+    barBookmarks
+      .filter((b) => b.parentId === folderId)
+      .map((c) => ({
+        label: c.label,
+        url: c.url,
+        favicon: c.favicon,
+        id: c.id,
+        user: true,
+        icon: 'doc'
+      }))
+  // Theme-default entries get a stable "m:<theme>:<i>" id, are marked `user` so
+  // they show the right-click Edit/Remove menu, and honour the rename/hide
+  // overrides. Folders also accept dropped pages + user-filed children.
+  const manifestItems: PersonalBarItem[] = (manifest?.personalBar ?? [])
+    .map((p, i): PersonalBarItem | null => {
+      const fid = `m:${themeId}:${i}`
+      if (barOverrides.hidden.includes(fid)) return null
+      const label = barOverrides.labels[fid] ?? p.label
+      if (p.children) {
+        const staticKids = p.children
+          .map((c, ci): PersonalBarItem | null => {
+            const cid = `${fid}:${ci}`
+            if (barOverrides.hidden.includes(cid)) return null
+            return {
+              label: barOverrides.labels[cid] ?? c.label,
+              url: barOverrides.urls[cid] ?? c.url,
+              icon: c.icon,
+              id: cid,
+              user: true
             }
-          : { label: b.label, url: b.url, favicon: b.favicon, id: b.id, user: true, icon: 'doc' }
-    )
+          })
+          .filter((x): x is PersonalBarItem => x !== null)
+        return { label, icon: p.icon, id: fid, user: true, children: [...staticKids, ...folderChildren(fid)] }
+      }
+      return { label, url: barOverrides.urls[fid] ?? p.url, icon: p.icon, id: fid, user: true }
+    })
+    .filter((x): x is PersonalBarItem => x !== null)
+  const barItems: PersonalBarItem[] = [
+    ...manifestItems,
+    // The user's own top-level bookmarks and folders.
+    ...barBookmarks
+      .filter((b) => !b.parentId)
+      .map(
+        (b): PersonalBarItem =>
+          b.type === 'folder'
+            ? {
+                label: b.label,
+                id: b.id,
+                user: true,
+                icon: 'folder',
+                children: folderChildren(b.id)
+              }
+            : { label: b.label, url: b.url, favicon: b.favicon, id: b.id, user: true, icon: 'doc' }
+      )
   ]
   // Entries for the Opera HotList tree/list — bookmarks with last-visited dates + history folder.
   const historyMap = new Map(history.map((h) => [h.url, h.last]))
@@ -1307,11 +1407,13 @@ export function App() {
           {
             title: 'Personal Bar',
             folder: true,
-            children: barBookmarks.map((b) => ({
-              title: b.label,
-              url: b.url,
-              last: historyMap.get(b.url ?? '')
-            }))
+            children: barBookmarks
+              .filter((b) => b.url)
+              .map((b) => ({
+                title: b.label,
+                url: b.url,
+                last: historyMap.get(b.url ?? '')
+              }))
           }
         ]
       : []),
@@ -1430,7 +1532,7 @@ export function App() {
           onDropUrl={dropBarBookmark}
           onDropIntoFolder={dropIntoFolder}
           onNewFolder={addBarFolder}
-          onEdit={(id) => setEditBookmark(findBarBookmark(id))}
+          onEdit={(item) => setEditBookmark(item)}
           onRemove={removeBarBookmark}
           onMenuToggle={setBarMenuOpen}
         />
@@ -1468,9 +1570,9 @@ export function App() {
           text={state.statusText}
           loading={loading}
           right={
-            settings.modemExtension ? (
+            modemOn ? (
               <ModemStatus
-                active={modemArmed}
+                active={modemOn}
                 phase={modemPhase}
                 speed={settings.connectionSpeed ?? 'full'}
                 onToggle={handleModemToggle}
@@ -1522,7 +1624,7 @@ export function App() {
             id: editBookmark.id,
             label: editBookmark.label,
             url: editBookmark.url ?? '',
-            folder: editBookmark.type === 'folder'
+            folder: editBookmark.folder
           }}
           onSave={saveBarBookmark}
           onRemove={removeBarBookmark}

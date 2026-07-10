@@ -22,8 +22,14 @@ interface Props {
   onToggle: () => void
 }
 
+const SPEED_LABEL: Record<ModemWidgetSpeed, string> = {
+  '28.8k': '28.8',
+  '56k': '56K',
+  isdn: 'ISDN',
+  full: 'onl'
+}
+
 export function ModemStatus({ active, phase, speed, variant = 'slim', onToggle }: Props) {
-  const showLabel = variant === 'slim'
   const showBadge = variant === 'sportster'
   const leds: Array<'pwr' | 'cd' | 'tx' | 'rx'> =
     variant === 'compact' ? ['cd', 'tx', 'rx'] : ['pwr', 'cd', 'tx', 'rx']
@@ -37,7 +43,7 @@ export function ModemStatus({ active, phase, speed, variant = 'slim', onToggle }
       aria-pressed={active}
       onClick={onToggle}
     >
-      {showLabel && <span className="ow-modem__label">MODEM</span>}
+      {variant === 'slim' && <span className="ow-modem__icon" aria-hidden />}
       <span className="ow-modem__leds">
         {leds.map((k) => (
           <i key={k} className={'ow-modem__led ow-modem__led--' + k}>
@@ -45,6 +51,7 @@ export function ModemStatus({ active, phase, speed, variant = 'slim', onToggle }
           </i>
         ))}
       </span>
+      {variant === 'slim' && <span className="ow-modem__speed">{SPEED_LABEL[speed]}</span>}
       {showBadge && <span className="ow-modem__badge">{speed === 'full' ? '' : '56K'}</span>}
     </button>
   )
