@@ -103,6 +103,7 @@
   },
   "dependencies": {
     "@ghostery/adblocker-electron": "2.9.0",
+    "@ghostery/adblocker-electron-preload": "2.18.1",
     "electron-updater": "^6.8.9"
   },
   "devDependencies": {
