@@ -153,7 +153,9 @@ const THEME_SPLASH: Record<string, { img: string; w: number; h: number }> = {
   netscape: { img: 'splash/netscape.png', w: 500, h: 375 },
   // Netscape Navigator Gold 3 splash — shown at the image's native 211×318 (1:1)
   // so it stays crisp and period-authentic (no upscaling, no distortion).
-  netscape3: { img: 'splash/netscape3.png', w: 211, h: 318 }
+  netscape3: { img: 'splash/netscape3.png', w: 211, h: 318 },
+  // Netscape Communicator Pro 4.04 (Mac) splash — shown at native 390×261 (1:1).
+  netscape4mac: { img: 'splash/netscape4mac.png', w: 390, h: 261 }
 }
 
 function newSplashWindow(w: number, h: number): BrowserWindow {
