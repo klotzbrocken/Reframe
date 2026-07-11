@@ -106,6 +106,11 @@ names a theme styles (`.ow-toolbar`, `.ow-tab`, `.ow-throbber`, `.ow-addressbar`
 `.ow-statusbar`, …) are defined neutrally in
 [`src/renderer/styles/base.css`](src/renderer/styles/base.css).
 
+## Security
+
+Found a vulnerability? Please report it privately — see the
+[security policy](.github/SECURITY.md).
+
 ## License
 
 Reframe's own code is released under the [MIT License](LICENSE).
