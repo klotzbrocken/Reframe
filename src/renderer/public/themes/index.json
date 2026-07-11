@@ -5,6 +5,8 @@
   { "id": "ie5", "name": "Internet Explorer 5", "era": "1999 · Windows 98" },
   { "id": "ie6", "name": "Internet Explorer 6.0", "era": "2001 · Windows XP" },
   { "id": "ie4mac", "name": "Internet Explorer 4.01 (Mac)", "era": "1998 · Mac OS 9" },
+  { "id": "omniweb", "name": "OmniWeb 3.0", "era": "1999 · NeXTSTEP / Rhapsody" },
+  { "id": "netscape4mac", "name": "Netscape Navigator 4.x (Mac)", "era": "2000 · Mac OS 9" },
   { "id": "netscape3", "name": "Netscape Navigator 3.04 Gold", "era": "1997 · Windows 95" },
   { "id": "netscape", "name": "Netscape Communicator 4.7", "era": "1999 · Windows 9x" },
   { "id": "safari", "name": "Safari 1.0", "era": "2003 · Mac OS X" },
