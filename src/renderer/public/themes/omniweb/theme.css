@@ -1,0 +1,381 @@
+/* =====================================================================
+ * OmniWeb 3.0 (NeXTSTEP / Rhapsody, ~1999)
+ *
+ * Chrome recreation from the pixel-precise handoff: platinum icon toolbar
+ * built from the ORIGINAL extracted button PNGs, a "Page address:" bar with a
+ * drag handle + dropdown chevron, and a platinum status bar. Everything is
+ * hard-edged — 1px highlight (top-left) + 1px shadow (bottom-right), no blur.
+ *
+ * The TITLE BAR (and matching platinum menu bar) is intentionally the same as
+ * Internet Explorer 4.01 for Macintosh — the Mac OS 9 Platinum bar — per request.
+ * That block is copied from the ie4mac theme; base.css excludes data-theme
+ * 'omniweb' from the Windows title-bar chrome (like ie4mac / camino).
+ * ===================================================================== */
+
+/* ===================================================================== *
+ * Window frame — the same Mac OS 9 raised platinum border as IE4 for Mac:
+ * a 3px bevel (white top-left, grey bottom-right) with a thin dark inner line,
+ * insetting the page on all four sides.
+ * ===================================================================== */
+.ow-root {
+  background: var(--ie4-light);
+  border: 3px solid;
+  border-color: #fcfcfc #6f6f6f #6f6f6f #fcfcfc;
+  box-shadow: inset 0 0 0 1px rgba(38, 38, 38, 0.4);
+}
+
+/* ===================================================================== *
+ * Title bar — Mac OS 9 Platinum (shared with IE4 for Mac).
+ * ===================================================================== */
+.ow-titlebar {
+  position: relative;
+  height: 20px;
+  padding: 0 5px;
+  background:
+    repeating-linear-gradient(to bottom, rgba(38, 38, 38, 0.16) 0 1px, transparent 1px 3px),
+    var(--ie4-platinum);
+  border-bottom: 1px solid var(--ie4-dark);
+  box-shadow:
+    inset 2px 2px 0 rgba(38, 38, 38, 0.1),
+    inset -2px -2px 0 rgba(38, 38, 38, 0.28);
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 62%;
+  padding: 1px 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ie4-dark);
+  letter-spacing: 0.035em;
+  background: var(--ie4-light);
+  pointer-events: none;
+}
+.ow-titlebar__controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+.ow-winbtn {
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #6e6e6e;
+  position: relative;
+}
+.ow-winbtn:focus,
+.ow-winbtn:focus-visible {
+  outline: none;
+}
+.ow-winbtn:active {
+  opacity: 0.7;
+}
+.ow-winbtn::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(135deg, #9a9a9a, #f1f1f1);
+  box-shadow:
+    0 0 0 1px rgb(38, 38, 38),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 rgb(76, 76, 76);
+}
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  margin-right: auto;
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 1;
+}
+.ow-winbtn[data-control='minimize'] {
+  order: 2;
+}
+.ow-winbtn[data-control='maximize']::after,
+.ow-winbtn[data-control='restore']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 3px;
+  height: 3px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgb(38, 38, 38);
+  z-index: 1;
+}
+.ow-winbtn[data-control='minimize']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 50%;
+  height: 1px;
+  background: rgb(38, 38, 38);
+  z-index: 1;
+}
+
+/* ===================================================================== *
+ * Menu bar — platinum Apple-style strip (shared with IE4 for Mac).
+ * ===================================================================== */
+.ow-menubar {
+  height: 21px;
+  padding: 0 6px;
+  align-items: center;
+  background: linear-gradient(to bottom, #fbfbfb, #ededed 55%, #dcdcdc);
+  border-bottom: 1px solid var(--ie4-dark);
+}
+.ow-menu__label {
+  padding: 2px 9px;
+  font-size: 12px;
+  color: #161616;
+  border-radius: 0;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #ffffff;
+  border: 1px solid var(--ie4-dark);
+  border-radius: 0;
+  padding: 2px;
+  font-size: 12px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #b0b0b0;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #c8c8c8;
+  margin: 3px 4px;
+}
+
+/* ===================================================================== *
+ * Toolbar — the ORIGINAL OmniWeb button PNGs, butted edge-to-edge.
+ * Each PNG is a full raised button (bevel baked in); render at a fixed
+ * 45px height, its own width, gap:0. Never recolor/upscale/crop them.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 0;
+  height: 54px;
+  gap: 0;
+  align-items: center;
+  padding: 4px 7px 5px 6px;
+  background: var(--ow-face);
+  border-bottom: 1px solid var(--ow-line);
+  box-shadow: none;
+}
+.ow-toolbar .ow-btn {
+  flex: 0 0 auto;
+  flex-direction: row;
+  height: 45px;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent center / auto 45px no-repeat;
+}
+.ow-toolbar .ow-btn:hover:not(:disabled),
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  border: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+/* Subtle press feedback only — no era-wrong drop shadow / wide inset. */
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+.ow-toolbar .ow-btn:disabled {
+  opacity: 0.4;
+}
+.ow-toolbar .ow-btn__icon,
+.ow-toolbar .ow-btn__label {
+  display: none;
+}
+/* Fixed CSS widths (from the 2× crops) so the bevel seams line up. */
+.ow-toolbar .ow-btn[data-action='back'] { width: 46px; background-image: url('assets/back.png'); }
+.ow-toolbar .ow-btn[data-action='forward'] { width: 50px; background-image: url('assets/fwd.png'); }
+.ow-toolbar .ow-btn[data-action='home'] { width: 48px; background-image: url('assets/home.png'); }
+.ow-toolbar .ow-btn[data-action='url'] { width: 41px; background-image: url('assets/open.png'); }
+.ow-toolbar .ow-btn[data-action='new'] { width: 48px; background-image: url('assets/new.png'); }
+.ow-toolbar .ow-btn[data-action='find'] { width: 48px; background-image: url('assets/find.png'); }
+.ow-toolbar .ow-btn[data-action='favorites'] { width: 39px; background-image: url('assets/split.png'); }
+.ow-toolbar .ow-btn[data-action='preferences'] { width: 41px; background-image: url('assets/gear.png'); }
+.ow-toolbar .ow-btn[data-action='security'] { width: 45px; background-image: url('assets/info.png'); }
+.ow-toolbar .ow-btn[data-action='print'] { width: 46px; background-image: url('assets/print.png'); }
+.ow-toolbar .ow-btn[data-action='refresh'] { width: 40px; background-image: url('assets/undo.png'); }
+/* Stop lives at the far right and is dim until a page is actually loading
+   (Reframe disables it when idle → the :disabled rule dims it to .4). */
+.ow-toolbar .ow-btn[data-action='stop'] {
+  width: 46px;
+  margin-left: auto;
+  background-image: url('assets/stop.png');
+}
+
+/* ===================================================================== *
+ * Address bar — "Page address:" + drag handle + URL field + chevron.
+ * ===================================================================== */
+.ow-addressbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 6px;
+  background: var(--ow-face);
+  border-bottom: 1px solid var(--ow-line);
+}
+.ow-address-label {
+  font: 700 12px var(--ow-font);
+  color: #111111;
+  white-space: nowrap;
+}
+/* Field wrapper — hard 1px inset, no blur. */
+.ow-address-combo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  background: #ffffff;
+  border: 2px solid var(--ow-field-idle);
+  border-radius: 0;
+  box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+.ow-address-combo:focus-within {
+  border-color: var(--ow-field-focus);
+}
+/* Page-proxy drag handle at the field's left edge (drag.png, pressed state). */
+.ow-address-favicon {
+  display: block;
+  width: 14px;
+  height: 16px;
+  margin: 0 2px 0 3px;
+  background: url('assets/drag.png') center / auto 16px no-repeat;
+  cursor: grab;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent !important;
+  font: 700 12px var(--ow-mono);
+  color: #000000;
+  padding: 0 5px;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+/* Trailing dropdown chevron cell (base hides it; OmniWeb opts in). */
+.ow-address-dropdown {
+  display: block;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 100%;
+  border: 0;
+  border-left: 1px solid #7f7f7f;
+  background: linear-gradient(135deg, #e6e6e6, #bcbcbc);
+  box-shadow: inset 1px 1px 0 #ffffff;
+  position: relative;
+}
+.ow-address-dropdown::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -30%);
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #333333;
+}
+.ow-address-list {
+  border: 1px solid var(--ie4-dark);
+  background: #ffffff;
+  font: 12px var(--ow-mono);
+}
+.ow-address-item:hover {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+/* OmniWeb has no Go button / Netscape location extras. */
+.ow-addressbar .ow-go,
+.ow-addressbar .ow-loc-links,
+.ow-addressbar .ow-loc-related,
+.ow-addressbar .ow-loc-bookmarks,
+.ow-addressbar .ow-loc-proxy {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Status bar — platinum, status square + text.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 20px;
+  gap: 6px;
+  padding: 0 8px;
+  align-items: center;
+  background: var(--ow-face);
+  border-top: 1px solid #ffffff;
+  box-shadow: inset 0 1px 0 var(--ow-line);
+  font: 11px var(--ow-font);
+  color: #1a1a1a;
+}
+.ow-statusbar::before {
+  content: '';
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, #efefef, #c2c2c2);
+  box-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #808080;
+}
+.ow-status-text {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ow-statusbar .ow-progress {
+  height: 8px;
+  border: 1px solid #7f7f7f;
+  background: #ffffff;
+}
+.ow-statusbar .ow-progress__bar {
+  background: repeating-linear-gradient(-45deg, #9a9aff 0 6px, #6f6fdf 6px 12px);
+}
+/* Keep a small right-aligned security zone, restyled platinum. */
+.ow-statusbar .ow-zone {
+  margin-left: auto;
+  font-size: 11px;
+  color: #1a1a1a;
+}
+
+/* ===================================================================== *
+ * Content — white viewport, hard 1px separator from the chrome.
+ * ===================================================================== */
+.ow-content {
+  background: var(--ow-content);
+  border-top: 1px solid #6f6d6e;
+}
