@@ -1,0 +1,456 @@
+/* =====================================================================
+ * Netscape Navigator / Communicator Pro 4.x for Macintosh (~2000)
+ *
+ * Pixel-faithful Mac OS 9 "Platinum" chrome from the design handoff: a 44×44
+ * bitmap icon toolbar (glyph + label baked into each PNG), a "Location :" bar
+ * with a sunken URL field, the black Netscape "N" throbber box, and a platinum
+ * status bar with the security padlock + component cluster.
+ *
+ * As requested, the TITLE BAR + window frame are the same Mac OS 9 Platinum
+ * chrome as Internet Explorer 4.01 for Macintosh (copied from ie4mac); base.css
+ * excludes data-theme 'netscape4mac' from the Windows title bar.
+ * ===================================================================== */
+
+/* ===================================================================== *
+ * Window frame — Mac OS 9 raised platinum border (shared with IE4 for Mac).
+ * ===================================================================== */
+.ow-root {
+  background: var(--ie4-light);
+  border: 3px solid;
+  border-color: #fcfcfc #6f6f6f #6f6f6f #fcfcfc;
+  box-shadow: inset 0 0 0 1px rgba(38, 38, 38, 0.4);
+}
+
+/* ===================================================================== *
+ * Title bar — Mac OS 9 Platinum (shared with IE4 for Mac).
+ * ===================================================================== */
+.ow-titlebar {
+  position: relative;
+  height: 20px;
+  padding: 0 5px;
+  background:
+    repeating-linear-gradient(to bottom, rgba(38, 38, 38, 0.16) 0 1px, transparent 1px 3px),
+    var(--ie4-platinum);
+  border-bottom: 1px solid var(--ie4-dark);
+  box-shadow:
+    inset 2px 2px 0 rgba(38, 38, 38, 0.1),
+    inset -2px -2px 0 rgba(38, 38, 38, 0.28);
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 62%;
+  padding: 1px 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ie4-dark);
+  letter-spacing: 0.035em;
+  background: var(--ie4-light);
+  pointer-events: none;
+}
+.ow-titlebar__controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+.ow-winbtn {
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #6e6e6e;
+  position: relative;
+}
+.ow-winbtn:focus,
+.ow-winbtn:focus-visible {
+  outline: none;
+}
+.ow-winbtn:active {
+  opacity: 0.7;
+}
+.ow-winbtn::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(135deg, #9a9a9a, #f1f1f1);
+  box-shadow:
+    0 0 0 1px rgb(38, 38, 38),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 rgb(76, 76, 76);
+}
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  margin-right: auto;
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 1;
+}
+.ow-winbtn[data-control='minimize'] {
+  order: 2;
+}
+.ow-winbtn[data-control='maximize']::after,
+.ow-winbtn[data-control='restore']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 3px;
+  height: 3px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgb(38, 38, 38);
+  z-index: 1;
+}
+.ow-winbtn[data-control='minimize']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 50%;
+  height: 1px;
+  background: rgb(38, 38, 38);
+  z-index: 1;
+}
+
+/* ===================================================================== *
+ * Menu bar — platinum (Windows/Linux fallback; hidden on Mac via nativeMenus).
+ * ===================================================================== */
+.ow-menubar {
+  height: 21px;
+  padding: 0 6px;
+  align-items: center;
+  background: linear-gradient(to bottom, #fbfbfb, #ededed 55%, #dcdcdc);
+  border-bottom: 1px solid var(--ie4-dark);
+}
+.ow-menu__label {
+  padding: 2px 9px;
+  font-size: 12px;
+  color: #161616;
+  border-radius: 0;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #ffffff;
+  border: 1px solid var(--ie4-dark);
+  border-radius: 0;
+  padding: 2px;
+  font-size: 12px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--ie4-sel);
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #b0b0b0;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #c8c8c8;
+  margin: 3px 4px;
+}
+
+/* ===================================================================== *
+ * Navigation toolbar — 44×44 bitmap buttons (glyph + label baked in),
+ * butted in a row with a 3px gap, on the platinum face. Never recolor/scale.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 0;
+  height: 50px;
+  gap: 3px;
+  align-items: center;
+  padding: 3px 5px 3px 0;
+  background: var(--ns-face);
+  border-bottom: 1px solid var(--ns-groove);
+  box-shadow: inset 0 -2px 0 #ffffff;
+}
+/* Left-edge collapse grips ("Riffel") on the toolbar and the location bar —
+   the classic Communicator "grabber": a small down-triangle at the top over a
+   dotted vertical rail, with a subtle bevelled right edge. */
+.ow-toolbar::before,
+.ow-addressbar::before,
+.ow-personalbar::before {
+  content: '';
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 14px;
+  margin-right: 3px;
+  border-right: 1px solid #9a9a9a;
+  box-shadow: inset 1px 0 0 #ffffff, inset -2px 0 0 #dedede;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0h9L4.5 5z' fill='%23555555'/%3E%3C/svg%3E"),
+    radial-gradient(circle, #707070 0.6px, transparent 0.9px);
+  background-repeat: no-repeat, repeat;
+  background-position: 3px 4px, 3px 12px;
+  background-size: 9px 5px, 3px 3px;
+}
+.ow-addressbar::before,
+.ow-personalbar::before {
+  width: 12px;
+  background-position: 2px 3px, 2px 10px;
+}
+.ow-toolbar .ow-btn {
+  flex: 0 0 auto;
+  flex-direction: row;
+  width: 44px;
+  height: 44px;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent center / 44px 44px no-repeat;
+  image-rendering: pixelated;
+}
+.ow-toolbar .ow-btn:hover:not(:disabled),
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  border: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  filter: brightness(0.9);
+}
+.ow-toolbar .ow-btn:disabled {
+  opacity: 0.45;
+}
+.ow-toolbar .ow-btn__icon,
+.ow-toolbar .ow-btn__label {
+  display: none;
+}
+.ow-toolbar .ow-btn[data-action='back'] { background-image: url('assets/icon-back.png'); }
+.ow-toolbar .ow-btn[data-action='forward'] { background-image: url('assets/icon-forward.png'); }
+.ow-toolbar .ow-btn[data-action='refresh'] { background-image: url('assets/icon-reload.png'); }
+.ow-toolbar .ow-btn[data-action='home'] { background-image: url('assets/icon-home.png'); }
+.ow-toolbar .ow-btn[data-action='search'] { background-image: url('assets/icon-search.png'); }
+.ow-toolbar .ow-btn[data-action='netscape'] { background-image: url('assets/icon-guide.png'); }
+.ow-toolbar .ow-btn[data-action='images'] { background-image: url('assets/icon-images.png'); }
+.ow-toolbar .ow-btn[data-action='print'] { background-image: url('assets/icon-print.png'); }
+.ow-toolbar .ow-btn[data-action='security'] { background-image: url('assets/icon-security.png'); }
+.ow-toolbar .ow-btn[data-action='stop'] { background-image: url('assets/icon-stop.png'); }
+
+/* The Netscape "N" box / throbber at the far right: static N when idle, the
+   animated GIF while loading. Base renders eight dots — hide them. */
+.ow-toolbar .ow-throbber {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  margin: 0 4px 0 2px;
+  border: 0;
+  overflow: hidden;
+  /* Idle = the animation's first frame (same size + no frame as the GIF), so
+     starting the animation neither grows the N nor adds/removes a border. */
+  background: #000000 center / cover no-repeat url('assets/nlogo-static.png');
+  image-rendering: pixelated;
+}
+.ow-toolbar .ow-throbber.is-active {
+  background-image: url('assets/throbber-anim.gif');
+}
+.ow-toolbar .ow-throbber__dot {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Location bar — "Location :" + bookmark icon + sunken URL field.
+ * ===================================================================== */
+.ow-addressbar {
+  height: 22px;
+  gap: 5px;
+  align-items: center;
+  padding: 0 6px 0 0;
+  background: var(--ns-face);
+  border-bottom: 1px solid var(--ns-groove);
+  box-shadow: inset 0 -1px 0 #ffffff;
+}
+.ow-address-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 11px var(--ow-font);
+  color: #111111;
+  white-space: nowrap;
+}
+/* The bookmark icon sits right after the "Location :" label — NOT inside the
+   URL field. */
+.ow-address-label::after {
+  content: '';
+  width: 17px;
+  height: 16px;
+  background: url('assets/loc-bookmark.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.ow-address-favicon {
+  display: none;
+}
+.ow-address-combo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 16px;
+  background: var(--ns-field);
+  border: 1px solid var(--ns-sunken);
+  border-right-color: #ffffff;
+  border-bottom-color: #ffffff;
+  border-radius: 0;
+  box-shadow: inset 1px 1px 0 #b0b0b0;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent !important;
+  font: 11px/14px var(--ow-font);
+  color: #000000;
+  padding: 0 3px;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+/* OmniWeb-style extras / Go button / dropdown are not part of this chrome. */
+.ow-addressbar .ow-go,
+.ow-addressbar .ow-loc-links,
+.ow-addressbar .ow-loc-related,
+.ow-addressbar .ow-loc-bookmarks,
+.ow-addressbar .ow-loc-proxy,
+.ow-address-dropdown {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Personal (bookmark) toolbar — the same quick-links bar as Netscape
+ * Communicator 4.7, with the ridged left grip.
+ * ===================================================================== */
+.ow-personalbar {
+  height: 21px;
+  gap: 2px;
+  padding: 1px 6px 1px 0;
+  background: var(--ns-face);
+  border-bottom: 1px solid var(--ns-divider);
+  box-shadow: inset 0 1px 0 var(--ns-light);
+}
+.ow-pbar-btn {
+  height: 16px;
+  padding: 0 6px 0 3px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #000000;
+  background: var(--ns-face);
+  border: 1px solid transparent;
+}
+.ow-pbar-btn:hover {
+  border-color: var(--ns-light) var(--ns-shadow) var(--ns-shadow) var(--ns-light);
+}
+.ow-pbar-btn:active {
+  border-color: var(--ns-shadow) var(--ns-light) var(--ns-light) var(--ns-shadow);
+}
+.ow-pbar-btn__icon {
+  width: 20px;
+  height: 15px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+.ow-pbar-btn[data-icon='man'] .ow-pbar-btn__icon {
+  background-image: url('assets/pbar_man.png');
+}
+.ow-pbar-btn[data-icon='doc'] .ow-pbar-btn__icon {
+  background-image: url('assets/pbar_doc.png');
+}
+
+/* ===================================================================== *
+ * Status bar — platinum, with the padlock + status text on the left and the
+ * component bar flush in the bottom-right corner. The Reframe modem widget is
+ * kept, sitting just left of the component bar.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 23px;
+  gap: 5px;
+  align-items: center;
+  padding: 0 0 0 5px;
+  background: var(--ns-status);
+  border-top: 1px solid var(--ns-sunken);
+  box-shadow: inset 0 1px 0 #ffffff;
+  font: 11px var(--ow-font);
+  color: #1a1a1a;
+}
+.ow-statusbar::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: url('assets/status-lock.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.ow-status-text {
+  flex: 0 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Progress bar only appears while a page is loading. */
+.ow-statusbar .ow-progress {
+  display: none;
+}
+.ow-statusbar .ow-progress.is-active {
+  display: block;
+  width: 120px;
+  height: 11px;
+  flex: 0 0 auto;
+  border: 1px solid var(--ns-sunken);
+  background: #ffffff;
+  box-shadow: inset 1px 1px 0 #b0b0b0;
+}
+.ow-statusbar .ow-progress__bar {
+  background: repeating-linear-gradient(90deg, #3b5fc0 0 6px, #6f8fe0 6px 12px);
+}
+/* Modem widget kept: pushed to the right, sitting left of the corner cluster. */
+.ow-statusbar .ow-modem {
+  margin-left: auto;
+}
+.ow-statusbar .ow-zone {
+  order: 1;
+  align-self: stretch;
+  width: 150px;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  font-size: 0;
+  color: transparent;
+  background: url('assets/status-right.png') right bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+.ow-statusbar .ow-zone__lock {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Content — white viewport under the chrome, hard 1px separator.
+ * ===================================================================== */
+.ow-content {
+  background: #ffffff;
+  border-top: 1px solid var(--ns-groove);
+}
