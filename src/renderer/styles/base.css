@@ -704,19 +704,19 @@ body,
  * ======================================================================== */
 
 /* ---- Windows 95/98 (IE template) -------------------------------------- */
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-titlebar {
   background: linear-gradient(90deg, #000080 0%, #1084d0 100%) !important;
   height: 22px !important;
   padding: 2px 3px 2px 4px !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar__text {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: none !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn {
   width: 16px !important;
   height: 14px !important;
   min-width: 16px !important;
@@ -727,29 +727,29 @@ body,
   border-color: #fff #808080 #808080 #fff !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn:active {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn:active {
   border-color: #808080 #fff #fff #808080 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='minimize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E") !important;
   background-position: bottom 3px left 4px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='maximize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='restore'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='close'] {
   margin-left: 2px !important;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 3px left 4px !important;
 }
 
 /* ---- Windows XP Luna --------------------------------------------------- */
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-titlebar {
   /* XP Luna Blue — the glossy active caption: bright top edge, deep blue body,
      a lighter sheen band near the bottom. cornerRadius 0 (no rounding). */
   background: linear-gradient(
@@ -771,13 +771,13 @@ body,
     inset 0 -1px 0 #0a246a !important;
   border-top: 1px solid #0c3b94 !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-titlebar__text {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: 1px 1px 2px rgba(0, 0, 40, 0.6) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn {
   width: 22px !important;
   height: 21px !important;
   min-width: 22px !important;
@@ -790,25 +790,25 @@ body,
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn:active {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn:active {
   background-color: #173f9c !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='minimize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='3' y='8' width='6' height='2' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='maximize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='2' y='2' width='8' height='8' fill='none' stroke='%23fff' stroke-width='1.4'/%3E%3Crect x='2' y='2' width='8' height='2.6' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='restore'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='4' y='2' width='6' height='6' fill='none' stroke='%23fff' stroke-width='1.3'/%3E%3Crect x='2' y='4' width='6' height='6' fill='%232a5fce' stroke='%23fff' stroke-width='1.3'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='close'] {
   margin-left: 3px !important;
   border-color: #a52a18 !important;
   background-color: #e0512f !important;
@@ -816,7 +816,7 @@ body,
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath stroke='%23fff' stroke-width='1.9' d='M3 3l6 6M9 3l-6 6'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 45%, rgba(80, 0, 0, 0.3)) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']) .ow-winbtn[data-control='close']:active {
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']) .ow-winbtn[data-control='close']:active {
   background-color: #c23e22 !important;
 }
 
@@ -1726,4 +1726,22 @@ body,
 .ow-modem-offline__spinner {
   font: 700 12px/1 'Courier New', monospace;
   color: #7fe0ff;
+}
+/* Themed dial-in backdrops (override the default dark gradient). */
+.ow-modem-offline--win {
+  background: #008c64;
+  color: #eaffef;
+}
+.ow-modem-offline--mac {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+.ow-modem-offline--mac .ow-modem-offline__hint {
+  color: #666666;
+}
+/* The centered dial-up GIF (retro-internet <img> or the struggle <canvas>). */
+.ow-modem-gif {
+  max-width: 92%;
+  max-height: 84%;
+  object-fit: contain;
 }
