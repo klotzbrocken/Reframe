@@ -20,6 +20,7 @@ import { ModemStatus, type ModemPhase } from './components/ModemStatus'
 import { playDialup, dialupTimings, type DialupHandle, type ModemSpeed } from './shell/modem-sound'
 import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
+import { DialGif } from './components/DialGif'
 import { TitleBar } from './components/TitleBar'
 import { WhatsNewDialog, WHATS_NEW_VERSION } from './components/WhatsNewDialog'
 import { UrlDialog } from './components/UrlDialog'
@@ -44,6 +45,10 @@ const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string 
   { id: '56k', label: '56K Modem' },
   { id: '28.8k', label: '28.8 Modem' }
 ]
+
+// Themes whose lineage is Mac/NeXT (vs. the Windows/PC themes). Drives which
+// dial-up GIF + backdrop the modem overlay shows.
+const MAC_THEMES = new Set(['safari', 'ie4mac', 'camino', 'omniweb'])
 
 export function App() {
   const loadSettings = (): Settings => {
@@ -515,6 +520,12 @@ export function App() {
   const modemArmed = modemOn && (settings.connectionSpeed ?? 'full') !== 'full'
   const modemSpeed = (settings.connectionSpeed ?? 'full') as ModemSpeed | 'full'
   const [modemPhase, setModemPhase] = useState<ModemPhase>('off')
+  // Mac-lineage themes get the "Dial Up: The Struggle" GIF on white; every other
+  // (Windows/PC) theme gets the retro-internet GIF on a #008C64 field.
+  const isMacTheme = MAC_THEMES.has(themeId)
+  // Holds the dial-up overlay open for a beat after connect so the Mac GIF's
+  // final frame plays exactly as the line comes up (see DialGif + startDial).
+  const [modemEndFrame, setModemEndFrame] = useState(false)
   const connectedRef = useRef(false)
   const dialRef = useRef<DialupHandle | null>(null)
   const dialTimersRef = useRef<number[]>([])
@@ -595,6 +606,12 @@ export function App() {
       window.setTimeout(() => {
         connectedRef.current = true
         setModemPhase('online')
+        // Mac themes: keep the overlay up a moment longer so the "struggle" GIF
+        // resolves to its final frame right as the connection comes up.
+        if (isMacTheme) {
+          setModemEndFrame(true)
+          dialTimersRef.current.push(window.setTimeout(() => setModemEndFrame(false), 1600))
+        }
         then()
       }, total * 1000)
     )
@@ -638,13 +655,11 @@ export function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modemPhase])
 
+  const modemDialing =
+    modemPhase === 'dialing' || modemPhase === 'ring' || modemPhase === 'handshake'
   const showModemOffline =
-    modemArmed &&
-    !connectedRef.current &&
-    (modemPhase === 'offline' ||
-      modemPhase === 'dialing' ||
-      modemPhase === 'ring' ||
-      modemPhase === 'handshake')
+    (modemArmed && !connectedRef.current && (modemPhase === 'offline' || modemDialing)) ||
+    modemEndFrame
 
   // Raise the chrome over the page view while the offline/dialing screen shows.
   useEffect(() => {
@@ -700,23 +715,33 @@ export function App() {
   }, [loading])
 
   // "Not connected / dialing" screen shown over the page area while offline.
+  // During the actual dial-in a period GIF plays, centered on a themed backdrop
+  // (Mac themes: the "struggle" GIF on white, final frame held for connect;
+  // Windows themes: the retro-internet GIF on #008C64).
   const modemOverlay = showModemOffline ? (
-    <div className="ow-modem-offline" role="button" tabIndex={0} onClick={handleModemToggle}>
-      <div className="ow-modem-offline__title">
-        {modemPhase === 'offline' ? 'Not connected' : 'Connecting…'}
-      </div>
-      <div className="ow-modem-offline__hint">
-        {modemPhase === 'offline'
-          ? 'Click to dial up'
-          : modemPhase === 'dialing'
-            ? 'Dialing…'
-            : modemPhase === 'ring'
-              ? 'Ringing…'
-              : 'Handshaking…'}
-      </div>
-      <div className="ow-modem-offline__spinner">
-        ▚▚▚ {(settings.connectionSpeed ?? '').toUpperCase()}
-      </div>
+    <div
+      className={'ow-modem-offline ' + (isMacTheme ? 'ow-modem-offline--mac' : 'ow-modem-offline--win')}
+      role="button"
+      tabIndex={0}
+      onClick={handleModemToggle}
+    >
+      {modemDialing || modemEndFrame ? (
+        isMacTheme ? (
+          <DialGif
+            src="/modem/dial-up-struggle.gif"
+            connected={modemEndFrame}
+            width={400}
+            height={242}
+          />
+        ) : (
+          <img className="ow-modem-gif" src="/modem/retro-internet.gif" alt="" />
+        )
+      ) : (
+        <>
+          <div className="ow-modem-offline__title">Not connected</div>
+          <div className="ow-modem-offline__hint">Click to dial up</div>
+        </>
+      )}
     </div>
   ) : null
 
