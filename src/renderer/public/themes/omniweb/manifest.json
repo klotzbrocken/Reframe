@@ -1,0 +1,63 @@
+{
+  "id": "omniweb",
+  "name": "OmniWeb 3.0",
+  "era": "1999 · NeXTSTEP / Rhapsody",
+  "toolbar": [
+    "back",
+    "forward",
+    "home",
+    "url",
+    "new",
+    "find",
+    "favorites",
+    "preferences",
+    "security",
+    "print",
+    "refresh",
+    "stop"
+  ],
+  "menus": ["File", "Edit", "View", "Go", "Help"],
+  "homeUrl": "https://www.omnigroup.com",
+  "oldWebDate": "19990101",
+  "layout": {
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": false,
+    "nativeMenus": true
+  },
+  "labels": {
+    "address": "Page address:",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Reload",
+    "home": "Home",
+    "new": "New Window",
+    "find": "Find",
+    "favorites": "Links",
+    "url": "Open Location",
+    "print": "Print",
+    "security": "Page Info",
+    "preferences": "Preferences"
+  },
+  "vars": {
+    "--ie4-platinum": "#cccccc",
+    "--ie4-light": "#dddddd",
+    "--ie4-dark": "#262626",
+    "--ie4-med": "#808080",
+    "--ie4-sel": "#333399",
+    "--ow-highlight": "#333399",
+    "--ow-titlebar": "#cccccc",
+    "--ow-text": "#0f0f0f",
+    "--ow-field": "#ffffff",
+    "--ow-face": "#c3c1c2",
+    "--ow-line": "#8f8d8e",
+    "--ow-content": "#ffffff",
+    "--ow-link": "#0000cc",
+    "--ow-field-idle": "#7f7f7f",
+    "--ow-field-focus": "#3b6ea5",
+    "--ow-font": "'Lucida Grande', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+    "--ow-mono": "'Lucida Console', 'Courier New', monospace"
+  }
+}
