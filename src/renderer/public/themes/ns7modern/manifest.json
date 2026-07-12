@@ -1,0 +1,50 @@
+{
+  "id": "ns7modern",
+  "name": "Netscape 7.02 (Mac)",
+  "era": "2003 · Mac OS X · Aqua",
+  "toolbar": ["back", "forward", "refresh", "stop", "print"],
+  "menus": ["File", "Edit", "View", "Go", "Bookmarks", "Tools", "Help"],
+  "personalBar": [
+    { "label": "Home", "url": "https://www.mozilla.org" },
+    { "label": "My Netscape", "url": "https://www.netscape.com" },
+    { "label": "Net2Phone", "url": "https://www.net2phone.com" },
+    { "label": "Search Netscape", "url": "https://search.netscape.com" },
+    { "label": "Shop@Netscape", "url": "https://www.netscape.com" }
+  ],
+  "homeUrl": "https://www.mozilla.org",
+  "oldWebDate": "20030201",
+  "layout": {
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": true,
+    "tabsPosition": "top",
+    "unifiedToolbar": true,
+    "nativeMenus": true
+  },
+  "throbber": { "kind": "image", "label": "Netscape" },
+  "labels": {
+    "address": "Location:",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Reload",
+    "home": "Home",
+    "print": "Print",
+    "search": "Search"
+  },
+  "vars": {
+    "--ie4-platinum": "#e2e6ea",
+    "--ie4-light": "#eef1f4",
+    "--ie4-dark": "#5a6673",
+    "--ns7-toolbar": "#c7d0d9",
+    "--ns7-toolbar-hi": "#dfe6ed",
+    "--ns7-urlbar": "#edf5f7",
+    "--ns7-content-border": "#494f5d",
+    "--ns7-status-text": "#22262f",
+    "--ns7-menu-hl": "#424f63",
+    "--ns7-edge": "#939eaa",
+    "--ns7-edge-hi": "#ebf4ff",
+    "--ns7-font": "'Charcoal', 'Geneva', 'Helvetica Neue', Verdana, sans-serif"
+  }
+}

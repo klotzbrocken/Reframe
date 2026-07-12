@@ -1,0 +1,468 @@
+/* =====================================================================
+ * Internet Explorer 4.5, Macintosh Edition (Microsoft, 1999)
+ *
+ * Mac OS 8.5 "Platinum" chrome built from the resource-fork-extracted assets:
+ * a flat button bar of 16×16 colour icons with 9px labels (bevel on hover), the
+ * spinning "e" throbber, an "Address:" bar with a sunken field, and a platinum
+ * status bar with the security padlock.
+ *
+ * The TITLE BAR + window frame are the same Mac OS 9 Platinum chrome as the
+ * other Mac themes (Internet Explorer 4.01) — copied from ie4mac; base.css
+ * excludes data-theme 'ie45mac' from the Windows title bar.
+ * ===================================================================== */
+
+/* ===================================================================== *
+ * Window frame — Mac OS 9 raised platinum border (shared with IE4 for Mac).
+ * ===================================================================== */
+.ow-root {
+  background: var(--ie4-light);
+  border: 3px solid;
+  border-color: #fcfcfc #6f6f6f #6f6f6f #fcfcfc;
+  box-shadow: inset 0 0 0 1px rgba(38, 38, 38, 0.4);
+}
+
+/* ===================================================================== *
+ * Title bar — Mac OS 9 Platinum (shared with IE4 for Mac).
+ * ===================================================================== */
+.ow-titlebar {
+  position: relative;
+  height: 20px;
+  padding: 0 5px;
+  background:
+    repeating-linear-gradient(to bottom, rgba(38, 38, 38, 0.16) 0 1px, transparent 1px 3px),
+    var(--ie4-platinum);
+  border-bottom: 1px solid var(--ie4-dark);
+  box-shadow:
+    inset 2px 2px 0 rgba(38, 38, 38, 0.1),
+    inset -2px -2px 0 rgba(38, 38, 38, 0.28);
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 62%;
+  padding: 1px 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ie4-dark);
+  letter-spacing: 0.035em;
+  background: var(--ie4-light);
+  pointer-events: none;
+}
+.ow-titlebar__controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+.ow-winbtn {
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #6e6e6e;
+  position: relative;
+}
+.ow-winbtn:focus,
+.ow-winbtn:focus-visible {
+  outline: none;
+}
+.ow-winbtn:active {
+  opacity: 0.7;
+}
+.ow-winbtn::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(135deg, #9a9a9a, #f1f1f1);
+  box-shadow:
+    0 0 0 1px rgb(38, 38, 38),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 rgb(76, 76, 76);
+}
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  margin-right: auto;
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 1;
+}
+.ow-winbtn[data-control='minimize'] {
+  order: 2;
+}
+.ow-winbtn[data-control='maximize']::after,
+.ow-winbtn[data-control='restore']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 3px;
+  height: 3px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgb(38, 38, 38);
+  z-index: 1;
+}
+.ow-winbtn[data-control='minimize']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 50%;
+  height: 1px;
+  background: rgb(38, 38, 38);
+  z-index: 1;
+}
+
+/* ===================================================================== *
+ * Menu bar — platinum; menu titles INVERT on hover (Mac, not a blue fill).
+ * ===================================================================== */
+.ow-menubar {
+  height: 20px;
+  padding: 0 6px;
+  align-items: center;
+  background: linear-gradient(to bottom, #fbfbfb, #ededed 55%, #dcdcdc);
+  border-bottom: 1px solid var(--ie4-dark);
+}
+.ow-menu__label {
+  padding: 1px 9px;
+  font: 12px var(--ie45-font);
+  color: #161616;
+  border-radius: 0;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: #000000;
+  color: #ffffff;
+}
+.ow-menu__dropdown {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 0;
+  padding: 2px;
+  font: 12px var(--ie45-font);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #000000;
+  color: #ffffff;
+}
+.ow-menu__item.is-disabled {
+  color: var(--gray-5);
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #c8c8c8;
+  margin: 3px 4px;
+}
+
+/* ===================================================================== *
+ * Button Bar (toolbar) — flat 16×16 colour icon + 9px label; the raised
+ * bevel appears only on hover, pressed bevel on click.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 0;
+  height: 52px;
+  gap: 0;
+  align-items: center;
+  padding: 2px 6px;
+  background: var(--gray-2);
+  border-bottom: 1px solid var(--gray-6);
+  box-shadow: inset 0 -1px 0 #ffffff;
+}
+/* Icon on top, 9px label beneath (the classic IE-for-Mac button). */
+.ow-toolbar .ow-btn {
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  min-width: 0;
+  gap: 1px;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #000000;
+}
+.ow-toolbar .ow-btn:hover:not(:disabled) {
+  border: 1px solid var(--gray-6);
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 var(--gray-5);
+}
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  box-shadow: inset 1px 1px 0 var(--gray-5), inset -1px -1px 0 #ffffff;
+  background: var(--gray-3);
+}
+.ow-toolbar .ow-btn:disabled {
+  opacity: 1;
+}
+.ow-toolbar .ow-btn:disabled .ow-btn__icon {
+  opacity: 0.4;
+}
+.ow-toolbar .ow-btn:disabled .ow-btn__label {
+  color: var(--gray-5);
+}
+.ow-toolbar .ow-btn__icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 22px 22px;
+  image-rendering: pixelated;
+}
+.ow-toolbar .ow-btn__label {
+  font: 9px var(--ie45-label);
+  line-height: 1;
+  color: #000000;
+  white-space: nowrap;
+}
+.ow-toolbar .ow-btn[data-action='back'] .ow-btn__icon { background-image: url('assets/toolbar2x/back.png'); }
+.ow-toolbar .ow-btn[data-action='forward'] .ow-btn__icon { background-image: url('assets/toolbar2x/forward.png'); }
+.ow-toolbar .ow-btn[data-action='stop'] .ow-btn__icon { background-image: url('assets/toolbar2x/stop.png'); }
+.ow-toolbar .ow-btn[data-action='refresh'] .ow-btn__icon { background-image: url('assets/toolbar2x/refresh.png'); }
+.ow-toolbar .ow-btn[data-action='home'] .ow-btn__icon { background-image: url('assets/toolbar2x/home.png'); }
+.ow-toolbar .ow-btn[data-action='favorites'] .ow-btn__icon { background-image: url('assets/toolbar2x/favorites.png'); }
+.ow-toolbar .ow-btn[data-action='history'] .ow-btn__icon { background-image: url('assets/toolbar2x/history.png'); }
+.ow-toolbar .ow-btn[data-action='search'] .ow-btn__icon { background-image: url('assets/toolbar2x/search.png'); }
+.ow-toolbar .ow-btn[data-action='find'] .ow-btn__icon { background-image: url('assets/toolbar2x/autofill.png'); }
+.ow-toolbar .ow-btn[data-action='fontup'] .ow-btn__icon { background-image: url('assets/toolbar2x/larger.png'); }
+.ow-toolbar .ow-btn[data-action='fontdown'] .ow-btn__icon { background-image: url('assets/toolbar2x/smaller.png'); }
+.ow-toolbar .ow-btn[data-action='print'] .ow-btn__icon { background-image: url('assets/toolbar2x/print.png'); }
+.ow-toolbar .ow-btn[data-action='mail'] .ow-btn__icon { background-image: url('assets/toolbar2x/mail.png'); }
+.ow-toolbar .ow-btn[data-action='preferences'] .ow-btn__icon { background-image: url('assets/toolbar2x/preferences.png'); }
+
+/* The spinning "e" throbber at the far right: static first frame idle, the
+   animated GIF while loading. Base renders eight dots — hide them. */
+.ow-toolbar .ow-throbber {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  margin-left: 6px;
+  background: var(--gray-2) url('assets/e-idle.png') center / 44px 44px no-repeat;
+  image-rendering: pixelated;
+}
+.ow-toolbar .ow-throbber.is-active {
+  background-image: url('assets/e-anim.gif');
+}
+.ow-toolbar .ow-throbber__dot {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Favorites bar — small text links, each with a little blue globe.
+ * ===================================================================== */
+.ow-personalbar {
+  height: 22px;
+  gap: 1px;
+  align-items: center;
+  padding: 1px 8px;
+  background: var(--gray-2);
+  border-bottom: 1px solid var(--gray-6);
+  box-shadow: inset 0 -1px 0 #ffffff;
+}
+.ow-pbar-btn {
+  height: 18px;
+  gap: 3px;
+  padding: 0 6px 0 3px;
+  font: 10px var(--ie45-font);
+  color: #000000;
+  background: transparent;
+  border: 1px solid transparent;
+}
+.ow-pbar-btn:hover {
+  border: 1px solid var(--gray-6);
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 var(--gray-5);
+}
+.ow-pbar-btn:active {
+  box-shadow: inset 1px 1px 0 var(--gray-5), inset -1px -1px 0 #ffffff;
+  background: var(--gray-3);
+}
+.ow-pbar-btn__icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  background: url('assets/globe.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+/* ===================================================================== *
+ * Address bar — "Address:" + sunken URL field + dropdown + Go.
+ * ===================================================================== */
+.ow-addressbar {
+  height: 24px;
+  gap: 5px;
+  align-items: center;
+  padding: 0 6px;
+  background: var(--gray-2);
+  border-bottom: 1px solid var(--gray-6);
+}
+.ow-address-label {
+  font: 10px var(--ie45-font);
+  color: #000000;
+  white-space: nowrap;
+}
+.ow-address-combo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 18px;
+  background: #ffffff;
+  border: 1px solid var(--gray-6);
+  border-radius: 0;
+  box-shadow: inset 1px 1px 0 var(--gray-5);
+}
+/* favicon slot at the field's left */
+.ow-address-favicon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 0 2px 0 2px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  image-rendering: pixelated;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent !important;
+  font: 12px var(--ie45-mono);
+  color: #000000;
+  padding: 0 4px;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+/* IE 4.5 puts the history dropdown at the LEFT of the field. */
+.ow-address-dropdown {
+  display: block;
+  order: -1;
+  flex: 0 0 auto;
+  width: 15px;
+  height: 100%;
+  border: 0;
+  border-right: 1px solid var(--gray-6);
+  background: var(--gray-2);
+  position: relative;
+}
+.ow-address-dropdown::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -30%);
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #333333;
+}
+.ow-go {
+  flex: 0 0 auto;
+  height: 18px;
+  padding: 0 8px;
+  font: 10px var(--ie45-font);
+  color: #000000;
+  background: var(--gray-2);
+  border: 1px solid var(--gray-6);
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 var(--gray-5);
+}
+.ow-go:active {
+  box-shadow: inset 1px 1px 0 var(--gray-5), inset -1px -1px 0 #ffffff;
+  background: var(--gray-3);
+}
+.ow-go__icon {
+  display: none;
+}
+.ow-addressbar .ow-loc-links,
+.ow-addressbar .ow-loc-related,
+.ow-addressbar .ow-loc-bookmarks,
+.ow-addressbar .ow-loc-proxy {
+  display: none;
+}
+.ow-address-list {
+  border: 1px solid #000000;
+  background: #ffffff;
+  font: 12px var(--ie45-mono);
+}
+.ow-address-item:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* ===================================================================== *
+ * Status bar — status text · progress · security zone (padlock).
+ * ===================================================================== */
+.ow-statusbar {
+  height: 20px;
+  gap: 6px;
+  align-items: center;
+  padding: 0 6px;
+  background: var(--gray-2);
+  border-top: 1px solid #ffffff;
+  box-shadow: inset 0 1px 0 var(--gray-5);
+  font: 10px var(--ie45-font);
+  color: #000000;
+}
+.ow-status-text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ow-statusbar .ow-progress {
+  display: none;
+}
+.ow-statusbar .ow-progress.is-active {
+  display: block;
+  width: 130px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 1px solid var(--gray-6);
+  background: #ffffff;
+  box-shadow: inset 1px 1px 0 var(--gray-5);
+  overflow: hidden;
+}
+.ow-statusbar .ow-progress__bar {
+  height: 100%;
+  background: var(--ie45-accent);
+}
+.ow-statusbar .ow-zone {
+  flex: 0 0 auto;
+  gap: 4px;
+  align-items: center;
+  font: 10px var(--ie45-font);
+  color: #000000;
+}
+.ow-statusbar .ow-zone__lock {
+  width: 14px;
+  height: 14px;
+  background: url('assets/lock.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+/* ===================================================================== *
+ * Content — white viewport under the chrome.
+ * ===================================================================== */
+.ow-content {
+  background: #ffffff;
+  border-top: 1px solid var(--gray-6);
+}

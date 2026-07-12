@@ -110,6 +110,9 @@ export interface OldwebAPI {
   setNetworkSpeed(profile: string): Promise<void>
   /** Toggle uBlock-Origin-style ad/tracker blocking (opt-in, default off). */
   setAdblock(enabled: boolean): Promise<void>
+  /** Retro display effect for page content: reduce colour depth
+   *  (off | 16bit | 8bit | 1bit) with optional ordered dithering. */
+  setPageDisplay(depth: string, dither: boolean): Promise<void>
   /** Archive Timeline: capture COUNT for each of the 12 months of `year` for `url`
    *  (index 0 = Jan). Fetched per year from the Wayback calendar API. */
   waybackMonths(url: string, year: number): Promise<number[]>

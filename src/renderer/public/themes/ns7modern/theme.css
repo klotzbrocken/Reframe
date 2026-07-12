@@ -1,0 +1,576 @@
+/* =====================================================================
+ * Netscape 7.02 for Macintosh — "Modern" skin (Netscape/AOL, 2003)
+ *
+ * Mozilla-based chrome: a blue-grey brushed-metal toolbar (#C7D0D9) with
+ * large round metallic buttons (41×38, four states each — normal/hover/
+ * active/disabled), the multi-colour-bevel Location bar, the Netscape
+ * throbber, and a platinum status bar. Assets are the original skin's own
+ * PNGs, cut data-driven from the shipped `-moz-image-region` rules.
+ *
+ * The TITLE BAR + window frame are the shared Mac OS 9 Platinum chrome used
+ * by the other Mac themes; base.css excludes data-theme 'ns7modern' from the
+ * Windows title bar.
+ * ===================================================================== */
+
+/* ===================================================================== *
+ * Window frame — Mac OS X Aqua (Netscape 7 ran on 10.2/10.3, standard Aqua).
+ * ===================================================================== */
+.ow-root {
+  background: var(--ie4-light);
+  border: 1px solid #6f6f6f;
+}
+
+/* ===================================================================== *
+ * Title bar — Aqua pinstripe with left-side traffic-light controls.
+ * ===================================================================== */
+.ow-titlebar {
+  position: relative;
+  height: 22px;
+  padding: 0 10px;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 0 1px, transparent 1px 2px),
+    linear-gradient(to bottom, #fbfbfb 0%, #e2e2e2 48%, #cfcfcf 100%);
+  border-bottom: 1px solid #8f8f8f;
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2b2b2b;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+  pointer-events: none;
+}
+/* Traffic lights sit at the LEFT of the title bar. */
+.ow-titlebar__controls {
+  order: -1;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+.ow-winbtn {
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  padding: 0;
+  border: 0.5px solid rgba(0, 0, 0, 0.32);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  position: relative;
+}
+.ow-winbtn:focus,
+.ow-winbtn:focus-visible {
+  outline: none;
+}
+.ow-winbtn:active {
+  filter: brightness(0.9);
+}
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  margin: 0;
+  background: radial-gradient(circle at 50% 35%, #ff857e, #ed4b43);
+}
+.ow-winbtn[data-control='minimize'] {
+  order: 1;
+  background: radial-gradient(circle at 50% 35%, #ffd066, #f5b21e);
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 2;
+  background: radial-gradient(circle at 50% 35%, #6ee07e, #1fb538);
+}
+
+/* ===================================================================== *
+ * Menu bar — platinum; active entry gets Netscape's blue-slate fill.
+ * ===================================================================== */
+.ow-menubar {
+  height: 20px;
+  padding: 0 6px;
+  align-items: center;
+  background: linear-gradient(to bottom, #fbfbfb, #eef1f4 55%, #dbe1e8);
+  border-bottom: 1px solid var(--ie4-dark);
+}
+.ow-menu__label {
+  padding: 1px 9px;
+  font: 12px var(--ns7-font);
+  color: #161c26;
+  border-radius: 0;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--ns7-menu-hl);
+  color: #ffffff;
+}
+.ow-menu__dropdown {
+  background: #ffffff;
+  border: 1px solid #5a6673;
+  border-radius: 0;
+  padding: 2px;
+  font: 12px var(--ns7-font);
+  box-shadow: 2px 2px 0 rgba(34, 38, 47, 0.3);
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--ns7-menu-hl);
+  color: #ffffff;
+}
+.ow-menu__item.is-disabled {
+  color: #8c99ab;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #c7d0d9;
+  margin: 3px 4px;
+}
+
+/* ===================================================================== *
+ * Navigation toolbar — brushed blue-grey metal with round 4-state buttons.
+ * ===================================================================== */
+/* Height + gradient are matched EXACTLY to the button PNGs' own baked-in
+   background (they ship with the original toolbar gradient painted behind the
+   round button), so each button's opaque square blends into the bar instead of
+   reading as a shadowed patch. Buttons are 38px tall and start at the top edge. */
+.ow-toolbar {
+  min-height: 0;
+  height: 38px;
+  gap: 1px;
+  align-items: center;
+  padding: 0 8px;
+  background: linear-gradient(to bottom, #ebf4ff 0, #dde3eb 1px, #b1bdc9 38px);
+  border-bottom: 1px solid var(--ns7-edge);
+}
+/* The whole button IS the metallic image (icon + bevel) — no caption. */
+.ow-toolbar .ow-btn {
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.ow-toolbar .ow-btn:hover:not(:disabled),
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
+.ow-toolbar .ow-btn:disabled {
+  opacity: 1;
+}
+.ow-toolbar .ow-btn__label {
+  display: none;
+}
+.ow-toolbar .ow-btn__icon {
+  width: 41px;
+  height: 38px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 41px 38px;
+}
+
+/* Back / Forward / Reload / Stop — round metal buttons, 41×38, four states. */
+.ow-toolbar .ow-btn[data-action='back'] .ow-btn__icon { background-image: url('toolbar/back_normal.png'); }
+.ow-toolbar .ow-btn[data-action='back']:hover:not(:disabled) .ow-btn__icon { background-image: url('toolbar/back_hover.png'); }
+.ow-toolbar .ow-btn[data-action='back']:active:not(:disabled) .ow-btn__icon { background-image: url('toolbar/back_active.png'); }
+.ow-toolbar .ow-btn[data-action='back']:disabled .ow-btn__icon { background-image: url('toolbar/back_disabled.png'); }
+
+.ow-toolbar .ow-btn[data-action='forward'] .ow-btn__icon { background-image: url('toolbar/forward_normal.png'); }
+.ow-toolbar .ow-btn[data-action='forward']:hover:not(:disabled) .ow-btn__icon { background-image: url('toolbar/forward_hover.png'); }
+.ow-toolbar .ow-btn[data-action='forward']:active:not(:disabled) .ow-btn__icon { background-image: url('toolbar/forward_active.png'); }
+.ow-toolbar .ow-btn[data-action='forward']:disabled .ow-btn__icon { background-image: url('toolbar/forward_disabled.png'); }
+
+.ow-toolbar .ow-btn[data-action='refresh'] .ow-btn__icon { background-image: url('toolbar/reload_normal.png'); }
+.ow-toolbar .ow-btn[data-action='refresh']:hover:not(:disabled) .ow-btn__icon { background-image: url('toolbar/reload_hover.png'); }
+.ow-toolbar .ow-btn[data-action='refresh']:active:not(:disabled) .ow-btn__icon { background-image: url('toolbar/reload_active.png'); }
+.ow-toolbar .ow-btn[data-action='refresh']:disabled .ow-btn__icon { background-image: url('toolbar/reload_disabled.png'); }
+
+.ow-toolbar .ow-btn[data-action='stop'] .ow-btn__icon { background-image: url('toolbar/stop_normal.png'); }
+.ow-toolbar .ow-btn[data-action='stop']:hover:not(:disabled) .ow-btn__icon { background-image: url('toolbar/stop_hover.png'); }
+.ow-toolbar .ow-btn[data-action='stop']:active:not(:disabled) .ow-btn__icon { background-image: url('toolbar/stop_active.png'); }
+.ow-toolbar .ow-btn[data-action='stop']:disabled .ow-btn__icon { background-image: url('toolbar/stop_disabled.png'); }
+
+/* Print — 49×33 printer icon, four states. */
+.ow-toolbar .ow-btn[data-action='print'] .ow-btn__icon {
+  width: 49px;
+  height: 33px;
+  background-size: 49px 33px;
+  background-image: url('toolbar/print_normal.png');
+}
+.ow-toolbar .ow-btn[data-action='print']:hover:not(:disabled) .ow-btn__icon { background-image: url('toolbar/print_hover.png'); }
+.ow-toolbar .ow-btn[data-action='print']:active:not(:disabled) .ow-btn__icon { background-image: url('toolbar/print_active.png'); }
+.ow-toolbar .ow-btn[data-action='print']:disabled .ow-btn__icon { background-image: url('toolbar/print_disabled.png'); }
+
+/* Netscape throbber at the far right: 38×38 still frame idle, animated GIF
+   while loading. Base renders eight dots — hide them. */
+.ow-toolbar .ow-throbber {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  margin-left: 18px;
+  margin-right: 4px;
+  background: transparent url('toolbar/throbber-single.png') center / 38px 38px no-repeat;
+}
+.ow-toolbar .ow-throbber.is-active {
+  background-image: url('toolbar/throbber-anim.gif');
+}
+.ow-toolbar .ow-throbber__dot {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Location bar — multi-colour-bevel field on the metal band.
+ * ===================================================================== */
+/* Unified toolbar: the Location bar flows inline in the button row (Netscape 7
+   had one nav toolbar), so it takes the free space with no band of its own. */
+.ow-addressbar {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: auto;
+  gap: 5px;
+  align-items: center;
+  padding: 0;
+  margin-left: 4px;
+  background: transparent;
+  border: 0;
+}
+.ow-address-label {
+  display: none;
+}
+.ow-address-combo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  border-radius: 2px;
+  /* 3px multi-colour bevel with the black mid-layer from the original CSS. */
+  background: url('toolbar/urlbar-mid.gif') var(--ns7-urlbar) bottom repeat-x;
+  box-shadow:
+    0 0 0 1px #000000,
+    0 0 0 2px #a7bacaaa,
+    inset 1px 1px 0 #ffffff;
+  border: 1px solid #768c9f;
+}
+.ow-address-favicon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 0 2px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent !important;
+  font: 12px var(--ns7-font);
+  color: #101820;
+  padding: 0 4px;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+.ow-address-dropdown {
+  display: block;
+  flex: 0 0 auto;
+  width: 15px;
+  height: 100%;
+  border: 0;
+  border-left: 1px solid #a2afbd;
+  background: transparent;
+  position: relative;
+}
+.ow-address-dropdown::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -30%);
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #424f63;
+}
+/* Icon-only Go button: the green arrow, no caption (font-size:0 collapses the
+   text node; the arrow is a CSS triangle, so it's unaffected). */
+.ow-go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  padding: 0 7px;
+  font-size: 0;
+  background: linear-gradient(to bottom, #f4f7fa, #cdd6df);
+  border: 1px solid #768c9f;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 #ffffff;
+}
+.ow-go:active {
+  background: linear-gradient(to bottom, #c2ccd6, #dee5ec);
+}
+/* Netscape's green "Go" arrow, drawn in CSS so no extra asset is needed. */
+.ow-go__icon {
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid #2f9e3f;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.6));
+}
+.ow-addressbar .ow-loc-links,
+.ow-addressbar .ow-loc-related,
+.ow-addressbar .ow-loc-bookmarks,
+.ow-addressbar .ow-loc-proxy {
+  display: none;
+}
+.ow-address-list {
+  border: 1px solid #5a6673;
+  background: #dde3eb;
+  font: 12px var(--ns7-font);
+}
+.ow-address-item:hover {
+  background: #9499ac;
+  color: #ffffff;
+}
+
+/* ===================================================================== *
+ * Personal toolbar — Netscape bookmark quick-links.
+ * ===================================================================== */
+.ow-personalbar {
+  height: 22px;
+  gap: 2px;
+  align-items: center;
+  padding: 1px 8px;
+  background: linear-gradient(to bottom, var(--ns7-toolbar-hi), var(--ns7-toolbar));
+  border-bottom: 1px solid var(--ns7-edge);
+}
+.ow-pbar-btn {
+  height: 18px;
+  gap: 4px;
+  padding: 0 7px;
+  font: 12px var(--ns7-font);
+  color: #16202b;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.ow-pbar-btn:hover {
+  border-color: #ffffff #939eaa #939eaa #ffffff;
+  background: rgba(255, 255, 255, 0.35);
+}
+.ow-pbar-btn:active {
+  border-color: #939eaa #ffffff #ffffff #939eaa;
+}
+.ow-pbar-btn__icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  background: #7c8aa0;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px #ffffff88;
+}
+
+/* ===================================================================== *
+ * Content + status bar.
+ * ===================================================================== */
+.ow-content {
+  background: #ffffff;
+  border-top: 1px solid var(--ns7-content-border);
+}
+.ow-statusbar {
+  height: 20px;
+  gap: 6px;
+  align-items: center;
+  padding: 0 8px;
+  background: var(--ns7-toolbar);
+  border-top: 1px solid #c7d0d9;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  font: 12px var(--ns7-font);
+  color: var(--ns7-status-text);
+}
+.ow-status-text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ow-statusbar .ow-progress {
+  display: none;
+}
+.ow-statusbar .ow-progress.is-active {
+  display: block;
+  width: 130px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 1px solid #768c9f;
+  background: #edf5f7;
+  overflow: hidden;
+}
+.ow-statusbar .ow-progress__bar {
+  height: 100%;
+  background: #424f63;
+}
+.ow-statusbar .ow-zone {
+  flex: 0 0 auto;
+  gap: 4px;
+  align-items: center;
+  font: 12px var(--ns7-font);
+  color: var(--ns7-status-text);
+}
+.ow-statusbar .ow-zone__lock {
+  width: 12px;
+  height: 14px;
+  background: linear-gradient(to bottom, #f4d980, #caa63a);
+  border: 1px solid #8a6f22;
+  border-radius: 2px 2px 0 0;
+}
+
+/* ===================================================================== *
+ * Integrated Search field — Netscape 7 kept it in the nav toolbar, right of
+ * the Location bar (unified toolbar).
+ * ===================================================================== */
+.ow-searchbox {
+  flex: 0 0 108px;
+  width: 108px;
+  height: 20px;
+  padding: 0 6px;
+  gap: 4px;
+  align-items: center;
+  background: url('toolbar/urlbar-mid.gif') var(--ns7-urlbar) bottom repeat-x;
+  border: 1px solid #768c9f;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px #000000, inset 1px 1px 0 #ffffff;
+}
+.ow-searchbox__engine {
+  width: 16px;
+  height: 15px;
+  flex: 0 0 16px;
+  border: 0;
+  background: url('toolbar/search_normal.png') center / 16px 15px no-repeat;
+}
+.ow-searchbox__monogram,
+.ow-searchbox__caret {
+  display: none;
+}
+.ow-searchbox__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font: 12px var(--ns7-font);
+  color: #101820;
+}
+.ow-searchbox__input::placeholder {
+  color: #7a8697;
+}
+.ow-searchbox__menu {
+  background: #ffffff;
+  border: 1px solid #5a6673;
+  font: 12px var(--ns7-font);
+}
+.ow-searchbox__option.is-active,
+.ow-searchbox__option:hover {
+  background: var(--ns7-menu-hl);
+  color: #ffffff;
+}
+/* Dot between Location and Search, with generous breathing room either side. */
+.ow-toolbar-dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  flex: 0 0 3px;
+  margin: 0 11px;
+  border-radius: 50%;
+  background: #7c8aa0;
+}
+
+/* ===================================================================== *
+ * Tab bar — Netscape 7 was one of the first tabbed browsers; a slim metal
+ * strip of folder-style tabs below the personal toolbar.
+ * ===================================================================== */
+.ow-tabstrip {
+  height: 22px;
+  padding: 0 4px;
+  gap: 1px;
+  align-items: flex-end;
+  background: linear-gradient(to bottom, #b8c2cd, var(--ns7-toolbar));
+  border-bottom: 1px solid var(--ns7-content-border);
+}
+.ow-tab {
+  height: 19px;
+  min-width: 90px;
+  max-width: 170px;
+  padding: 0 8px;
+  gap: 5px;
+  align-items: center;
+  border: 1px solid var(--ns7-edge);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(to bottom, #dfe6ed, #c2ccd6);
+  font: 12px var(--ns7-font);
+  color: #2a333f;
+}
+.ow-tab.is-active {
+  background: linear-gradient(to bottom, #f2f6fa, var(--ns7-urlbar));
+  color: #101820;
+  box-shadow: inset 0 1px 0 #ffffff;
+}
+.ow-tab__favicon {
+  display: block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+}
+.ow-tab__spinner {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+}
+.ow-tab__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ow-tab__close {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: #55606d;
+  font-size: 12px;
+  line-height: 1;
+}
+.ow-tab__close:hover {
+  background: #ffffff88;
+  color: #16202b;
+}
+.ow-tab-new {
+  width: 22px;
+  height: 19px;
+  border: 1px solid var(--ns7-edge);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(to bottom, #dfe6ed, #c2ccd6);
+  color: #2a333f;
+  font-size: 13px;
+  line-height: 17px;
+}

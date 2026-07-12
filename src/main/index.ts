@@ -89,6 +89,55 @@ function applyClientHints(ses: Electron.Session): void {
   })
 }
 
+/** Add `data:` to a single CSP directive value's source list (idempotent). */
+function withDataSource(value: string): string {
+  if (/\bdata:/.test(value)) return value
+  // `'none'` must stand alone — replace it rather than appending.
+  if (/^'none'$/i.test(value.trim())) return 'data:'
+  return value.trim() + ' data:'
+}
+
+/**
+ * While the retro display effect is on, the page's ordered-dither tile is a
+ * `data:` image referenced by the injected filter. Strict sites (e.g. Gmail)
+ * set `img-src` without `data:`, which would blank the tile and wash out the
+ * effect. This relaxes ONLY `img-src` to also allow `data:` images, and ONLY
+ * while the effect is active — nothing else about the site's CSP changes.
+ */
+function relaxImgDataCsp(csp: string): string {
+  const dirs = csp.split(';').map((d) => d.trim()).filter(Boolean)
+  let hasImg = false
+  let defaultVal: string | null = null
+  for (let i = 0; i < dirs.length; i++) {
+    const m = /^([a-zA-Z-]+)\s*(.*)$/.exec(dirs[i])
+    if (!m) continue
+    const name = m[1].toLowerCase()
+    if (name === 'img-src') {
+      hasImg = true
+      dirs[i] = 'img-src ' + withDataSource(m[2])
+    } else if (name === 'default-src') {
+      defaultVal = m[2]
+    }
+  }
+  // No img-src but a default-src fallback governs images — add an explicit one.
+  if (!hasImg && defaultVal != null) dirs.push('img-src ' + withDataSource(defaultVal))
+  return dirs.join('; ')
+}
+
+function applyDisplayCsp(ses: Electron.Session, active: () => boolean): void {
+  ses.webRequest.onHeadersReceived((details, cb) => {
+    if (!active()) return cb({})
+    const headers = details.responseHeaders
+    if (!headers) return cb({})
+    for (const key of Object.keys(headers)) {
+      if (key.toLowerCase() !== 'content-security-policy') continue
+      const vals = headers[key]
+      headers[key] = (Array.isArray(vals) ? vals : [vals]).map(relaxImgDataCsp)
+    }
+    cb({ responseHeaders: headers })
+  })
+}
+
 // Optional launch parameter: start with a specific theme for THIS run, e.g.
 //   Reframe --theme=netscape        (packaged: open -a Reframe --args --theme=netscape)
 //   npm run dev -- --theme=ie4mac   (dev)
@@ -155,7 +204,9 @@ const THEME_SPLASH: Record<string, { img: string; w: number; h: number }> = {
   // so it stays crisp and period-authentic (no upscaling, no distortion).
   netscape3: { img: 'splash/netscape3.png', w: 211, h: 318 },
   // Netscape Communicator Pro 4.04 (Mac) splash — shown at native 390×261 (1:1).
-  netscape4mac: { img: 'splash/netscape4mac.png', w: 390, h: 261 }
+  netscape4mac: { img: 'splash/netscape4mac.png', w: 390, h: 261 },
+  // Netscape 6.0 splash — shown at native 418×265 (1:1).
+  netscape6: { img: 'splash/netscape6.png', w: 418, h: 265 }
 }
 
 function newSplashWindow(w: number, h: number): BrowserWindow {
@@ -460,6 +511,7 @@ function createWindow(): void {
 app.whenReady().then(() => {
   registerAppProtocol()
   applyClientHints(session.defaultSession)
+  applyDisplayCsp(session.defaultSession, () => (shell?.getPageDisplay().depth ?? 'off') !== 'off')
   setDockIcon()
   buildAppMenu()
   setupAutoUpdate()
