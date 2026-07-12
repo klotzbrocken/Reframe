@@ -187,7 +187,9 @@ export function App() {
     { label: 'Hamsterdance', url: 'https://originalhampster.ytmnd.com/' },
     { label: 'reddit', url: 'https://old.reddit.com/' },
     { label: 'OldaVista', url: 'https://oldavista.com/' },
-    { label: '68k.news', url: 'https://68k.news/' }
+    // 68k.news is HTTP-only (its TLS cert doesn't match the host), so https
+    // dead-ends on a cert error — keep the explicit http:// URL.
+    { label: '68k.news', url: 'http://68k.news/' }
   ]
   const normUrl = (u: string): string =>
     u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/+$/, '')
