@@ -31,6 +31,11 @@ export interface Settings {
   connectionSpeed?: 'full' | 'isdn' | '56k' | '28.8k'
   /** Block ads & trackers using uBlock-Origin-style filter lists (opt-in). */
   adblock?: boolean
+  /** Retro colour-depth reduction applied to page content, for all themes.
+   *  Default (unset/off) = full true colour. ('auto' is a legacy value.) */
+  colorDepth?: 'auto' | 'off' | '16bit' | '8bit' | '1bit'
+  /** Ordered dithering for the reduced-colour-depth modes (default on). */
+  pageDither?: boolean
   /** Modem dial-up emulation: play a dial-up handshake before the first page
    *  of a session loads, and show the status-bar modem widget. */
   modemExtension?: boolean
@@ -82,6 +87,10 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
   const [labelFontSize, setLabelFontSize] = useState(settings.labelFontSize || 'normal')
   const [closeAction, setCloseAction] = useState(settings.closeAction || 'quit')
   const [adblock, setAdblock] = useState(settings.adblock ?? false)
+  const [colorDepth, setColorDepth] = useState(
+    settings.colorDepth && settings.colorDepth !== 'auto' ? settings.colorDepth : 'off'
+  )
+  const [pageDither, setPageDither] = useState(settings.pageDither ?? true)
   const [modemExtension, setModemExtension] = useState(settings.modemExtension !== false)
   const [connectionSpeed, setConnectionSpeed] = useState(settings.connectionSpeed || 'full')
   const [modemVolume, setModemVolume] = useState(settings.modemVolume ?? 70)
@@ -211,6 +220,30 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               <span>Block ads &amp; trackers</span>
             </label>
 
+            <label className="ow-field">
+              <span>Colour depth (web pages)</span>
+              <select
+                value={colorDepth}
+                onChange={(e) =>
+                  setColorDepth(e.target.value as 'off' | '16bit' | '8bit' | '1bit')
+                }
+              >
+                <option value="off">Off — true colour (default)</option>
+                <option value="16bit">16-bit — thousands</option>
+                <option value="8bit">8-bit — 256 colours</option>
+                <option value="1bit">1-bit — black &amp; white</option>
+              </select>
+            </label>
+
+            <label className="ow-field ow-field--check">
+              <input
+                type="checkbox"
+                checked={pageDither}
+                onChange={(e) => setPageDither(e.target.checked)}
+              />
+              <span>Dither reduced colour depth (ordered/Bayer)</span>
+            </label>
+
             <label className="ow-field ow-field--check">
               <input
                 type="checkbox"
@@ -231,47 +264,49 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               <span>Modem dial-up emulation (sound + status-bar modem widget)</span>
             </label>
 
-            <label className="ow-field">
-              <span>Connection speed</span>
-              <select
-                value={connectionSpeed}
-                onChange={(e) =>
-                  setConnectionSpeed(e.target.value as NonNullable<Settings['connectionSpeed']>)
-                }
-              >
-                {SPEED_OPTS.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="ow-field-row">
+              <label className="ow-field" style={{ flex: 1 }}>
+                <span>Connection speed</span>
+                <select
+                  value={connectionSpeed}
+                  onChange={(e) =>
+                    setConnectionSpeed(e.target.value as NonNullable<Settings['connectionSpeed']>)
+                  }
+                >
+                  {SPEED_OPTS.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="ow-field">
-              <span>Dial-up volume ({modemVolume}%)</span>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={modemVolume}
-                onChange={(e) => setModemVolume(Number(e.target.value))}
-              />
-            </label>
+              <label className="ow-field" style={{ flex: 1 }}>
+                <span>Dial-up sound</span>
+                <select
+                  value={modemSound}
+                  onChange={(e) =>
+                    setModemSound(e.target.value as 'us' | 'europe' | 'synth' | 'custom')
+                  }
+                >
+                  <option value="us">US — real</option>
+                  <option value="europe">Europe — real</option>
+                  <option value="synth">Synthesized</option>
+                  <option value="custom">Custom (URL)</option>
+                </select>
+              </label>
 
-            <label className="ow-field">
-              <span>Dial-up sound</span>
-              <select
-                value={modemSound}
-                onChange={(e) =>
-                  setModemSound(e.target.value as 'us' | 'europe' | 'synth' | 'custom')
-                }
-              >
-                <option value="us">US — “The Sound of dial-up” (real)</option>
-                <option value="europe">Europe — real recording</option>
-                <option value="synth">Synthesized (no file)</option>
-                <option value="custom">Custom recording (URL)</option>
-              </select>
-            </label>
+              <label className="ow-field" style={{ flex: 1 }}>
+                <span>Volume ({modemVolume}%)</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={modemVolume}
+                  onChange={(e) => setModemVolume(Number(e.target.value))}
+                />
+              </label>
+            </div>
             {modemSound === 'custom' && (
               <label className="ow-field ow-field--wide">
                 <span>Custom dial-up recording URL (mp3/ogg/m4a)</span>
@@ -290,7 +325,8 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
             <p className="ow-dialog__legal">Reframe {__APP_VERSION__}</p>
             <p className="ow-dialog__legal">{LEGAL}</p>
           </details>
-
+        </div>
+        <div className="ow-dialog__buttons">
           <a
             className="ow-kofi"
             href={KOFI}
@@ -301,12 +337,10 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
           >
             <img
               src="https://storage.ko-fi.com/cdn/kofi2.png?v=6"
-              height={36}
+              height={30}
               alt="Buy Me a Coffee at ko-fi.com"
             />
           </a>
-        </div>
-        <div className="ow-dialog__buttons">
           <button
             onClick={() => {
               onSave({
@@ -325,6 +359,10 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 labelFontSize: labelFontSize as FontSize,
                 closeAction: closeAction as 'quit' | 'minimize',
                 adblock: adblock || undefined,
+                // Off is the default — persist only an explicit reduced depth.
+                colorDepth: colorDepth === 'off' ? undefined : colorDepth,
+                // Default-on: persist `false` only when the page dither is off.
+                pageDither: pageDither ? undefined : false,
                 // Default-on: persist `false` only when explicitly turned off.
                 modemExtension: modemExtension ? undefined : false,
                 // Enabling the modem with speed "off" would be a no-op — give it

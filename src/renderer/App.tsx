@@ -48,7 +48,16 @@ const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string 
 
 // Themes whose lineage is Mac/NeXT (vs. the Windows/PC themes). Drives which
 // dial-up GIF + backdrop the modem overlay shows.
-const MAC_THEMES = new Set(['safari', 'ie4mac', 'camino', 'omniweb'])
+const MAC_THEMES = new Set([
+  'safari',
+  'ie4mac',
+  'ie45mac',
+  'ie45macmono',
+  'camino',
+  'omniweb',
+  'netscape4mac',
+  'ns7modern'
+])
 
 export function App() {
   const loadSettings = (): Settings => {
@@ -176,7 +185,8 @@ export function App() {
     { label: 'Weather Channel', url: 'https://weather.com/retro/' },
     { label: 'RetroMac', url: 'https://myretromac.app/' },
     { label: 'Hamsterdance', url: 'https://originalhampster.ytmnd.com/' },
-    { label: 'reddit', url: 'https://old.reddit.com/' }
+    { label: 'reddit', url: 'https://old.reddit.com/' },
+    { label: 'OldaVista', url: 'https://oldavista.com/' }
   ]
   const normUrl = (u: string): string =>
     u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/+$/, '')
@@ -415,6 +425,14 @@ export function App() {
   useEffect(() => {
     window.oldweb.setAdblock(settings.adblock ?? false)
   }, [settings.adblock])
+  // Retro "display" effect on page content (colour-depth reduction + dither).
+  // Default is OFF for every theme — pages render in full colour unless the user
+  // explicitly picks a reduced depth in Settings (mono themes included).
+  useEffect(() => {
+    let depth = settings.colorDepth ?? 'off'
+    if (depth === 'auto') depth = 'off' // legacy value → treat as off
+    window.oldweb.setPageDisplay(depth, settings.pageDither ?? true)
+  }, [settings.colorDepth, settings.pageDither])
   useEffect(() => {
     actions.setOldWebDate(waybackDate)
   }, [waybackDate, actions])
@@ -1089,6 +1107,8 @@ export function App() {
             { type: 'sep' },
             { type: 'item', label: 'Stop Loading', disabled: !loading, onSelect: () => actions.stop() }
           ]
+        // IE 4.5 for Mac names this menu "Favorites"; same contents as Bookmarks.
+        case 'Favorites':
         case 'Bookmarks':
           return [
             { type: 'item', label: 'Add Bookmark', onSelect: addBookmark },
@@ -1391,33 +1411,6 @@ export function App() {
         user: true,
         icon: 'doc'
       }))
-  // Theme-default entries get a stable "m:<theme>:<i>" id, are marked `user` so
-  // they show the right-click Edit/Remove menu, and honour the rename/hide
-  // overrides. Folders also accept dropped pages + user-filed children.
-  const manifestItems: PersonalBarItem[] = (manifest?.personalBar ?? [])
-    .map((p, i): PersonalBarItem | null => {
-      const fid = `m:${themeId}:${i}`
-      if (barOverrides.hidden.includes(fid)) return null
-      const label = barOverrides.labels[fid] ?? p.label
-      if (p.children) {
-        const staticKids = p.children
-          .map((c, ci): PersonalBarItem | null => {
-            const cid = `${fid}:${ci}`
-            if (barOverrides.hidden.includes(cid)) return null
-            return {
-              label: barOverrides.labels[cid] ?? c.label,
-              url: barOverrides.urls[cid] ?? c.url,
-              icon: c.icon,
-              id: cid,
-              user: true
-            }
-          })
-          .filter((x): x is PersonalBarItem => x !== null)
-        return { label, icon: p.icon, id: fid, user: true, children: [...staticKids, ...folderChildren(fid)] }
-      }
-      return { label, url: barOverrides.urls[fid] ?? p.url, icon: p.icon, id: fid, user: true }
-    })
-    .filter((x): x is PersonalBarItem => x !== null)
   // App-wide default links, shown at the head of every theme's bookmark bar.
   // They carry stable "m:__default:<i>" ids so the existing rename/hide override
   // system treats them exactly like theme-default entries (Edit/Remove work).
@@ -1435,8 +1428,10 @@ export function App() {
     }
   ).filter((x): x is PersonalBarItem => x !== null)
   const barItems: PersonalBarItem[] = [
+    // Every theme's bookmark bar shows the same global defaults only — the
+    // theme's own manifest personalBar entries (manifestItems) are intentionally
+    // NOT rendered here; the manifest still gates whether a bar shows at all.
     ...defaultBarItems,
-    ...manifestItems,
     // The user's own top-level bookmarks and folders.
     ...barBookmarks
       .filter((b) => !b.parentId)

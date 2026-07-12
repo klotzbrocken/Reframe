@@ -114,6 +114,13 @@ export class BrowserShell {
   private insets: ContentInsets = { ...DEFAULT_INSETS }
   private chromeOnTop = false
   private speed = 'full'
+  /**
+   * Optional retro display effect applied to page content (not the chrome):
+   * reduced colour depth + optional ordered dither. `off` = today's true colour.
+   * The page preload (page.cjs) reads this at document-start and applies it via
+   * webFrame.insertCSS (before first paint, and immune to the page's CSP).
+   */
+  private pageDisplay: { depth: string; dither: boolean } = { depth: 'off', dither: true }
 
   constructor(
     private win: BaseWindow,
@@ -783,6 +790,24 @@ export class BrowserShell {
     wc.executeJavaScript(
       `(${injectRetro.toString()})(${tab.retro});`
     ).catch(() => {})
+  }
+
+  /**
+   * Set the retro display effect for all page content. `depth` is one of
+   * off | 16bit | 8bit | 1bit; `dither` toggles ordered (Bayer) dithering on the
+   * quantised modes. The page preload reads the current value at document-start
+   * (page:getDisplay) and applies live changes (page:setDisplay) without a reload.
+   */
+  setPageDisplay(depth: string, dither: boolean): void {
+    this.pageDisplay = { depth, dither }
+    for (const tab of this.tabs.values()) {
+      const wc = tab.view.webContents
+      if (!wc.isDestroyed()) wc.send('page:setDisplay', this.pageDisplay)
+    }
+  }
+
+  getPageDisplay(): { depth: string; dither: boolean } {
+    return this.pageDisplay
   }
 
 }
