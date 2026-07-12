@@ -186,7 +186,8 @@ export function App() {
     { label: 'RetroMac', url: 'https://myretromac.app/' },
     { label: 'Hamsterdance', url: 'https://originalhampster.ytmnd.com/' },
     { label: 'reddit', url: 'https://old.reddit.com/' },
-    { label: 'OldaVista', url: 'https://oldavista.com/' }
+    { label: 'OldaVista', url: 'https://oldavista.com/' },
+    { label: '68k.news', url: 'https://68k.news/' }
   ]
   const normUrl = (u: string): string =>
     u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/+$/, '')
@@ -978,7 +979,11 @@ export function App() {
             },
             { type: 'item', label: 'Print…', onSelect: () => actions.print() },
             { type: 'sep' },
-            { type: 'item', label: 'Close Tab', onSelect: () => window.oldweb.closeWindow() }
+            {
+              type: 'item',
+              label: 'Close Tab',
+              onSelect: () => activeTab && actions.closeTab(activeTab.id)
+            }
           ]
         case 'Edit':
           return [

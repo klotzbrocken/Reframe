@@ -1,22 +1,22 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.7.0'
+export const WHATS_NEW_VERSION = '1.8.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'New theme — Camino 2.0',
-    body: 'The Mozilla community’s Mac-native browser (2009), rebuilt in full Aqua: glossy traffic-light window controls, the original toolbar icons, the “hide toolbar” pill, and — because Camino had no in-window menus — its File/View/History/Bookmarks menus live in the real macOS menu bar. Bookmark-bar folders and its own “About Camino” page are included too.'
+    title: 'Go monochrome — the 1-bit web',
+    body: 'The star of this release. A brand-new “Internet Explorer 4.5 (Mac, monochrome)” theme renders the whole browser — and every web page inside it — in authentic 1-bit black & white with ordered Bayer dithering, exactly like a classic compact Mac. And it’s not just that theme: a new “Colour depth” setting (True colour · 16-bit · 8-bit · 1-bit, with optional dithering) can crush today’s web down to thousands, 256, or two colours in ANY theme. Text stays crisp and readable thanks to a contrast-boosted 1-bit renderer, and it even works on locked-down sites like Gmail — applied before the page paints, so there’s no colour flash.'
   },
   {
-    title: 'Modem dial-up emulation',
-    body: 'Switch it on in Settings for the full 1990s ritual: the browser boots “not connected”, and the first page of each session waits behind an authentic dial-up handshake — pick the classic US recording, a European one, or a synthesized tone. A little modem widget with blinking PWR/CD/TX/RX LEDs sits in the status bar, and the page then crawls in at your chosen connection speed.'
+    title: 'Two new Mac browsers',
+    body: 'Internet Explorer 4.5 for Macintosh in full Mac OS 8.5 “Platinum” (colour and monochrome), plus Netscape 7.02 for Mac in its “Modern” skin — the Aqua traffic-light title bar, one unified toolbar with the Location field and Search sitting right next to the round metal buttons, the spinning Netscape throbber, and real tabbed browsing.'
   },
   {
-    title: 'Bookmark-bar folders',
-    body: 'Right-click the bookmarks bar to make a New Folder, then drag pages into it — folders open as a dropdown. Works in every theme that has a bookmarks bar.'
+    title: 'Settings & bookmarks polish',
+    body: 'New Colour-depth and dithering controls; the dial-up modem widget is now on by default; connection speed, dial-up sound and volume share one tidy row. Every theme’s bookmark bar now carries the same handpicked set — including OldaVista and 68k.news, both perfect period-accurate places to browse.'
   }
 ]
 

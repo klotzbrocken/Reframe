@@ -365,10 +365,11 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 pageDither: pageDither ? undefined : false,
                 // Default-on: persist `false` only when explicitly turned off.
                 modemExtension: modemExtension ? undefined : false,
-                // Enabling the modem with speed "off" would be a no-op — give it
-                // a period speed so the dial-up actually gates a slow load.
-                connectionSpeed:
-                  modemExtension && connectionSpeed === 'full' ? '56k' : connectionSpeed,
+                // Save the speed exactly as chosen. (Do NOT auto-promote "full"
+                // to 56k just because the modem widget is on — that silently armed
+                // the dial-up gate whenever the user saved anything. The gate only
+                // arms when the user explicitly picks a period speed.)
+                connectionSpeed,
                 modemVolume: modemVolume === 70 ? undefined : modemVolume,
                 modemSound,
                 modemSampleUrl:
