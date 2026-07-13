@@ -78,7 +78,6 @@ const WAIT_IMAGES_JS = `new Promise((resolve) => {
 interface Tab {
   id: number
   view: WebContentsView
-  retro: boolean
   favicon: string | null
   /** Key of the injected "hide images" stylesheet, when images are off. */
   imagesOffKey?: string
@@ -120,7 +119,15 @@ export class BrowserShell {
    * The page preload (page.cjs) reads this at document-start and applies it via
    * webFrame.insertCSS (before first paint, and immune to the page's CSP).
    */
-  private pageDisplay: { depth: string; dither: boolean } = { depth: 'off', dither: true }
+  // Global default display mode + optional per-origin overrides. A tab resolves
+  // to its origin's override (depth/typo) falling back to the global default;
+  // dither is always the global setting.
+  private globalDisplay: { depth: string; dither: boolean; typo: string } = {
+    depth: 'off',
+    dither: true,
+    typo: 'off'
+  }
+  private displayBySite: Record<string, { depth?: string; typo?: string }> = {}
 
   constructor(
     private win: BaseWindow,
@@ -221,7 +228,7 @@ export class BrowserShell {
         preload: join(__dirname, '../preload/page.cjs')
       }
     })
-    const tab: Tab = { id, view, retro: false, favicon: null }
+    const tab: Tab = { id, view, favicon: null }
     this.tabs.set(id, tab)
     this.order.push(id)
     this.win.contentView.addChildView(view)
@@ -343,13 +350,6 @@ export class BrowserShell {
     else if (cmd === 'copy') wc.copy()
     else if (cmd === 'paste') wc.paste()
     else wc.selectAll()
-  }
-
-  setRetroContent(id: number, enabled: boolean): void {
-    const tab = this.tabs.get(id)
-    if (!tab) return
-    tab.retro = enabled
-    this.applyRetro(tab)
   }
 
 
@@ -593,11 +593,14 @@ export class BrowserShell {
   }
 
   /** Toggle uBlock-Origin-style ad/tracker blocking on the page session, then
-   *  reload the active tab so the change takes effect right away. */
+   *  reload every tab so the change takes effect right away (not just the active
+   *  one — otherwise background tabs stay inconsistent until their next reload). */
   async setAdblock(enabled: boolean): Promise<void> {
     await applyAdblock(enabled)
-    const wc = this.activeId != null ? this.tabs.get(this.activeId)?.view.webContents : undefined
-    if (wc && !wc.isDestroyed()) wc.reload()
+    for (const tab of this.tabs.values()) {
+      const wc = tab.view.webContents
+      if (!wc.isDestroyed()) wc.reload()
+    }
   }
 
   /** Opera "Save to file": save the page as a complete HTML file. */
@@ -744,7 +747,6 @@ export class BrowserShell {
     wc.on('did-navigate-in-page', () => this.push(tab))
     wc.on('page-title-updated', () => this.push(tab))
     wc.on('did-fail-load', () => this.push(tab))
-    wc.on('dom-ready', () => this.applyRetro(tab))
 
     // Hovering a link -> show target in the status bar (period-accurate detail).
     wc.on('update-target-url', (_e, url) => {
@@ -783,56 +785,49 @@ export class BrowserShell {
     })
   }
 
-  private applyRetro(tab: Tab): void {
-    const wc = tab.view.webContents
-    if (wc.isDestroyed()) return
-    // Insert/remove a CRT overlay. Kept additive so it can be toggled live.
-    wc.executeJavaScript(
-      `(${injectRetro.toString()})(${tab.retro});`
-    ).catch(() => {})
-  }
-
   /**
    * Set the retro display effect for all page content. `depth` is one of
    * off | 16bit | 8bit | 1bit; `dither` toggles ordered (Bayer) dithering on the
    * quantised modes. The page preload reads the current value at document-start
    * (page:getDisplay) and applies live changes (page:setDisplay) without a reload.
    */
-  setPageDisplay(depth: string, dither: boolean): void {
-    this.pageDisplay = { depth, dither }
-    for (const tab of this.tabs.values()) {
-      const wc = tab.view.webContents
-      if (!wc.isDestroyed()) wc.send('page:setDisplay', this.pageDisplay)
+  setPageDisplay(depth: string, dither: boolean, typo: string): void {
+    this.globalDisplay = { depth, dither, typo }
+    this.broadcastDisplay()
+  }
+
+  /** Replace the per-origin override map (e.g. `{ "https://x.com": {depth,typo} }`). */
+  setDisplayBySite(bySite: Record<string, { depth?: string; typo?: string }>): void {
+    this.displayBySite = bySite || {}
+    this.broadcastDisplay()
+  }
+
+  /** Effective mode for an origin: its override (depth/typo) over the global
+   *  default; dither always comes from the global setting. */
+  getPageDisplay(origin?: string): { depth: string; dither: boolean; typo: string } {
+    const o = origin ? this.displayBySite[origin] : undefined
+    return {
+      depth: o?.depth ?? this.globalDisplay.depth,
+      dither: this.globalDisplay.dither,
+      typo: o?.typo ?? this.globalDisplay.typo
     }
   }
 
-  getPageDisplay(): { depth: string; dither: boolean } {
-    return this.pageDisplay
+  /** Push each open tab the mode resolved for ITS current origin. */
+  private broadcastDisplay(): void {
+    for (const tab of this.tabs.values()) {
+      const wc = tab.view.webContents
+      if (wc.isDestroyed()) continue
+      let origin = ''
+      try {
+        origin = new URL(wc.getURL()).origin
+      } catch {
+        /* about:blank / no URL — global default applies */
+      }
+      wc.send('page:setDisplay', this.getPageDisplay(origin))
+    }
   }
 
-}
-
-/** Runs inside the page. Adds or removes a CRT scanline/vignette overlay. */
-function injectRetro(enabled: boolean): void {
-  const ID = '__oldweb_crt__'
-  const existing = document.getElementById(ID)
-  if (!enabled) {
-    existing?.remove()
-    return
-  }
-  if (existing) return
-  const el = document.createElement('div')
-  el.id = ID
-  el.style.cssText = [
-    'position:fixed',
-    'inset:0',
-    'z-index:2147483647',
-    'pointer-events:none',
-    'mix-blend-mode:multiply',
-    'background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,0.18) 3px,rgba(0,0,0,0) 4px)',
-    'box-shadow:inset 0 0 140px 30px rgba(0,0,0,0.45)'
-  ].join(';')
-  document.documentElement.appendChild(el)
 }
 
 

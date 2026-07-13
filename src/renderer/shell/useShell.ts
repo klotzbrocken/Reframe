@@ -20,7 +20,6 @@ export interface ShellActions {
   reload: () => void
   stop: () => void
   print: () => void
-  toggleRetro: () => void
   toggleOldWeb: () => void
   /** Turn Wayback on/off explicitly (used by the floating controls) and
    *  re-navigate the current page through (or out of) the Wayback Machine. */
@@ -34,11 +33,9 @@ const empty: ShellState = { tabs: [], activeId: null, statusText: '', maximized:
 export function useShell(onLoadStart?: () => void): {
   state: ShellState
   actions: ShellActions
-  retro: boolean
   oldWeb: boolean
 } {
   const [state, setState] = useState<ShellState>(empty)
-  const [retro, setRetro] = useState(false)
   const [oldWeb, setOldWeb] = useState(false)
   const oldWebRef = useRef(false)
   const oldWebDateRef = useRef('2002')
@@ -97,15 +94,6 @@ export function useShell(onLoadStart?: () => void): {
     reload: () => activeRef.current != null && window.oldweb.reload(activeRef.current),
     stop: () => activeRef.current != null && window.oldweb.stop(activeRef.current),
     print: () => activeRef.current != null && window.oldweb.print(activeRef.current),
-    toggleRetro: () => {
-      const id = activeRef.current
-      if (id == null) return
-      setRetro((prev) => {
-        const next = !prev
-        window.oldweb.setRetroContent(id, next)
-        return next
-      })
-    },
     toggleOldWeb: () => {
       const id = activeRef.current
       setOldWeb((prev) => {
@@ -146,7 +134,7 @@ export function useShell(onLoadStart?: () => void): {
     }
   }
 
-  return { state, actions, retro, oldWeb }
+  return { state, actions, oldWeb }
 }
 
 function reduce(s: ShellState, e: ShellEvent): ShellState {

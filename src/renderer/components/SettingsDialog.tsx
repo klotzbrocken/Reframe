@@ -33,9 +33,16 @@ export interface Settings {
   adblock?: boolean
   /** Retro colour-depth reduction applied to page content, for all themes.
    *  Default (unset/off) = full true colour. ('auto' is a legacy value.) */
-  colorDepth?: 'auto' | 'off' | '16bit' | '8bit' | '1bit'
+  colorDepth?: 'auto' | 'off' | '16bit' | '216' | '8bit' | '1bit'
   /** Ordered dithering for the reduced-colour-depth modes (default on). */
   pageDither?: boolean
+  /** Classic Web Typography & Controls: era fonts, classic link colours, dotted
+   *  focus and beveled native form controls. 'era' auto-picks intensity from the
+   *  active theme's era. Default off. */
+  classicType?: 'off' | 'era' | 'light' | 'full'
+  /** Per-origin display overrides set from the "For this site" section; each
+   *  field falls back to the global default when absent. */
+  displayBySite?: Record<string, { depth?: string; typo?: string }>
   /** Modem dial-up emulation: play a dial-up handshake before the first page
    *  of a session loads, and show the status-bar modem widget. */
   modemExtension?: boolean
@@ -59,6 +66,8 @@ const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string 
 interface Props {
   settings: Settings
   themes: { id: string; name: string }[]
+  /** Origin of the active tab (http/https), for the "For this site" override. */
+  currentOrigin?: string
   onSave: (s: Settings) => void
   onClose: () => void
   onOpenExternal: (url: string) => void
@@ -75,7 +84,18 @@ const LEGAL =
   'The bundled “Charcoal” font (Apple’s classic Mac OS system typeface) and a pixel “MS Sans Serif” ' +
   'are used for period-accurate text; all font rights remain with their respective owners.'
 
-export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExternal }: Props) {
+export function SettingsDialog({
+  settings,
+  themes,
+  currentOrigin,
+  onSave,
+  onClose,
+  onOpenExternal
+}: Props) {
+  const siteOrigin = /^https?:\/\//i.test(currentOrigin ?? '') ? (currentOrigin as string) : ''
+  const siteOverride = siteOrigin ? settings.displayBySite?.[siteOrigin] : undefined
+  const [siteDepth, setSiteDepth] = useState(siteOverride?.depth ?? 'default')
+  const [siteTypo, setSiteTypo] = useState(siteOverride?.typo ?? 'default')
   const [home, setHome] = useState(settings.home || SITE)
   const [mailUseLocal, setMailUseLocal] = useState(settings.mailUseLocal ?? false)
   const [mailUrl, setMailUrl] = useState(settings.mailUrl || 'https://mail.google.com')
@@ -91,6 +111,7 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
     settings.colorDepth && settings.colorDepth !== 'auto' ? settings.colorDepth : 'off'
   )
   const [pageDither, setPageDither] = useState(settings.pageDither ?? true)
+  const [classicType, setClassicType] = useState(settings.classicType ?? 'off')
   const [modemExtension, setModemExtension] = useState(settings.modemExtension !== false)
   const [connectionSpeed, setConnectionSpeed] = useState(settings.connectionSpeed || 'full')
   const [modemVolume, setModemVolume] = useState(settings.modemVolume ?? 70)
@@ -225,12 +246,13 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               <select
                 value={colorDepth}
                 onChange={(e) =>
-                  setColorDepth(e.target.value as 'off' | '16bit' | '8bit' | '1bit')
+                  setColorDepth(e.target.value as 'off' | '16bit' | '216' | '8bit' | '1bit')
                 }
               >
                 <option value="off">Off — true colour (default)</option>
                 <option value="16bit">16-bit — thousands</option>
                 <option value="8bit">8-bit — 256 colours</option>
+                <option value="216">216 — web-safe palette</option>
                 <option value="1bit">1-bit — black &amp; white</option>
               </select>
             </label>
@@ -243,6 +265,49 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
               />
               <span>Dither reduced colour depth (ordered/Bayer)</span>
             </label>
+
+            <label className="ow-field">
+              <span>Classic web typography &amp; controls</span>
+              <select
+                value={classicType}
+                onChange={(e) =>
+                  setClassicType(e.target.value as 'off' | 'era' | 'light' | 'full')
+                }
+              >
+                <option value="off">Off (default)</option>
+                <option value="era">Era-appropriate (auto)</option>
+                <option value="light">Light — classic links &amp; controls</option>
+                <option value="full">Full — era fonts too</option>
+              </select>
+            </label>
+
+            {siteOrigin && (
+              <>
+                <div className="ow-field--sep ow-field--wide">
+                  For this site only — {siteOrigin.replace(/^https?:\/\//, '')}
+                </div>
+                <label className="ow-field">
+                  <span>Colour depth (this site)</span>
+                  <select value={siteDepth} onChange={(e) => setSiteDepth(e.target.value)}>
+                    <option value="default">Use default (above)</option>
+                    <option value="off">Off — true colour</option>
+                    <option value="16bit">16-bit</option>
+                    <option value="8bit">8-bit — 256</option>
+                    <option value="216">216 — web-safe</option>
+                    <option value="1bit">1-bit</option>
+                  </select>
+                </label>
+                <label className="ow-field">
+                  <span>Typography (this site)</span>
+                  <select value={siteTypo} onChange={(e) => setSiteTypo(e.target.value)}>
+                    <option value="default">Use default (above)</option>
+                    <option value="off">Off</option>
+                    <option value="light">Light</option>
+                    <option value="full">Full</option>
+                  </select>
+                </label>
+              </>
+            )}
 
             <label className="ow-field ow-field--check">
               <input
@@ -363,6 +428,19 @@ export function SettingsDialog({ settings, themes, onSave, onClose, onOpenExtern
                 colorDepth: colorDepth === 'off' ? undefined : colorDepth,
                 // Default-on: persist `false` only when the page dither is off.
                 pageDither: pageDither ? undefined : false,
+                classicType: classicType === 'off' ? undefined : classicType,
+                // Merge the "for this site" override into the per-origin map
+                // (drop the entry when both fields are "Use default").
+                displayBySite: (() => {
+                  if (!siteOrigin) return settings.displayBySite
+                  const next = { ...(settings.displayBySite ?? {}) }
+                  const entry: { depth?: string; typo?: string } = {}
+                  if (siteDepth !== 'default') entry.depth = siteDepth
+                  if (siteTypo !== 'default') entry.typo = siteTypo
+                  if (entry.depth || entry.typo) next[siteOrigin] = entry
+                  else delete next[siteOrigin]
+                  return Object.keys(next).length ? next : undefined
+                })(),
                 // Default-on: persist `false` only when explicitly turned off.
                 modemExtension: modemExtension ? undefined : false,
                 // Save the speed exactly as chosen. (Do NOT auto-promote "full"

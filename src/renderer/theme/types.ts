@@ -65,8 +65,12 @@ export interface ThemeManifest {
   menus?: string[]
   /** Home / Search target for this theme (era-appropriate; archived if needed). */
   homeUrl?: string
-  /** Optional personal / bookmark toolbar (Netscape-style quick links). An entry
-   *  with `children` renders as a folder (its children open in a dropdown). */
+  /** Whether this theme shows a personal / bookmark toolbar. NOTE: the bookmark
+   *  bar now renders the app-wide GLOBAL default links (see DEFAULT_LINKS in
+   *  App.tsx) for every theme; the entries listed here are NO LONGER rendered —
+   *  a non-empty `personalBar` only acts as the on/off gate for whether the bar
+   *  appears at all. (Kept as objects for backwards-compatible manifests.) An
+   *  entry with `children` would render as a folder if per-theme items return. */
   personalBar?: {
     label: string
     icon?: string

@@ -78,18 +78,41 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
       ? s()?.copyShareImage(dataUrl)
       : undefined
   )
-  handle('shell:setRetroContent', (_e, id, enabled) =>
-    validId(id) ? s()?.setRetroContent(id, asBool(enabled)) : undefined
-  )
   handle('shell:setNetworkSpeed', (_e, profile) => s()?.setNetworkSpeed(asString(profile)))
   handle('shell:setAdblock', (_e, enabled) => s()?.setAdblock(asBool(enabled)))
-  handle('shell:setPageDisplay', (_e, depth, dither) =>
-    s()?.setPageDisplay(asString(depth), asBool(dither))
+  const safeDepth = (d: string): string =>
+    d === '16bit' || d === '216' || d === '8bit' || d === '1bit' ? d : 'off'
+  const safeTypo = (t: string): string => (t === 'light' || t === 'full' ? t : 'off')
+  handle('shell:setPageDisplay', (_e, depth, dither, typo) =>
+    s()?.setPageDisplay(safeDepth(asString(depth)), asBool(dither), safeTypo(asString(typo)))
   )
-  // Synchronous: the page preload asks for the current display mode at
+  // Per-origin overrides: `{ "https://x.com": { depth?, typo? } }` (each value
+  // "default"/absent means inherit the global default). Sanitised here.
+  handle('shell:setDisplayBySite', (_e, bySite) => {
+    const clean: Record<string, { depth?: string; typo?: string }> = {}
+    if (bySite && typeof bySite === 'object') {
+      for (const [k, v] of Object.entries(bySite as Record<string, unknown>)) {
+        if (typeof k !== 'string' || !v || typeof v !== 'object') continue
+        const m = v as { depth?: unknown; typo?: unknown }
+        // 'off' is a valid per-site override (force true colour / no typography
+        // even when the global default is reduced); absent = inherit global.
+        const depth =
+          typeof m.depth === 'string' && ['off', '16bit', '216', '8bit', '1bit'].includes(m.depth)
+            ? m.depth
+            : undefined
+        const typo =
+          typeof m.typo === 'string' && ['off', 'light', 'full'].includes(m.typo)
+            ? m.typo
+            : undefined
+        if (depth || typo) clean[k] = { depth, typo }
+      }
+    }
+    return s()?.setDisplayBySite(clean)
+  })
+  // Synchronous: the page preload asks for the mode for its origin at
   // document-start so the effect lands before the first paint.
-  ipcMain.on('page:getDisplay', (e) => {
-    e.returnValue = s()?.getPageDisplay() ?? { depth: 'off', dither: true }
+  ipcMain.on('page:getDisplay', (e, origin) => {
+    e.returnValue = s()?.getPageDisplay(asString(origin)) ?? { depth: 'off', dither: true, typo: 'off' }
   })
   handle('wayback:months', (_e, url, year) => s()?.waybackMonths(asString(url), Number(year)) ?? [])
   handle('shell:print', (_e, id) => (validId(id) ? s()?.print(id) : undefined))
