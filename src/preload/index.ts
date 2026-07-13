@@ -18,12 +18,11 @@ const api: OldwebAPI = {
   shareCopy: (dataUrl) => ipcRenderer.invoke('share:copy', dataUrl),
   setContentInsets: (insets: ContentInsets) =>
     ipcRenderer.invoke('shell:setContentInsets', insets),
-  setRetroContent: (id, enabled) =>
-    ipcRenderer.invoke('shell:setRetroContent', id, enabled),
   setNetworkSpeed: (profile) => ipcRenderer.invoke('shell:setNetworkSpeed', profile),
   setAdblock: (enabled) => ipcRenderer.invoke('shell:setAdblock', enabled),
-  setPageDisplay: (depth, dither) =>
-    ipcRenderer.invoke('shell:setPageDisplay', depth, dither),
+  setPageDisplay: (depth, dither, typo) =>
+    ipcRenderer.invoke('shell:setPageDisplay', depth, dither, typo),
+  setDisplayBySite: (bySite) => ipcRenderer.invoke('shell:setDisplayBySite', bySite),
   waybackMonths: (url, year) => ipcRenderer.invoke('wayback:months', url, year),
   print: (id) => ipcRenderer.invoke('shell:print', id),
   savePage: (id) => ipcRenderer.invoke('shell:savePage', id),

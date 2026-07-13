@@ -119,7 +119,7 @@ export function App() {
   })
   const [manifest, setManifest] = useState<ThemeManifest | null>(null)
 
-  const { state, actions, retro, oldWeb } = useShell(() =>
+  const { state, actions, oldWeb } = useShell(() =>
     themeEngine.playSound('navigate')
   )
 
@@ -196,14 +196,36 @@ export function App() {
   const [bookmarks, setBookmarks] = useState<PanelEntry[]>(() => {
     const stored = loadStore('reframe.bookmarks')
     const defaults = DEFAULT_LINKS.map((d) => ({ title: d.label, url: d.url }))
-    // One-time top-up so existing installs also get the default links (deduped by
-    // host+path). The flag makes it run once, so later user deletions stick.
-    if (!localStorage.getItem('reframe.defaultLinks.v1')) {
-      localStorage.setItem('reframe.defaultLinks.v1', '1')
-      const have = new Set(stored.map((b) => normUrl(b.url)))
-      return [...defaults.filter((d) => !have.has(normUrl(d.url))), ...stored]
+    // Per-link seeding: remember which default links have already been offered (by
+    // normalized URL) so NEW defaults added in later versions still reach existing
+    // installs once, while defaults the user has since deleted are not re-added.
+    // (Replaces the coarse one-shot `reframe.defaultLinks.v1` flag, which froze the
+    // default set at whatever shipped when a user first ran the app.)
+    let seeded = new Set<string>()
+    try {
+      const raw = localStorage.getItem('reframe.defaultLinks.seeded')
+      if (raw) seeded = new Set(JSON.parse(raw) as string[])
+      else if (localStorage.getItem('reframe.defaultLinks.v1'))
+        // Migrate from the old flag: the four original defaults were already
+        // offered — mark them seeded so deletions of them stick.
+        seeded = new Set([
+          'weather.com/retro',
+          'myretromac.app',
+          'originalhampster.ytmnd.com',
+          'old.reddit.com'
+        ])
+    } catch {
+      /* ignore malformed storage */
     }
-    return stored.length ? stored : defaults
+    const have = new Set(stored.map((b) => normUrl(b.url)))
+    const toAdd = defaults.filter((d) => !seeded.has(normUrl(d.url)) && !have.has(normUrl(d.url)))
+    // Record every current default as seeded so none is ever re-added later.
+    localStorage.setItem(
+      'reframe.defaultLinks.seeded',
+      JSON.stringify([...new Set([...seeded, ...defaults.map((d) => normUrl(d.url))])])
+    )
+    if (stored.length === 0 && toAdd.length === 0) return defaults
+    return [...toAdd, ...stored]
   })
   const [history, setHistory] = useState<PanelEntry[]>(() => loadStore('reframe.history'))
   const [panel, setPanel] = useState<{
@@ -428,14 +450,23 @@ export function App() {
   useEffect(() => {
     window.oldweb.setAdblock(settings.adblock ?? false)
   }, [settings.adblock])
-  // Retro "display" effect on page content (colour-depth reduction + dither).
-  // Default is OFF for every theme — pages render in full colour unless the user
-  // explicitly picks a reduced depth in Settings (mono themes included).
+  // Retro "display" effect on page content: colour-depth reduction + dither, plus
+  // the Classic Web Typography level. Both default OFF — pages render normally
+  // unless the user opts in via Settings. `era` resolves against the theme's era
+  // (older themes → the heavier 'full' serif look; newer → milder 'light').
   useEffect(() => {
     let depth = settings.colorDepth ?? 'off'
     if (depth === 'auto') depth = 'off' // legacy value → treat as off
-    window.oldweb.setPageDisplay(depth, settings.pageDither ?? true)
-  }, [settings.colorDepth, settings.pageDither])
+    const classic = settings.classicType ?? 'off'
+    let typo = 'off'
+    if (classic === 'light' || classic === 'full') typo = classic
+    else if (classic === 'era') {
+      const year = parseInt((manifest?.oldWebDate ?? '').slice(0, 4), 10)
+      typo = year && year <= 2000 ? 'full' : 'light'
+    }
+    window.oldweb.setPageDisplay(depth, settings.pageDither ?? true, typo)
+    window.oldweb.setDisplayBySite(settings.displayBySite ?? {})
+  }, [settings.colorDepth, settings.pageDither, settings.classicType, settings.displayBySite, manifest])
   useEffect(() => {
     actions.setOldWebDate(waybackDate)
   }, [waybackDate, actions])
@@ -497,12 +528,18 @@ export function App() {
   useEffect(() => {
     setTimeline({ years: {}, months: {}, total: 0 })
   }, [baseKey])
+  // Track the current page key so an in-flight month fetch that resolves after
+  // the user has navigated away is dropped instead of polluting the new timeline.
+  const baseKeyRef = useRef(baseKey)
+  baseKeyRef.current = baseKey
   const loadYear = useCallback(
     async (year: number): Promise<void> => {
       if (!/^https?:\/\//i.test(activeUrl) || !year) return
+      const reqKey = baseKey
       setTimelineLoading(true)
       try {
         const counts = await window.oldweb.waybackMonths(activeUrl, year)
+        if (baseKeyRef.current !== reqKey) return // navigated away — drop stale result
         setTimeline((prev) => {
           const months = { ...prev.months }
           let present = 0
@@ -518,10 +555,10 @@ export function App() {
           return { years, months, total }
         })
       } finally {
-        setTimelineLoading(false)
+        if (baseKeyRef.current === reqKey) setTimelineLoading(false)
       }
     },
-    [activeUrl]
+    [activeUrl, baseKey]
   )
   // Explicit user home > the theme's era-appropriate homeUrl (manifest) > default.
   const homeUrl = settings.home || manifest?.homeUrl || 'https://www.myretromac.app'
@@ -1663,6 +1700,13 @@ export function App() {
         <SettingsDialog
           settings={settings}
           themes={themes}
+          currentOrigin={(() => {
+            try {
+              return new URL(activeUrl).origin
+            } catch {
+              return ''
+            }
+          })()}
           onSave={saveSettings}
           onClose={() => setDialogOpen(false)}
           onOpenExternal={(u) => window.oldweb.openExternal(u)}

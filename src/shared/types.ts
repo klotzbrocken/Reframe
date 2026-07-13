@@ -104,15 +104,17 @@ export interface OldwebAPI {
   shareCopy(dataUrl: string): Promise<void>
   /** Tell the engine how much room the chrome occupies, so it can place pages. */
   setContentInsets(insets: ContentInsets): Promise<void>
-  /** Toggle the optional CRT "retro content" overlay for a tab. */
-  setRetroContent(id: number, enabled: boolean): Promise<void>
   /** "Time Warp Modem": throttle the network to a period speed (full/isdn/56k/28.8k). */
   setNetworkSpeed(profile: string): Promise<void>
   /** Toggle uBlock-Origin-style ad/tracker blocking (opt-in, default off). */
   setAdblock(enabled: boolean): Promise<void>
   /** Retro display effect for page content: reduce colour depth
-   *  (off | 16bit | 8bit | 1bit) with optional ordered dithering. */
-  setPageDisplay(depth: string, dither: boolean): Promise<void>
+   *  (off | 16bit | 216 | 8bit | 1bit) with optional ordered dithering, plus a
+   *  classic-typography level (off | light | full). */
+  setPageDisplay(depth: string, dither: boolean, typo: string): Promise<void>
+  /** Per-origin display overrides: `{ origin: { depth?, typo? } }`; absent
+   *  fields inherit the global default. */
+  setDisplayBySite(bySite: Record<string, { depth?: string; typo?: string }>): Promise<void>
   /** Archive Timeline: capture COUNT for each of the 12 months of `year` for `url`
    *  (index 0 = Jan). Fetched per year from the Wayback calendar API. */
   waybackMonths(url: string, year: number): Promise<number[]>

@@ -101,6 +101,9 @@ function displayCss(mode: { depth?: string; dither?: boolean } | null): string {
     return 'html{filter:' + filterUrl(monoBody(dither)) + ' !important;background:#fff !important}'
   } else if (depth === '16bit') {
     f = filterUrl(posterBody(32, 64, 32, 1 / 32, dither)) // RGB 5-6-5
+  } else if (depth === '216') {
+    // Netscape "web-safe" palette: exactly 6 levels/channel (00,33,…,FF) = 216.
+    f = filterUrl(posterBody(6, 6, 6, 1 / 6, dither))
   } else if (depth === '8bit') {
     f = filterUrl(posterBody(8, 8, 4, 1 / 8, dither)) // RGB 3-3-2 (256 colours)
   } else {
@@ -109,29 +112,82 @@ function displayCss(mode: { depth?: string; dither?: boolean } | null): string {
   return 'html{filter:' + f + ' !important}'
 }
 
-let insertedKey: string | null = null
-function applyDisplay(mode: { depth?: string; dither?: boolean } | null): void {
-  try {
-    if (insertedKey) {
-      webFrame.removeInsertedCSS(insertedKey)
-      insertedKey = null
-    }
-  } catch {
-    /* frame gone — ignore */
+// --- Classic Web Typography & Controls -------------------------------------
+// A pure-CSS layer that makes modern pages *read* older: period link colours,
+// dotted focus rings and beveled native form controls at both levels, plus a
+// serif body + system UI font at 'full' (older eras). No pixel processing.
+function typographyCss(level: string | undefined): string {
+  if (level !== 'light' && level !== 'full') return ''
+  const rules: string[] = [
+    // Period hyperlink colours, always underlined.
+    'a:link{color:#0000ee!important;text-decoration:underline!important}',
+    'a:visited{color:#551a8b!important}',
+    'a:active{color:#ff0000!important}',
+    // Pre-modern dotted focus ring.
+    ':focus{outline:1px dotted #000!important;outline-offset:0!important}',
+    // Beveled push-buttons (outset, inset while pressed).
+    'button,input[type=button],input[type=submit],input[type=reset]{' +
+      '-webkit-appearance:auto!important;appearance:auto!important;' +
+      'border:2px outset #d4d0c8!important;border-radius:0!important;' +
+      'background:#d4d0c8!important;color:#000!important;padding:1px 7px!important;' +
+      "font-family:'Geneva','MS Sans Serif',Tahoma,Geneva,sans-serif!important;box-shadow:none!important}",
+    'button:active,input[type=button]:active,input[type=submit]:active,input[type=reset]:active{' +
+      'border-style:inset!important}',
+    // Sunken text fields + selects.
+    'input[type=text],input[type=search],input[type=email],input[type=url],' +
+      'input[type=password],input[type=tel],input[type=number],textarea,select{' +
+      '-webkit-appearance:auto!important;appearance:auto!important;' +
+      'border:2px inset #d4d0c8!important;border-radius:0!important;' +
+      'background:#fff!important;color:#000!important;box-shadow:none!important}'
+  ]
+  if (level === 'full') {
+    // Older eras: Times body + a classic UI/monospace stack. (Icon-font glyphs
+    // may fall back to letters — that's the 'era' trade-off; the milder 'light'
+    // level leaves fonts untouched.)
+    rules.push(
+      "html,body,p,div,span,li,dd,dt,td,th,blockquote,figcaption{font-family:'Times New Roman',Times,Georgia,serif!important}",
+      "h1,h2,h3,h4,h5,h6{font-family:'Times New Roman',Times,serif!important}",
+      "code,pre,kbd,samp,tt{font-family:'Courier New',Courier,monospace!important}"
+    )
   }
-  const css = displayCss(mode)
-  if (css) {
+  return rules.join('')
+}
+
+let filterKey: string | null = null
+let typoKey: string | null = null
+function applyDisplay(mode: { depth?: string; dither?: boolean; typo?: string } | null): void {
+  const drop = (k: string | null): null => {
     try {
-      insertedKey = webFrame.insertCSS(css)
+      if (k) webFrame.removeInsertedCSS(k)
+    } catch {
+      /* frame gone — ignore */
+    }
+    return null
+  }
+  filterKey = drop(filterKey)
+  typoKey = drop(typoKey)
+  const fcss = displayCss(mode)
+  if (fcss) {
+    try {
+      filterKey = webFrame.insertCSS(fcss)
     } catch {
       /* insertCSS unavailable this early — ignore */
     }
   }
+  const tcss = typographyCss(mode?.typo)
+  if (tcss) {
+    try {
+      typoKey = webFrame.insertCSS(tcss)
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
-// Read the current mode synchronously at document-start (before first paint)…
+// Read the mode for THIS origin synchronously at document-start (before first
+// paint) so a per-site override lands without a flash.
 try {
-  applyDisplay(ipcRenderer.sendSync('page:getDisplay'))
+  applyDisplay(ipcRenderer.sendSync('page:getDisplay', location.origin))
 } catch {
   /* main handler not ready — the broadcast below will catch us up */
 }

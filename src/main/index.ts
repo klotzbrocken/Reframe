@@ -527,9 +527,29 @@ function createWindow(): void {
   })
 }
 
+// Remote pages default to DENY for sensitive capabilities. Electron grants
+// permission requests automatically when no handler is set (Security Checklist
+// #7), which would let any site pull camera/mic/geolocation/notifications/screen
+// capture. Only a few benign, user-initiated capabilities are allowed.
+const ALLOWED_PERMISSIONS = new Set<string>([
+  'fullscreen',
+  'pointerLock',
+  'clipboard-sanitized-write'
+])
+
+function applyPermissionHandlers(ses: Electron.Session): void {
+  ses.setPermissionRequestHandler((_wc, permission, callback) => {
+    callback(ALLOWED_PERMISSIONS.has(permission))
+  })
+  ses.setPermissionCheckHandler((_wc, permission) => ALLOWED_PERMISSIONS.has(permission))
+  // Screen / window capture is always refused — hand back no source.
+  ses.setDisplayMediaRequestHandler((_request, callback) => callback({}))
+}
+
 app.whenReady().then(() => {
   registerAppProtocol()
   applyClientHints(session.defaultSession)
+  applyPermissionHandlers(session.defaultSession)
   applyDisplayCsp(session.defaultSession, () => (shell?.getPageDisplay().depth ?? 'off') !== 'off')
   setDockIcon()
   buildAppMenu()
