@@ -387,6 +387,21 @@ function setupAutoUpdate(): void {
 // menu bar). Cleared to null → the default built-in Edit/Window menus are used.
 let themeMenuModel: NativeMenuModel | null = null
 
+// Standard Edit-menu commands mapped to Electron roles. A theme menu item whose
+// label matches becomes a role item, so its accelerator (Cmd+C/V/X/A/Z) and
+// click act on the FOCUSED webContents — including the chrome's own address /
+// search fields, not only the page. Without this, native-menu (Mac) themes had
+// no working copy/paste in the address bar (the theme item routed to the page).
+const EDIT_ROLES: Record<string, MenuItemConstructorOptions['role']> = {
+  undo: 'undo',
+  redo: 'redo',
+  cut: 'cut',
+  copy: 'copy',
+  paste: 'paste',
+  delete: 'delete',
+  'select all': 'selectAll'
+}
+
 // Native application menu — Settings live here (global), not in the theme menus.
 // When a theme supplies `themeMenuModel`, its menus replace the default
 // Edit/Window entries and route clicks back to the renderer by (menu, item).
@@ -417,6 +432,10 @@ function buildAppMenu(): void {
         submenu: m.items.map((it, ii): MenuItemConstructorOptions => {
           if (it.type === 'sep') return { type: 'separator' }
           if (it.type === 'title') return { label: it.label ?? '', enabled: false }
+          // Standard clipboard/undo entries → native roles (act on the focused
+          // field, so copy/paste works in the address bar too).
+          const role = it.label ? EDIT_ROLES[it.label.trim().toLowerCase()] : undefined
+          if (role) return { label: it.label ?? '', role }
           return {
             label: it.label ?? '',
             enabled: !it.disabled,

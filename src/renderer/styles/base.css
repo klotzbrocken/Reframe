@@ -25,6 +25,15 @@ body {
   -webkit-user-select: none;
 }
 
+/* The chrome disables text selection globally (above), but text-entry fields
+   must stay selectable — otherwise you can't select a URL in the address bar to
+   copy it. */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 .ow-root {
   display: flex;
   flex-direction: column;
