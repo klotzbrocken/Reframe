@@ -56,6 +56,9 @@ const CHROME_SHIM = `(() => { try {
 
 /** Cache of Archive-Timeline month lookups, keyed "url|year" (10 min TTL). */
 const timelineCache = new Map<string, { at: number; months: number[] }>()
+/** Hard cap on cached timeline entries — oldest is evicted when full so the map
+ *  can't grow without bound over a long session. */
+const TIMELINE_CACHE_MAX = 200
 
 /** Runs in a page: resolves once every <img> has loaded (or after 6s). */
 const WAIT_IMAGES_JS = `new Promise((resolve) => {
@@ -466,6 +469,11 @@ export class BrowserShell {
       for (const it of j.items ?? []) {
         const m = Number(String(it[0]).padStart(10, '0').slice(0, 2))
         if (m >= 1 && m <= 12) counts[m - 1]++
+      }
+      // Evict the oldest entry when full (Map preserves insertion order).
+      if (timelineCache.size >= TIMELINE_CACHE_MAX) {
+        const oldest = timelineCache.keys().next().value
+        if (oldest !== undefined) timelineCache.delete(oldest)
       }
       timelineCache.set(key, { at: Date.now(), months: counts })
       return counts

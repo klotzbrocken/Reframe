@@ -39,6 +39,20 @@ const MONTHS = [
   'Dec'
 ]
 
+// The year slider runs MIN_YEAR…MAX_YEAR, plus one extra stop on the far right
+// that means "Today" (live web) — so the slider replaces the old Today/Time-Travel
+// buttons: drag fully right for today, drag left to time-travel.
+const TODAY_STOP = MAX_YEAR + 1
+
+// Colour-depth choices for the flyout's quick Display control (short labels).
+const DEPTH_OPTS: { id: string; label: string }[] = [
+  { id: 'off', label: 'True colour' },
+  { id: '16bit', label: '16-bit' },
+  { id: '8bit', label: '256' },
+  { id: '216', label: '216' },
+  { id: '1bit', label: '1-bit' }
+]
+
 interface Props {
   themes: ThemeItem[]
   themeId: string
@@ -60,6 +74,11 @@ interface Props {
   speed: string
   speedOpts: SpeedItem[]
   onSpeed: (id: string) => void
+  /** Quick global colour-depth + dither controls (mirror of Settings). */
+  colorDepth: string
+  onColorDepth: (id: string) => void
+  dither: boolean
+  onDither: (on: boolean) => void
   /** Archive Timeline: real Wayback capture density for the current page. */
   timeline: WaybackTimeline
   /** True while the timeline for the current page is being fetched. */
@@ -83,13 +102,17 @@ export function FloatingMenu({
   speed,
   speedOpts,
   onSpeed,
+  colorDepth,
+  onColorDepth,
+  dither,
+  onDither,
   timeline,
   timelineLoading,
   onYear
 }: Props) {
   const [open, setOpen] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
-  const [year, setYear] = useState(waybackYear || 2001)
+  const [year, setYear] = useState(oldWeb ? waybackYear || 2001 : TODAY_STOP)
   const [month, setMonth] = useState(waybackMonth || 6)
   const ref = useRef<HTMLDivElement>(null)
   const panelOpen = open || !!forceOpen
@@ -101,7 +124,9 @@ export function FloatingMenu({
   yearRef.current = year
   const monthRef = useRef(month)
   monthRef.current = month
-  const travel = (): void => onWayback(yearRef.current, monthRef.current)
+  // On release: the far-right stop returns to the live web, any year time-travels.
+  const travel = (): void =>
+    yearRef.current >= TODAY_STOP ? onWaybackOff() : onWayback(yearRef.current, monthRef.current)
 
   // Load a year's real captures when the panel opens and (debounced) whenever the
   // selected year settles — the calendar API is queried one year at a time.
@@ -131,12 +156,16 @@ export function FloatingMenu({
     onWayback(yearRef.current, m)
   }
 
-  // Derived "mode": where the page comes from.
-  const mode: 'today' | 'travel' = oldWeb ? 'travel' : 'today'
+  // Derived "mode" follows the slider position: the far-right stop = today.
+  const isToday = year >= TODAY_STOP
+  const mode: 'today' | 'travel' = isToday ? 'today' : 'travel'
 
+  // Keep the thumb in sync with the actual page state: today parks it far right,
+  // an active Wayback year moves it to that year.
   useEffect(() => {
-    if (waybackYear) setYear(waybackYear)
-  }, [waybackYear])
+    if (!oldWeb) setYear(TODAY_STOP)
+    else if (waybackYear) setYear(waybackYear)
+  }, [oldWeb, waybackYear])
   useEffect(() => {
     if (waybackMonth) setMonth(waybackMonth)
   }, [waybackMonth])
@@ -218,7 +247,6 @@ export function FloatingMenu({
               </span>
               <span className="ow-fab__bigmeta">
                 <span className={'ow-fab__status ow-fab__status--' + mode}>{statusText}</span>
-                {mode === 'today' && <span className="ow-fab__target">· target {year}</span>}
               </span>
             </div>
 
@@ -258,90 +286,70 @@ export function FloatingMenu({
               type="range"
               className="ow-fab__range"
               min={MIN_YEAR}
-              max={MAX_YEAR}
+              max={TODAY_STOP}
               value={year}
-              aria-label="Wayback year"
+              aria-label="Wayback year — far right is today"
               onChange={(e) => setYear(Number(e.target.value))}
               onPointerUp={travel}
               onKeyUp={travel}
             />
             <div className="ow-fab__years">
               <span>{MIN_YEAR}</span>
-              <span>{MAX_YEAR}</span>
+              <span>Today</span>
             </div>
 
-            {/* Month timeline — which months of the selected year were archived. */}
-            <div className="ow-fab__hist ow-fab__hist--month">
-              {MONTHS.map((mn, i) => {
-                const m = i + 1
-                const c = monthCount(year, m)
-                const has = c > 0
-                return (
-                  <button
-                    key={mn}
-                    type="button"
-                    className={
-                      'ow-fab__bar' + (has ? '' : ' is-empty') + (m === month ? ' is-sel' : '')
-                    }
-                    style={{ height: has ? 15 + Math.round((c / maxMonth) * 85) + '%' : '8%' }}
-                    title={`${mn} ${year}${has ? ` · ${c} capture${c > 1 ? 's' : ''}` : ' · no snapshot'}`}
-                    aria-label={`${mn} ${year}${has ? '' : ' — no snapshot'}`}
-                    disabled={!has}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      pickMonth(m)
-                    }}
-                  />
-                )
-              })}
-            </div>
+            {/* Month controls only make sense while time-travelling — hidden at Today. */}
+            {!isToday && (
+              <>
+                {/* Month timeline — which months of the selected year were archived. */}
+                <div className="ow-fab__hist ow-fab__hist--month">
+                  {MONTHS.map((mn, i) => {
+                    const m = i + 1
+                    const c = monthCount(year, m)
+                    const has = c > 0
+                    return (
+                      <button
+                        key={mn}
+                        type="button"
+                        className={
+                          'ow-fab__bar' + (has ? '' : ' is-empty') + (m === month ? ' is-sel' : '')
+                        }
+                        style={{ height: has ? 15 + Math.round((c / maxMonth) * 85) + '%' : '8%' }}
+                        title={`${mn} ${year}${has ? ` · ${c} capture${c > 1 ? 's' : ''}` : ' · no snapshot'}`}
+                        aria-label={`${mn} ${year}${has ? '' : ' — no snapshot'}`}
+                        disabled={!has}
+                        onMouseDown={(e) => {
+                          e.preventDefault()
+                          pickMonth(m)
+                        }}
+                      />
+                    )
+                  })}
+                </div>
 
-            {/* Month — 12 discrete steps; release reloads that month's snapshot.
-                The chosen month shows in the status line above, not in the scale. */}
-            <input
-              type="range"
-              className="ow-fab__range"
-              min={1}
-              max={12}
-              step={1}
-              value={month}
-              aria-label={'Wayback month — ' + MONTHS[month - 1]}
-              onChange={(e) => setMonth(Number(e.target.value))}
-              onPointerUp={travel}
-              onKeyUp={travel}
-            />
-            <div className="ow-fab__years">
-              <span>Jan</span>
-              <span>Dec</span>
-            </div>
+                {/* Month — 12 discrete steps; release reloads that month's snapshot. */}
+                <input
+                  type="range"
+                  className="ow-fab__range"
+                  min={1}
+                  max={12}
+                  step={1}
+                  value={month}
+                  aria-label={'Wayback month — ' + MONTHS[month - 1]}
+                  onChange={(e) => setMonth(Number(e.target.value))}
+                  onPointerUp={travel}
+                  onKeyUp={travel}
+                />
+                <div className="ow-fab__years">
+                  <span>Jan</span>
+                  <span>Dec</span>
+                </div>
 
-            {timeline.years[year] === 0 && !timelineLoading && (
-              <div className="ow-fab__hint">No snapshots in {year} — try another year.</div>
+                {timeline.years[year] === 0 && !timelineLoading && (
+                  <div className="ow-fab__hint">No snapshots in {year} — try another year.</div>
+                )}
+              </>
             )}
-
-            {/* mode segment */}
-            <div className="ow-fab__seg" role="group" aria-label="Page source">
-              <button
-                type="button"
-                className={'ow-fab__segbtn' + (mode === 'today' ? ' is-active' : '')}
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  onWaybackOff()
-                }}
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                className={'ow-fab__segbtn' + (mode === 'travel' ? ' is-active' : '')}
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  onWayback(year, month)
-                }}
-              >
-                Time-Travel
-              </button>
-            </div>
           </div>
 
           <div className="ow-fab__div" />
@@ -415,6 +423,36 @@ export function FloatingMenu({
                   {s.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div className="ow-fab__div" />
+
+          {/* ---- Retro display (global colour depth + dither) ---- */}
+          <div className="ow-fab__section">
+            <div className="ow-fab__title">Retro Display</div>
+            <div className="ow-fab__displayrow">
+              <select
+                className="ow-fab__select"
+                value={colorDepth}
+                aria-label="Colour depth"
+                onChange={(e) => onColorDepth(e.target.value)}
+              >
+                {DEPTH_OPTS.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.label}
+                  </option>
+                ))}
+              </select>
+              <label className="ow-fab__check">
+                <input
+                  type="checkbox"
+                  checked={dither}
+                  disabled={colorDepth === 'off'}
+                  onChange={(e) => onDither(e.target.checked)}
+                />
+                <span>Dither</span>
+              </label>
             </div>
           </div>
         </div>

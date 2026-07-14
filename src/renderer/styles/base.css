@@ -469,7 +469,7 @@ body,
   justify-content: center;
 }
 .ow-dialog {
-  width: 660px;
+  width: 700px;
   max-width: 94vw;
   max-height: 92vh;
   overflow-y: auto;
@@ -516,7 +516,7 @@ body,
 .ow-dialog__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 18px;
+  gap: 9px 16px;
 }
 .ow-field--wide {
   grid-column: 1 / -1;
@@ -543,10 +543,10 @@ body,
   color: #444;
 }
 .ow-dialog__body {
-  padding: 14px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 9px;
 }
 .ow-dialog__about {
   margin: 0;
@@ -1442,6 +1442,40 @@ body,
   border-color: #1a4fb0;
   background: #1f5fc4;
   color: #fff;
+}
+/* Quick Retro-Display row (colour depth select + dither toggle). */
+.ow-fab__displayrow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ow-fab__select {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid #c2c2c2;
+  border-radius: 7px;
+  background: #fcfcfc;
+  color: #4a4f58;
+  font: inherit;
+  font-size: 12px;
+}
+.ow-fab__check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a4f58;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ow-fab__check input {
+  margin: 0;
+}
+.ow-fab__check input:disabled + span {
+  opacity: 0.45;
 }
 
 /* ---- Share ----------------------------------------------------------- */
