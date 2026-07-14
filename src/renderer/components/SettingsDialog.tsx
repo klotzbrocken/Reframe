@@ -92,10 +92,18 @@ export function SettingsDialog({
   onClose,
   onOpenExternal
 }: Props) {
-  const siteOrigin = /^https?:\/\//i.test(currentOrigin ?? '') ? (currentOrigin as string) : ''
+  // Lock the site override to the origin the dialog OPENED on — otherwise a
+  // navigation while Settings is open could save the override to a different site
+  // than the one whose values are shown. (The dialog remounts on each open.)
+  const [siteOrigin] = useState(() =>
+    /^https?:\/\//i.test(currentOrigin ?? '') ? (currentOrigin as string) : ''
+  )
   const siteOverride = siteOrigin ? settings.displayBySite?.[siteOrigin] : undefined
   const [siteDepth, setSiteDepth] = useState(siteOverride?.depth ?? 'default')
   const [siteTypo, setSiteTypo] = useState(siteOverride?.typo ?? 'default')
+  // Whether the colour-depth/typography controls edit the global default or the
+  // current site's override — one set of controls instead of two duplicated sets.
+  const [displayScope, setDisplayScope] = useState<'all' | 'site'>('all')
   const [home, setHome] = useState(settings.home || SITE)
   const [mailUseLocal, setMailUseLocal] = useState(settings.mailUseLocal ?? false)
   const [mailUrl, setMailUrl] = useState(settings.mailUrl || 'https://mail.google.com')
@@ -241,23 +249,61 @@ export function SettingsDialog({
               <span>Block ads &amp; trackers</span>
             </label>
 
-            <label className="ow-field">
-              <span>Colour depth (web pages)</span>
-              <select
-                value={colorDepth}
-                onChange={(e) =>
-                  setColorDepth(e.target.value as 'off' | '16bit' | '216' | '8bit' | '1bit')
-                }
-              >
-                <option value="off">Off — true colour (default)</option>
-                <option value="16bit">16-bit — thousands</option>
-                <option value="8bit">8-bit — 256 colours</option>
-                <option value="216">216 — web-safe palette</option>
-                <option value="1bit">1-bit — black &amp; white</option>
-              </select>
-            </label>
+            <div className="ow-field--sep ow-field--wide">Retro display (web pages)</div>
 
-            <label className="ow-field ow-field--check">
+            <div className="ow-field-row">
+              <label className="ow-field" style={{ flex: 1 }}>
+                <span>Apply to</span>
+                <select
+                  value={displayScope}
+                  onChange={(e) => setDisplayScope(e.target.value as 'all' | 'site')}
+                >
+                  <option value="all">All sites (default)</option>
+                  {siteOrigin && (
+                    <option value="site">
+                      This site — {siteOrigin.replace(/^https?:\/\//, '')}
+                    </option>
+                  )}
+                </select>
+              </label>
+              <label className="ow-field" style={{ flex: 1 }}>
+                <span>Colour depth</span>
+                <select
+                  value={displayScope === 'site' ? siteDepth : colorDepth}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (displayScope === 'site') setSiteDepth(v)
+                    else setColorDepth(v as 'off' | '16bit' | '216' | '8bit' | '1bit')
+                  }}
+                >
+                  {displayScope === 'site' && <option value="default">Use default</option>}
+                  <option value="off">Off — true colour</option>
+                  <option value="16bit">16-bit — thousands</option>
+                  <option value="8bit">8-bit — 256</option>
+                  <option value="216">216 — web-safe</option>
+                  <option value="1bit">1-bit — B&amp;W</option>
+                </select>
+              </label>
+              <label className="ow-field" style={{ flex: 1 }}>
+                <span>Typography</span>
+                <select
+                  value={displayScope === 'site' ? siteTypo : classicType}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (displayScope === 'site') setSiteTypo(v)
+                    else setClassicType(v as 'off' | 'era' | 'light' | 'full')
+                  }}
+                >
+                  {displayScope === 'site' && <option value="default">Use default</option>}
+                  <option value="off">Off</option>
+                  {displayScope === 'all' && <option value="era">Era-appropriate</option>}
+                  <option value="light">Light — links &amp; controls</option>
+                  <option value="full">Full — era fonts (may affect icons)</option>
+                </select>
+              </label>
+            </div>
+
+            <label className="ow-field ow-field--check ow-field--wide">
               <input
                 type="checkbox"
                 checked={pageDither}
@@ -265,49 +311,6 @@ export function SettingsDialog({
               />
               <span>Dither reduced colour depth (ordered/Bayer)</span>
             </label>
-
-            <label className="ow-field">
-              <span>Classic web typography &amp; controls</span>
-              <select
-                value={classicType}
-                onChange={(e) =>
-                  setClassicType(e.target.value as 'off' | 'era' | 'light' | 'full')
-                }
-              >
-                <option value="off">Off (default)</option>
-                <option value="era">Era-appropriate (auto)</option>
-                <option value="light">Light — classic links &amp; controls</option>
-                <option value="full">Full — era fonts too</option>
-              </select>
-            </label>
-
-            {siteOrigin && (
-              <>
-                <div className="ow-field--sep ow-field--wide">
-                  For this site only — {siteOrigin.replace(/^https?:\/\//, '')}
-                </div>
-                <label className="ow-field">
-                  <span>Colour depth (this site)</span>
-                  <select value={siteDepth} onChange={(e) => setSiteDepth(e.target.value)}>
-                    <option value="default">Use default (above)</option>
-                    <option value="off">Off — true colour</option>
-                    <option value="16bit">16-bit</option>
-                    <option value="8bit">8-bit — 256</option>
-                    <option value="216">216 — web-safe</option>
-                    <option value="1bit">1-bit</option>
-                  </select>
-                </label>
-                <label className="ow-field">
-                  <span>Typography (this site)</span>
-                  <select value={siteTypo} onChange={(e) => setSiteTypo(e.target.value)}>
-                    <option value="default">Use default (above)</option>
-                    <option value="off">Off</option>
-                    <option value="light">Light</option>
-                    <option value="full">Full</option>
-                  </select>
-                </label>
-              </>
-            )}
 
             <label className="ow-field ow-field--check">
               <input

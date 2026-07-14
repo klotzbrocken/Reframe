@@ -124,9 +124,9 @@ function relaxImgDataCsp(csp: string): string {
   return dirs.join('; ')
 }
 
-function applyDisplayCsp(ses: Electron.Session, active: () => boolean): void {
+function applyDisplayCsp(ses: Electron.Session, active: (url: string) => boolean): void {
   ses.webRequest.onHeadersReceived((details, cb) => {
-    if (!active()) return cb({})
+    if (!active(details.url)) return cb({})
     const headers = details.responseHeaders
     if (!headers) return cb({})
     for (const key of Object.keys(headers)) {
@@ -550,7 +550,17 @@ app.whenReady().then(() => {
   registerAppProtocol()
   applyClientHints(session.defaultSession)
   applyPermissionHandlers(session.defaultSession)
-  applyDisplayCsp(session.defaultSession, () => (shell?.getPageDisplay().depth ?? 'off') !== 'off')
+  applyDisplayCsp(session.defaultSession, (url) => {
+    // Relax CSP when THIS request's origin has an effective reduced-colour mode —
+    // including a per-site override even if the global default is off.
+    let origin = ''
+    try {
+      origin = new URL(url).origin
+    } catch {
+      /* non-URL request — treat as global */
+    }
+    return (shell?.getPageDisplay(origin).depth ?? 'off') !== 'off'
+  })
   setDockIcon()
   buildAppMenu()
   setupAutoUpdate()

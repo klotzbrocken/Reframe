@@ -41,9 +41,9 @@ import {
 // "Time Warp Modem" speed choices shown in the Help menu (Help → Time Warp Modem).
 const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string }[] = [
   { id: 'full', label: 'Off' },
-  { id: 'isdn', label: 'ISDN (64 kbit/s)' },
-  { id: '56k', label: '56K Modem' },
-  { id: '28.8k', label: '28.8 Modem' }
+  { id: 'isdn', label: 'ISDN (64K)' },
+  { id: '56k', label: '56K' },
+  { id: '28.8k', label: '28.8K' }
 ]
 
 // Themes whose lineage is Mac/NeXT (vs. the Windows/PC themes). Drives which
@@ -528,6 +528,20 @@ export function App() {
   useEffect(() => {
     setTimeline({ years: {}, months: {}, total: 0 })
   }, [baseKey])
+  // The flyout's quick colour control acts on the CURRENT page: if the site has a
+  // per-site override it edits THAT (so a global change isn't silently shadowed by
+  // the override), otherwise it edits the global default.
+  const flyoutOrigin = (() => {
+    try {
+      return new URL(activeUrl).origin
+    } catch {
+      return ''
+    }
+  })()
+  const flyoutSiteOv = flyoutOrigin ? settings.displayBySite?.[flyoutOrigin] : undefined
+  const flyoutDepth =
+    flyoutSiteOv?.depth ??
+    (!settings.colorDepth || settings.colorDepth === 'auto' ? 'off' : settings.colorDepth)
   // Track the current page key so an in-flight month fetch that resolves after
   // the user has navigated away is dropped instead of polluting the new timeline.
   const baseKeyRef = useRef(baseKey)
@@ -1753,6 +1767,26 @@ export function App() {
         speed={settings.connectionSpeed || 'full'}
         speedOpts={SPEED_OPTS}
         onSpeed={(id) => setConnectionSpeed(id as Settings['connectionSpeed'])}
+        colorDepth={flyoutDepth}
+        onColorDepth={(v) => {
+          if (flyoutSiteOv) {
+            // Edit this site's override so the current page actually changes.
+            saveSettings({
+              ...settings,
+              displayBySite: {
+                ...(settings.displayBySite ?? {}),
+                [flyoutOrigin]: { ...flyoutSiteOv, depth: v }
+              }
+            })
+          } else {
+            saveSettings({
+              ...settings,
+              colorDepth: v === 'off' ? undefined : (v as Settings['colorDepth'])
+            })
+          }
+        }}
+        dither={settings.pageDither ?? true}
+        onDither={(b) => saveSettings({ ...settings, pageDither: b ? undefined : false })}
         timeline={timeline}
         timelineLoading={timelineLoading}
         onYear={loadYear}
