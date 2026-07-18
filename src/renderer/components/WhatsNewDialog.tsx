@@ -1,22 +1,26 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.8.0'
+export const WHATS_NEW_VERSION = '1.9.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'Go monochrome — the 1-bit web',
-    body: 'The star of this release. A brand-new “Internet Explorer 4.5 (Mac, monochrome)” theme renders the whole browser — and every web page inside it — in authentic 1-bit black & white with ordered Bayer dithering, exactly like a classic compact Mac. And it’s not just that theme: a new “Colour depth” setting (True colour · 16-bit · 8-bit · 1-bit, with optional dithering) can crush today’s web down to thousands, 256, or two colours in ANY theme. Text stays crisp and readable thanks to a contrast-boosted 1-bit renderer, and it even works on locked-down sites like Gmail — applied before the page paints, so there’s no colour flash.'
+    title: 'Retro Display Engine v2 — now per site',
+    body: 'The colour-depth engine grew up. Set a global look, then override any individual site: a page can stay in glorious true colour while everything else drops to 256, 16-bit or 1-bit — the choice sticks per origin and is applied before the page paints, so there’s no colour flash. There’s a new web-safe “216” mode (the classic Netscape colour cube), and you can flip depth or dithering for the current page right from the Time Machine flyout.'
   },
   {
-    title: 'Two new Mac browsers',
-    body: 'Internet Explorer 4.5 for Macintosh in full Mac OS 8.5 “Platinum” (colour and monochrome), plus Netscape 7.02 for Mac in its “Modern” skin — the Aqua traffic-light title bar, one unified toolbar with the Location field and Search sitting right next to the round metal buttons, the spinning Netscape throbber, and real tabbed browsing.'
+    title: 'Classic Web Typography',
+    body: 'A new, optional typography layer dresses today’s web in period clothing — era-appropriate link colours, dotted focus outlines, beveled form controls, and a classic serif body at the “Full” setting. It’s pure CSS injected safely (CSP-friendly), with an “era” option that auto-picks the right look from whichever theme you’re wearing. Choose Off, Light or Full in Settings.'
   },
   {
-    title: 'Settings & bookmarks polish',
-    body: 'New Colour-depth and dithering controls; the dial-up modem widget is now on by default; connection speed, dial-up sound and volume share one tidy row. Every theme’s bookmark bar now carries the same handpicked set — including OldaVista and 68k.news, both perfect period-accurate places to browse.'
+    title: 'A slimmer Time Machine',
+    body: 'The year flyout is cleaner: the slider’s far-right stop is now “Today” (live) — drag left to travel back, and the month controls appear only when you do. The separate Today / Time-Travel buttons are gone, quick Retro-Display controls moved in, and the dial-up speed labels are shorter (Off · ISDN 64K · 56K · 28.8K).'
+  },
+  {
+    title: 'Hardening & fixes',
+    body: 'Security hardening: remote pages are now default-denied camera, mic and other sensitive permissions. Copy & paste works in the address bar again (and the Edit menu’s Cut/Copy/Paste act on the right field). The ad-block toggle now reloads every tab, per-site reduced-colour pages stay Gmail-safe, and the Archive timeline no longer pulls in stale data after you navigate away.'
   }
 ]
 
