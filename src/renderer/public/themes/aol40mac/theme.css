@@ -1,0 +1,176 @@
+/* =====================================================================
+ * AOL Desktop 4.0 — Macintosh (Mac OS 9) variant.
+ *
+ * Reuses the entire Windows AOL theme (toolbar, channels, MDI workspace,
+ * dial-in animation, …) via @import, and swaps every window caption — the
+ * application window, the MDI child window and the minimised stubs — for the
+ * classic Mac OS 9 "Platinum" title bar: horizontal pinstripes, a left close
+ * box and right collapse/zoom boxes, with the title centred on a masked chip.
+ * ===================================================================== */
+@import url('../aol40/theme.css');
+
+/* Shared Platinum pinstripe caption fill. */
+:root {
+  --plat-stripes: repeating-linear-gradient(to bottom, rgba(38, 38, 38, 0.16) 0 1px, transparent 1px 3px);
+}
+
+/* A reusable Mac window-control box (the little 3D square gadget). */
+.ow-titlebar .ow-winbtn,
+.ow-content__winbtn,
+.ow-mdi-stub__b {
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  position: relative;
+}
+.ow-titlebar .ow-winbtn::before,
+.ow-content__winbtn::before,
+.ow-mdi-stub__b::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, #9a9a9a, #f1f1f1);
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #6e6e6e, 0 0 0 1px #5a5a5a;
+}
+.ow-titlebar .ow-winbtn:active::before,
+.ow-content__winbtn:active::before,
+.ow-mdi-stub__b:active::before {
+  filter: brightness(0.88);
+}
+
+/* ---- Outer application window ----------------------------------------- */
+.ow-titlebar {
+  position: relative;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--plat-stripes), var(--ie4-platinum);
+  border-bottom: 1px solid var(--ie4-dark);
+  box-shadow: inset 2px 2px 0 rgba(38, 38, 38, 0.1), inset -2px -2px 0 rgba(38, 38, 38, 0.28);
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 62%;
+  padding: 1px 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: 700 12px var(--mac-font);
+  color: var(--ie4-dark);
+  letter-spacing: 0.03em;
+  background: var(--ie4-light);
+  text-shadow: none;
+}
+.ow-titlebar__controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+/* Close on the left, collapse/zoom on the right (Mac order). */
+.ow-titlebar .ow-winbtn[data-control='close'] { order: 0; margin: 0 auto 0 0; }
+.ow-titlebar .ow-winbtn[data-control='maximize'],
+.ow-titlebar .ow-winbtn[data-control='restore'] { order: 1; }
+.ow-titlebar .ow-winbtn[data-control='minimize'] { order: 2; }
+
+/* ---- MDI child window caption ----------------------------------------- */
+.ow-content__titlebar {
+  position: relative;
+  height: 19px;
+  padding: 0 5px;
+  gap: 5px;
+  background: var(--plat-stripes), var(--ie4-platinum);
+  border-bottom: 1px solid var(--ie4-dark);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 0 rgba(38, 38, 38, 0.22);
+  color: var(--ie4-dark);
+  font: 700 11px var(--mac-font);
+  cursor: move;
+}
+.ow-content__titleicon {
+  display: none;
+}
+.ow-content__titletext {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 58%;
+  padding: 0 10px;
+  background: var(--ie4-light);
+  color: var(--ie4-dark);
+}
+.ow-content__winbtns {
+  margin-left: auto;
+  gap: 4px;
+  z-index: 1;
+}
+/* Clear the Win98 SVG glyphs from the imported theme. */
+.ow-content__winbtn[data-c='min'],
+.ow-content__winbtn[data-c='max'],
+.ow-content__winbtn[data-c='close'],
+.ow-content__chrome.is-max .ow-content__winbtn[data-c='max'] {
+  background-image: none;
+}
+/* Mac window layout: the close box sits on the LEFT, collapse/zoom on the right
+   — as on a real Mac OS 9 window. Close is pulled out of the right-hand group. */
+.ow-content__titlebar {
+  padding-left: 22px;
+}
+.ow-content__winbtn[data-c='close'] {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+/* ---- Minimised stubs → Platinum captions ------------------------------ */
+.ow-mdi-stub {
+  padding: 0 3px;
+  background: var(--ie4-platinum);
+  color: var(--ie4-dark);
+  font: 700 11px var(--mac-font);
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #6e6e6e, 0 0 0 1px #5a5a5a;
+}
+/* The active window's own minimised stub shows the pinstripes. */
+.ow-mdi-stub.is-min {
+  background: var(--plat-stripes), var(--ie4-platinum);
+}
+.ow-mdi-stub__icon {
+  display: none;
+}
+.ow-mdi-stub__t {
+  background: var(--ie4-light);
+  padding: 0 6px;
+  border-radius: 0;
+}
+.ow-mdi-stub__b[data-c='restore'],
+.ow-mdi-stub__b[data-c='max'],
+.ow-mdi-stub__b[data-c='close'] {
+  background-image: none;
+}
+/* Same Mac layout on the minimised stubs: close box on the left. */
+.ow-mdi-stub {
+  position: relative;
+  padding-left: 20px;
+}
+.ow-mdi-stub__b[data-c='close'] {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+}

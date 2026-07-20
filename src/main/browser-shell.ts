@@ -316,6 +316,15 @@ export class BrowserShell {
     void wc.loadURL(pageUrl(`about/${safe}.html`))
   }
 
+  /** Load a bundled per-theme page (e.g. AOL's Channels directory) in a tab.
+   *  Both ids are gated to plain slugs so the path can't escape the bundle. */
+  openThemePage(id: number, themeId: string, page: string): void {
+    const slug = /^[a-z0-9-]+$/i
+    const wc = this.tabs.get(id)?.view.webContents
+    if (!slug.test(themeId) || !slug.test(page) || !wc || wc.isDestroyed()) return
+    void wc.loadURL(pageUrl(`themes/${themeId}/${page}.html`))
+  }
+
   /** A 2-finger swipe came from a page view: navigate the owning tab's history.
    *  Matching by sender id keeps a page from steering any other tab. */
   swipeNavigate(senderWebContentsId: number, dir: 'back' | 'forward'): void {

@@ -23,6 +23,9 @@ interface Props {
   /** NCSA Mosaic: when set, a read-only "Document Title:" row is shown above the
    *  URL row (the theme lays them out as two lines). Undefined = single row. */
   documentTitle?: string
+  /** Notifies when the recent-addresses dropdown opens/closes, so the shell can
+   *  grey out the page beneath it (AOL). */
+  onListVisibleChange?: (visible: boolean) => void
 }
 
 export function AddressBar({
@@ -39,7 +42,8 @@ export function AddressBar({
   onRelated,
   onToggleImages,
   imagesOff,
-  documentTitle
+  documentTitle,
+  onListVisibleChange
 }: Props) {
   const [value, setValue] = useState(url)
   const [focused, setFocused] = useState(false)
@@ -66,8 +70,12 @@ export function AddressBar({
   const listVisible = listOpen && history.length > 0
   useEffect(() => {
     requestChromeTop('addrlist', listVisible)
-    return () => requestChromeTop('addrlist', false)
-  }, [listVisible])
+    onListVisibleChange?.(listVisible)
+    return () => {
+      requestChromeTop('addrlist', false)
+      onListVisibleChange?.(false)
+    }
+  }, [listVisible, onListVisibleChange])
 
   // Close the dropdown on an outside click.
   useEffect(() => {
@@ -195,6 +203,11 @@ export function AddressBar({
       <button type="submit" className="ow-go" title={goLabel}>
         <span className="ow-go__icon" aria-hidden />
         {goLabel}
+      </button>
+      {/* AOL "Keyword" — submits the field as a keyword/search, same as Go.
+          Hidden by default; the AOL theme shows and styles it. */}
+      <button type="submit" className="ow-keyword" title="Keyword">
+        Keyword
       </button>
       <button type="button" className="ow-loc-related" title="What's Related" onClick={onRelated}>
         <span className="ow-loc-related__icon" aria-hidden />

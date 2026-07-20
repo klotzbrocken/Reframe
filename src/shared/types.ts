@@ -74,6 +74,7 @@ export interface OldwebAPI {
   goForward(id: number): Promise<void>
   /** Load the active theme's bundled "About <browser>" history page in a tab. */
   openAbout(id: number, themeId: string): Promise<void>
+  openThemePage(id: number, themeId: string, page: string): Promise<void>
   reload(id: number): Promise<void>
   stop(id: number): Promise<void>
   /** Clipboard/selection command run against the active page (Edit menu, buttons). */
