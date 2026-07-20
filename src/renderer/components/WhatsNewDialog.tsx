@@ -1,26 +1,26 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.9.0'
+export const WHATS_NEW_VERSION = '1.10.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'Retro Display Engine v2 — now per site',
-    body: 'The colour-depth engine grew up. Set a global look, then override any individual site: a page can stay in glorious true colour while everything else drops to 256, 16-bit or 1-bit — the choice sticks per origin and is applied before the page paints, so there’s no colour flash. There’s a new web-safe “216” mode (the classic Netscape colour cube), and you can flip depth or dithering for the current page right from the Time Machine flyout.'
+    title: 'You’ve Got Mail — the AOL Desktop 4.0 theme',
+    body: 'The star of this release: a pixel-faithful recreation of the 1998 AOL client wrapped around today’s web. The colourful two-row toolbar, the Keyword bar, the running-man throbber and the dial-in animation are all here — and every page floats inside a real MDI “child window” you can move, resize, minimise and maximise, just like the original. Icons that needed the real AOL service (Mail, People, Quotes…) are shown greyed out, as they’d be before you signed on.'
   },
   {
-    title: 'Classic Web Typography',
-    body: 'A new, optional typography layer dresses today’s web in period clothing — era-appropriate link colours, dotted focus outlines, beveled form controls, and a classic serif body at the “Full” setting. It’s pure CSS injected safely (CSP-friendly), with an “era” option that auto-picks the right look from whichever theme you’re wearing. Choose Off, Light or Full in Settings.'
+    title: 'Two flavours — Windows & Mac OS 9',
+    body: 'Pick “AOL Desktop 4.0” for the classic Windows look, or “AOL Desktop 4.0 (Mac OS 9)” for the Macintosh version — same AOL shell, but with the classic Platinum title bars (close box on the left) and the menus up in the real Mac menu bar.'
   },
   {
-    title: 'A slimmer Time Machine',
-    body: 'The year flyout is cleaner: the slider’s far-right stop is now “Today” (live) — drag left to travel back, and the month controls appear only when you do. The separate Today / Time-Travel buttons are gone, quick Retro-Display controls moved in, and the dial-up speed labels are shorter (Off · ISDN 64K · 56K · 28.8K).'
+    title: 'Channels that go somewhere',
+    body: 'Click the Channels icon for the iconic channel directory, or its little ▼ for a quick drop-down — News, Sports, Travel, Shopping and more, each linking to a fitting modern site. Don’t like a destination? Right-click any channel to edit its link; your choices are remembered.'
   },
   {
-    title: 'Hardening & fixes',
-    body: 'Security hardening: remote pages are now default-denied camera, mic and other sensitive permissions. Copy & paste works in the address bar again (and the Edit menu’s Cut/Copy/Paste act on the right field). The ad-block toggle now reloads every tab, per-site reduced-colour pages stay Gmail-safe, and the Archive timeline no longer pulls in stale data after you navigate away.'
+    title: 'More windows, less clutter',
+    body: 'With a window minimised, typing a new address opens a fresh window — several can be open at once, each as its own title-bar. The navigation arrows light up only when they’re usable, and the address bar doubles as the Keyword box. Themes are now sorted by year, and every AOL screen has its own “About” page.'
   }
 ]
 
