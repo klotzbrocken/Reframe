@@ -56,8 +56,33 @@ const MAC_THEMES = new Set([
   'camino',
   'omniweb',
   'netscape4mac',
-  'ns7modern'
+  'ns7modern',
+  'aol40mac'
 ])
+
+// AOL Desktop 4.0 channel directory — label + a fitting modern destination.
+// Used both by the Channels toolbar dropdown and the themed channels page.
+const AOL_CHANNELS: { label: string; url: string }[] = [
+  { label: 'AOL Today', url: 'https://www.aol.com' },
+  { label: 'News', url: 'https://www.reuters.com' },
+  { label: 'Sports', url: 'https://www.espn.com' },
+  { label: 'Influence', url: 'https://www.politico.com' },
+  { label: 'Travel', url: 'https://www.tripadvisor.com' },
+  { label: 'International', url: 'https://www.bbc.com/news/world' },
+  { label: 'Personal Finance', url: 'https://www.marketwatch.com' },
+  { label: 'WorkPlace', url: 'https://www.linkedin.com/jobs' },
+  { label: 'Computing', url: 'https://www.theverge.com' },
+  { label: 'Research & Learn', url: 'https://en.wikipedia.org' },
+  { label: 'Entertainment', url: 'https://www.imdb.com' },
+  { label: 'Games', url: 'https://www.ign.com' },
+  { label: 'Interests', url: 'https://www.reddit.com' },
+  { label: 'Lifestyles', url: 'https://www.goodhousekeeping.com' },
+  { label: 'Shopping', url: 'https://www.amazon.com' },
+  { label: 'Health', url: 'https://www.webmd.com' },
+  { label: 'Families', url: 'https://www.parents.com' },
+  { label: 'Kids Only', url: 'https://pbskids.org' },
+  { label: 'Local', url: 'https://www.yelp.com' }
+]
 
 export function App() {
   const loadSettings = (): Settings => {
@@ -129,6 +154,13 @@ export function App() {
     // live web instead of navigating to nothing.
     if (!input.trim()) {
       if (oldWeb) goToday()
+      return
+    }
+    // AOL multi-window: with the active window minimised, entering an address
+    // opens a NEW window (tab) instead of navigating the minimised one — so
+    // several windows can be open at once.
+    if (mdi === 'min') {
+      void window.oldweb.createTab(stripWaybackDisplay(input.trim()))
       return
     }
     // "2007://…" — an explicit year prefix time-travels to that year, for the
@@ -411,13 +443,60 @@ export function App() {
   }, [])
 
   const contentRef = useRef<HTMLDivElement>(null)
+  // AOL MDI child window: the page frame can be moved, resized, minimised,
+  // maximised and closed. Geometry is a ref (no re-render per mousemove); the
+  // page view follows because report() re-measures the frame each time.
+  const chromeRef = useRef<HTMLDivElement>(null)
+  const mdiGeom = useRef<{ l: number; t: number; w: number; h: number } | null>(null)
+  const [mdi, setMdi] = useState<'normal' | 'max' | 'min' | 'closed'>('normal')
+  // The recent-addresses dropdown is open — AOL greys the page beneath it.
+  const [addrListOpen, setAddrListOpen] = useState(false)
+  // AOL Channels toolbar dropdown: anchor position, or null when closed.
+  const [channelsMenu, setChannelsMenu] = useState<{ left: number; top: number } | null>(null)
+  useEffect(() => {
+    requestChromeTop('channels', channelsMenu != null)
+    return () => requestChromeTop('channels', false)
+  }, [channelsMenu])
+  // Per-channel link overrides (right-click a channel to edit its target),
+  // persisted in localStorage. `editingChannel` is the label being edited inline.
+  const [channelOverrides, setChannelOverrides] = useState<Record<string, string>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('reframe.aolChannels') || '{}')
+    } catch {
+      return {}
+    }
+  })
+  const [editingChannel, setEditingChannel] = useState<string | null>(null)
+  const channelUrl = (label: string, fallback: string): string => channelOverrides[label] ?? fallback
+  const saveChannel = (label: string, url: string): void => {
+    setChannelOverrides((o) => {
+      const next = { ...o }
+      if (url.trim()) next[label] = url.trim()
+      else delete next[label]
+      try {
+        localStorage.setItem('reframe.aolChannels', JSON.stringify(next))
+      } catch {
+        /* ignore quota / disabled storage */
+      }
+      return next
+    })
+    setEditingChannel(null)
+  }
 
   // --- themes ---
   useEffect(() => {
     themeEngine.list().then(setThemes)
   }, [])
   useEffect(() => {
-    themeEngine.apply(themeId).then(setManifest).catch(() => setManifest(null))
+    themeEngine
+      .apply(themeId)
+      .then((m) => {
+        setManifest(m)
+        // Track the active theme in the Dock/taskbar icon (main falls back to the
+        // Reframe icon for themes without a dedicated one).
+        window.oldweb.setAppIcon(themeEngine.getId() ?? themeId)
+      })
+      .catch(() => setManifest(null))
   }, [themeId])
   // Switch theme on an explicit user choice. The boot splash is fired here (not
   // in an effect) so it only shows on a real switch — never at startup, where
@@ -484,7 +563,30 @@ export function App() {
     })
   }, [])
 
-  useLayoutEffect(report, [report, state.tabs.length, themeId, manifest, hotlistOpen])
+  useLayoutEffect(report, [report, state.tabs.length, themeId, manifest, hotlistOpen, mdi])
+
+  // Apply the MDI child-window geometry whenever the mode changes. In 'normal'
+  // mode a dragged/resized window keeps its explicit box (mdiGeom); max / min /
+  // closed are handled by CSS classes, so inline geometry is cleared to let the
+  // class win. The page view is re-measured after each change.
+  useLayoutEffect(() => {
+    const el = chromeRef.current
+    if (!el) return
+    el.style.inset = ''
+    el.style.left = ''
+    el.style.top = ''
+    el.style.width = ''
+    el.style.height = ''
+    if (mdi === 'normal' && mdiGeom.current) {
+      const g = mdiGeom.current
+      el.style.inset = 'auto'
+      el.style.left = `${g.l}px`
+      el.style.top = `${g.t}px`
+      el.style.width = `${g.w}px`
+      el.style.height = `${g.h}px`
+    }
+    report()
+  }, [mdi, report])
 
   useEffect(() => {
     let raf = 0
@@ -517,6 +619,11 @@ export function App() {
   const [timeline, setTimeline] = useState<WaybackTimeline>({ years: {}, months: {}, total: 0 })
   const [timelineLoading, setTimelineLoading] = useState(false)
   const activeUrl = unwrapWayback(activeTab?.url ?? '')
+  // Navigating (e.g. clicking a toolbar icon) re-opens a closed or minimised MDI
+  // child window, so the page you asked for is actually visible again.
+  useEffect(() => {
+    setMdi((m) => (m === 'closed' || m === 'min' ? 'normal' : m))
+  }, [activeUrl])
   // Reset only when the *page* changes — not when time-travel swaps the snapshot
   // URL (which flaps trailing slash / http↔https on redirects). Normalise so
   // scrubbing years keeps accumulating instead of clearing the bars each time.
@@ -595,6 +702,9 @@ export function App() {
   // Mac-lineage themes get the "Dial Up: The Struggle" GIF on white; every other
   // (Windows/PC) theme gets the retro-internet GIF on a #008C64 field.
   const isMacTheme = MAC_THEMES.has(themeId)
+  // The AOL themes replace the generic dial-up overlay with AOL's own connecting
+  // animation (the running man) + status.
+  const isAol = themeId === 'aol40' || themeId === 'aol40mac'
   // Holds the dial-up overlay open for a beat after connect so the Mac GIF's
   // final frame plays exactly as the line comes up (see DialGif + startDial).
   const [modemEndFrame, setModemEndFrame] = useState(false)
@@ -797,7 +907,33 @@ export function App() {
       tabIndex={0}
       onClick={handleModemToggle}
     >
-      {modemDialing || modemEndFrame ? (
+      {isAol ? (
+        <div
+          className={
+            'ow-aoldial ' +
+            (modemEndFrame ? 'is-connected' : modemDialing ? 'is-dialing' : 'is-idle')
+          }
+        >
+          <div className="ow-aoldial__run" aria-hidden />
+          <div className="ow-aoldial__title">
+            {modemEndFrame
+              ? 'Welcome!'
+              : modemDialing
+                ? 'Connecting to America Online'
+                : 'America Online'}
+          </div>
+          <div className="ow-aoldial__bar" aria-hidden>
+            <div className="ow-aoldial__fill" />
+          </div>
+          <div className="ow-aoldial__status">
+            {modemEndFrame
+              ? "You've Got Mail!"
+              : modemDialing
+                ? 'Dialing… please wait'
+                : 'Click to sign on'}
+          </div>
+        </div>
+      ) : modemDialing || modemEndFrame ? (
         isMacTheme ? (
           <DialGif
             src="/modem/dial-up-struggle.gif"
@@ -866,11 +1002,32 @@ export function App() {
   }
   const openShare = (): void => void runShare(Number(waybackDate.slice(0, 4)))
 
+  // AOL's Read / Mail Center open the configured mailbox; Write opens its compose
+  // view — same Settings as the generic Mail button (local mailto: app, or a
+  // webmail URL; Gmail gets its compose deep link).
+  const mailInbox = (): void =>
+    settings.mailUseLocal
+      ? void window.oldweb.openExternal('mailto:')
+      : actions.navigate(settings.mailUrl?.trim() || 'https://mail.google.com')
+  const mailCompose = (): void => {
+    if (settings.mailUseLocal) return void window.oldweb.openExternal('mailto:')
+    const u = settings.mailUrl?.trim()
+    if (!u || /mail\.google\.com/i.test(u)) {
+      actions.navigate('https://mail.google.com/mail/?view=cm&fs=1&tf=1')
+    } else actions.navigate(u)
+  }
+
   // The toolbar is fully theme-defined: the manifest lists exactly which
   // buttons appear and in what order. Each action maps to a handler here.
   const navAction: Record<
     Exclude<ToolbarItem, '|'>,
-    { label: string; onClick: () => void; disabled?: boolean }
+    {
+      label: string
+      // The click event is forwarded by NavButton; most actions ignore it, but
+      // Channels uses it to tell the icon (→ overview) from the ▼ (→ dropdown).
+      onClick: (e?: { clientX: number; currentTarget: HTMLElement }) => void
+      disabled?: boolean
+    }
   > = {
     back: { label: labels.back, onClick: actions.back, disabled: !activeTab?.canGoBack },
     forward: { label: labels.forward, onClick: actions.forward, disabled: !activeTab?.canGoForward },
@@ -988,7 +1145,36 @@ export function App() {
     // for authenticity; Images (auto-load) is permanently disabled, as in the app.
     nsedit: { label: labels.nsedit, onClick: () => {} },
     find: { label: labels.find, onClick: () => {} },
-    images: { label: labels.images, onClick: () => {}, disabled: true }
+    images: { label: labels.images, onClick: () => {}, disabled: true },
+    // AOL Desktop 4.0. "Internet" opens the web (home); "Channels" opens the
+    // themed channel directory. The rest need the real AOL service (mail, chat,
+    // stock quotes, member perks…) so they render greyed-out and inert.
+    internet: { label: labels.internet, onClick: () => gatedNavigate(homeUrl) },
+    channels: {
+      label: labels.channels,
+      // Click on the ▼ (right ~16px of the button) opens the dropdown; clicking
+      // the icon opens the full channel overview page.
+      onClick: (e) => {
+        const r = e?.currentTarget.getBoundingClientRect()
+        const onArrow = r != null && e != null && e.clientX - r.left > r.width - 16
+        if (onArrow) {
+          setChannelsMenu((m) =>
+            m ? null : { left: Math.round(r.left), top: Math.round(r.bottom) }
+          )
+        } else if (activeTab) {
+          void window.oldweb.openThemePage(activeTab.id, 'aol40', 'channels')
+        }
+      }
+    },
+    weather: { label: labels.weather, onClick: () => gatedNavigate('https://weather.com/retro/') },
+    read: { label: labels.read, onClick: mailInbox },
+    write: { label: labels.write, onClick: mailCompose },
+    mailcenter: { label: labels.mailcenter, onClick: mailInbox },
+    myfiles: { label: labels.myfiles, onClick: () => {}, disabled: true },
+    myaol: { label: labels.myaol, onClick: () => {}, disabled: true },
+    people: { label: labels.people, onClick: () => {}, disabled: true },
+    quotes: { label: labels.quotes, onClick: () => {}, disabled: true },
+    perks: { label: labels.perks, onClick: () => {}, disabled: true }
   }
   const toolbarItems = manifest?.toolbar ?? DEFAULT_TOOLBAR
   const menus = manifest?.menus ?? DEFAULT_MENUS
@@ -1422,7 +1608,185 @@ export function App() {
     if (imagesOff && activeTab) window.oldweb.setImagesEnabled(activeTab.id, false)
   }, [activeTab?.url, activeTab?.id, imagesOff])
 
-  const titleText = (activeTab?.title ? `${activeTab.title} - ` : '') + 'Reframe'
+  // AOL's application window is always titled "America Online" (the current
+  // page's title moves to the inner MDI child-window title bar instead).
+  const titleText = isAol
+    ? 'America Online'
+    : (activeTab?.title ? `${activeTab.title} - ` : '') + 'Reframe'
+
+  // The page view is measured against .ow-content__frame (not .ow-content), so a
+  // theme can wrap it in an inner "child window" — the AOL MDI look: a titled
+  // Win98 window floating in the workspace. For every other theme the chrome
+  // fills the content area exactly (frame == content), so nothing changes. The
+  // MDI title bar shows the active page's title (hidden unless a theme styles it).
+  // Seed mdiGeom from the window's current on-screen box (relative to .ow-content)
+  // the first time it's moved or resized, so it switches cleanly from the CSS
+  // default inset to an explicit box.
+  const mdiInitGeom = (): void => {
+    const el = chromeRef.current
+    if (el && !mdiGeom.current) {
+      mdiGeom.current = { l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }
+    }
+  }
+  const applyGeom = (): void => {
+    const el = chromeRef.current
+    const g = mdiGeom.current
+    if (!el || !g) return
+    el.style.inset = 'auto'
+    el.style.left = `${g.l}px`
+    el.style.top = `${g.t}px`
+    el.style.width = `${g.w}px`
+    el.style.height = `${g.h}px`
+    report()
+  }
+  const mdiDrag = (
+    e: { clientX: number; clientY: number },
+    mode: 'move' | 'resize'
+  ): void => {
+    if (mdi !== 'normal') return
+    mdiInitGeom()
+    const g0 = { ...(mdiGeom.current as { l: number; t: number; w: number; h: number }) }
+    const sx = e.clientX
+    const sy = e.clientY
+    const onMove = (ev: MouseEvent): void => {
+      const dx = ev.clientX - sx
+      const dy = ev.clientY - sy
+      mdiGeom.current =
+        mode === 'move'
+          ? { ...g0, l: g0.l + dx, t: Math.max(0, g0.t + dy) }
+          : { ...g0, w: Math.max(220, g0.w + dx), h: Math.max(120, g0.h + dy) }
+      applyGeom()
+    }
+    const onUp = (): void => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
+  const pageFrame = (
+    <div
+      className={
+        'ow-content__chrome' +
+        (mdi === 'max' ? ' is-max' : '') +
+        (mdi === 'min' ? ' is-min' : '') +
+        (mdi === 'closed' ? ' is-closed' : '')
+      }
+      ref={chromeRef}
+    >
+      <div
+        className="ow-content__titlebar"
+        onMouseDown={(e) => mdiDrag(e, 'move')}
+        onDoubleClick={() => setMdi((m) => (m === 'max' ? 'normal' : 'max'))}
+      >
+        <span className="ow-content__titleicon" aria-hidden />
+        <span className="ow-content__titletext">{activeTab?.title || 'America Online'}</span>
+        <div className="ow-content__winbtns" onMouseDown={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            className="ow-content__winbtn"
+            data-c="min"
+            title="Minimize"
+            onClick={() => setMdi((m) => (m === 'min' ? 'normal' : 'min'))}
+          />
+          <button
+            type="button"
+            className="ow-content__winbtn"
+            data-c="max"
+            title={mdi === 'max' ? 'Restore' : 'Maximize'}
+            onClick={() => setMdi((m) => (m === 'max' ? 'normal' : 'max'))}
+          />
+          <button
+            type="button"
+            className="ow-content__winbtn"
+            data-c="close"
+            title="Close"
+            onClick={() => {
+              // With several windows open, close this one (its tab) and fall to
+              // the next; otherwise just hide it (navigation brings it back).
+              if (activeTab && state.tabs.length > 1) actions.closeTab(activeTab.id)
+              else setMdi('closed')
+            }}
+          />
+        </div>
+      </div>
+      <div className="ow-content__frame" ref={contentRef} />
+      <span
+        className="ow-content__resize"
+        aria-hidden
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          mdiDrag(e, 'resize')
+        }}
+      />
+    </div>
+  )
+  // A grey scrim over the page while the address dropdown is open (AOL). The
+  // chrome floats above the page then (requestChromeTop), so this shows through.
+  const pageScrim =
+    addrListOpen && isAol ? <div className="ow-page-scrim" aria-hidden /> : null
+
+  // AOL multi-window: every tab is an MDI window. The active one shows as the big
+  // window; the others (plus the active one when minimised) sit as title-bar
+  // stubs along the bottom of the workspace. Click a stub to bring it up front.
+  const bgTabs = state.tabs.filter((t) => t.id !== activeTab?.id)
+  const activeMinStub = mdi === 'min' ? activeTab : null
+  const hasStubs = isAol && (bgTabs.length > 0 || activeMinStub != null)
+  // One uniform stub per hidden window: the active window when minimised, plus
+  // every background tab. `active` marks the current tab's own minimised stub.
+  const stubList = [
+    ...(activeMinStub ? [{ t: activeMinStub, active: true }] : []),
+    ...bgTabs.map((t) => ({ t, active: false }))
+  ]
+  const restoreStub = (id: number, active: boolean): void => {
+    if (active) setMdi('normal')
+    else actions.activate(id)
+  }
+  const mdiStubs = hasStubs ? (
+    <div className="ow-mdi-stubs">
+      {stubList.map(({ t, active }) => (
+        <div key={t.id} className={'ow-mdi-stub' + (active ? ' is-min' : '')}>
+          <span className="ow-mdi-stub__icon" aria-hidden />
+          <span
+            className="ow-mdi-stub__t"
+            title={t.title || t.url}
+            onClick={() => restoreStub(t.id, active)}
+          >
+            {t.title || t.url || 'Window'}
+          </span>
+          <span className="ow-mdi-stub__btns">
+            <button
+              type="button"
+              className="ow-mdi-stub__b"
+              data-c="restore"
+              title="Restore"
+              onClick={() => restoreStub(t.id, active)}
+            />
+            <button
+              type="button"
+              className="ow-mdi-stub__b"
+              data-c="max"
+              title="Maximize"
+              onClick={() => {
+                if (!active) actions.activate(t.id)
+                setMdi('max')
+              }}
+            />
+            <button
+              type="button"
+              className="ow-mdi-stub__b"
+              data-c="close"
+              title="Close"
+              onClick={() => {
+                if (state.tabs.length > 1) actions.closeTab(t.id)
+                else setMdi('closed')
+              }}
+            />
+          </span>
+        </div>
+      ))}
+    </div>
+  ) : null
 
   // Firefox-era layout: the address field + search box sit on the nav-button
   // row itself, and the throbber lives in the menu bar (not the toolbar).
@@ -1455,6 +1819,7 @@ export function App() {
         const u = unwrapWayback(activeTab?.url ?? '')
         if (u) actions.navigate('https://www.google.com/search?q=related:' + encodeURIComponent(u))
       }}
+      onListVisibleChange={setAddrListOpen}
     />
   )
   // User bookmarks filed inside a given folder id, as dropdown child items.
@@ -1663,12 +2028,18 @@ export function App() {
             onNavigate={actions.navigate}
             onClose={() => setHotlistOpen(false)}
           />
-          <div className="ow-content" ref={contentRef}>
+          <div className={'ow-content' + (hasStubs ? ' has-stubs' : '')}>
+            {pageFrame}
+            {pageScrim}
+            {mdiStubs}
             {modemOverlay}
           </div>
         </div>
       ) : (
-        <div className="ow-content" ref={contentRef}>
+        <div className={'ow-content' + (hasStubs ? ' has-stubs' : '')}>
+          {pageFrame}
+          {pageScrim}
+          {mdiStubs}
           {modemOverlay}
         </div>
       )}
@@ -1819,6 +2190,59 @@ export function App() {
           url={unwrapWayback(activeTab?.url ?? '')}
           onClose={() => setSecurityOpen(false)}
         />
+      )}
+      {channelsMenu && (
+        <>
+          <div className="ow-channels-backdrop" onMouseDown={() => setChannelsMenu(null)} />
+          <ul
+            className="ow-channels-menu"
+            style={{ left: channelsMenu.left, top: channelsMenu.top }}
+          >
+            <li
+              className="ow-channels-menu__head"
+              onMouseDown={() => {
+                setChannelsMenu(null)
+                if (activeTab) void window.oldweb.openThemePage(activeTab.id, 'aol40', 'channels')
+              }}
+            >
+              AOL Channels…
+            </li>
+            {AOL_CHANNELS.map((c) =>
+              editingChannel === c.label ? (
+                <li key={c.label} className="ow-channels-menu__edit">
+                  <input
+                    autoFocus
+                    defaultValue={channelUrl(c.label, c.url)}
+                    spellCheck={false}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') saveChannel(c.label, (e.target as HTMLInputElement).value)
+                      else if (e.key === 'Escape') setEditingChannel(null)
+                    }}
+                    onBlur={(e) => saveChannel(c.label, e.target.value)}
+                  />
+                </li>
+              ) : (
+                <li
+                  key={c.label}
+                  className="ow-channels-menu__item"
+                  title={`${channelUrl(c.label, c.url)}  (right-click to edit)`}
+                  onMouseDown={() => {
+                    setChannelsMenu(null)
+                    actions.navigate(channelUrl(c.label, c.url))
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault()
+                    setEditingChannel(c.label)
+                  }}
+                >
+                  {c.label}
+                  {channelOverrides[c.label] && <span className="ow-channels-menu__dot"> •</span>}
+                </li>
+              )
+            )}
+          </ul>
+        </>
       )}
     </div>
   )

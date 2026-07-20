@@ -49,7 +49,20 @@ export const TOOLBAR_ITEMS = [
   // Netscape Navigator 3.04 toolbar set
   'nsedit',
   'find',
-  'images'
+  'images',
+  // AOL Desktop 4.0 toolbar set (the colourful icon band). Several are inert /
+  // greyed in Reframe because they'd need the real AOL service (mail, chat…).
+  'read',
+  'write',
+  'mailcenter',
+  'myfiles',
+  'myaol',
+  'internet',
+  'channels',
+  'people',
+  'quotes',
+  'perks',
+  'weather'
 ] as const
 
 /** Toolbar entries. Known actions render as buttons; '|' is a separator. */
@@ -150,6 +163,17 @@ export interface ThemeManifest {
     nsedit?: string
     find?: string
     images?: string
+    read?: string
+    write?: string
+    mailcenter?: string
+    myfiles?: string
+    myaol?: string
+    internet?: string
+    channels?: string
+    people?: string
+    quotes?: string
+    perks?: string
+    weather?: string
   }
   /** Event name -> sound file (relative to the theme's sounds/ dir). */
   sounds?: Record<string, string>
@@ -194,7 +218,18 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
   loaddisk: 'Load to Disk',
   nsedit: 'Edit',
   find: 'Find',
-  images: 'Images'
+  images: 'Images',
+  read: 'Read',
+  write: 'Write',
+  mailcenter: 'Mail Center',
+  myfiles: 'My Files',
+  myaol: 'My AOL',
+  internet: 'Internet',
+  channels: 'Channels',
+  people: 'People',
+  quotes: 'Quotes',
+  perks: 'Perks',
+  weather: 'Weather'
 }
 
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']

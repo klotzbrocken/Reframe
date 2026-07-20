@@ -38,9 +38,7 @@
     ],
     "extraResources": [
       "resources/**/*",
-      "!resources/app-icons/reframe.icns",
-      "!resources/app-icons/ie5.png",
-      "!resources/app-icons/netscape.png"
+      "!resources/app-icons/reframe.icns"
     ],
     "publish": [
       {

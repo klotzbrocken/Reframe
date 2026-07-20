@@ -299,12 +299,20 @@ function showThemeSplash(themeId: string): void {
   }, THEME_SPLASH_MS)
 }
 
+// Theme id used to name a per-theme icon file — same shape as the renderer's
+// safeThemeId, so a hostile value can never escape the app-icons directory.
+const THEME_ICON_ID = /^[a-z0-9-]+$/
+
 // Reframe app / dock icon. We load a PNG rather than the .icns: nativeImage
 // parses PNG reliably at runtime (some .icns variants come back empty), and a
 // 512px master scales cleanly to every dock size. The .icns is still used by
 // electron-builder when packaging the .app (build/icon.icns).
-function setDockIcon(): void {
-  if (process.platform !== 'darwin' || !app.dock) return
+//
+// Per-theme icons: a theme with its own `<id>.png` in app-icons/ gets it; every
+// other theme falls back to the Reframe master. Only the RUNNING-app icon (macOS
+// Dock, Windows/Linux taskbar) changes — the static .app/.exe file icon is baked
+// at build time and can't vary per theme.
+function loadAppIcon(themeId?: string): Electron.NativeImage | null {
   // Try several roots: in dev getAppPath() may resolve to the project root OR to
   // the out/ build dir, so also probe relative to this module (out/main).
   const bases = app.isPackaged
@@ -313,16 +321,27 @@ function setDockIcon(): void {
         join(app.getAppPath(), 'resources/app-icons'),
         join(__dirname, '../../resources/app-icons')
       ]
+  // Candidate files in priority order: the theme's own icon, then Reframe's.
+  const files: string[] = []
+  if (themeId && THEME_ICON_ID.test(themeId)) files.push(`${themeId}.png`)
+  files.push('reframe.png', 'reframe.icns')
   for (const base of bases) {
-    for (const file of ['reframe.png', 'reframe.icns']) {
+    for (const file of files) {
       const img = nativeImage.createFromPath(join(base, file))
-      if (!img.isEmpty()) {
-        app.dock.setIcon(img)
-        return
-      }
+      if (!img.isEmpty()) return img
     }
   }
-  console.error('[reframe] dock icon not found; tried:', bases.join(', '))
+  return null
+}
+
+function applyAppIcon(themeId?: string): void {
+  const img = loadAppIcon(themeId)
+  if (!img) {
+    console.error('[reframe] app icon not found for theme:', themeId ?? '(default)')
+    return
+  }
+  if (process.platform === 'darwin') app.dock?.setIcon(img)
+  else mainWindow?.setIcon(img)
 }
 
 // --- auto-update (electron-updater, fed by GitHub Releases) ---------------
@@ -561,10 +580,14 @@ app.whenReady().then(() => {
     }
     return (shell?.getPageDisplay(origin).depth ?? 'off') !== 'off'
   })
-  setDockIcon()
+  applyAppIcon()
   buildAppMenu()
   setupAutoUpdate()
-  ipcMain.handle('app:setIcon', () => {})
+  // The renderer calls this whenever a theme is applied, so the Dock/taskbar icon
+  // tracks the active theme (falls back to the Reframe icon if the theme has none).
+  ipcMain.handle('app:setIcon', (_e, themeId: unknown) =>
+    applyAppIcon(typeof themeId === 'string' ? themeId : undefined)
+  )
   // A theme (e.g. Camino) asks to render its menus in the real macOS menu bar.
   ipcMain.handle('menu:setNative', (_e, model: NativeMenuModel | null) => {
     themeMenuModel = model && Array.isArray(model.menus) ? model : null

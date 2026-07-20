@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AOL Channels</title>
+    <style>
+      :root {
+        --cream: #fdf8ea;
+        --accent: #004a80;
+        --rule: #d8cfa8;
+        --font: Geneva, Tahoma, Verdana, 'MS Sans Serif', sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        font-family: var(--font);
+        font-size: 11px;
+        color: #000;
+        background: var(--cream);
+        -webkit-font-smoothing: none;
+        display: flex;
+        min-height: 100%;
+      }
+      /* Left panel — Channels wordmark, return link, search box. */
+      .side {
+        width: 200px;
+        flex: 0 0 200px;
+        padding: 14px 12px;
+        border-right: 1px solid var(--rule);
+        background: linear-gradient(180deg, #eef4fb, var(--cream) 220px);
+        overflow: hidden;
+      }
+      .side img.logo { width: 170px; height: auto; display: block; margin-bottom: 14px; }
+      .ret {
+        display: flex; align-items: center; gap: 6px;
+        color: var(--accent); font-weight: 700; text-decoration: none;
+        margin-bottom: 14px; cursor: pointer;
+      }
+      .ret img { width: 18px; height: 18px; }
+      .ret:hover { text-decoration: underline; }
+      .search { display: flex; align-items: center; gap: 4px; max-width: 100%; }
+      .search input {
+        flex: 1; min-width: 0; width: 100%; height: 22px;
+        border: 2px inset #d0d0d0; background: #fff;
+        font: 11px var(--font); padding: 0 6px;
+      }
+      /* Right panel — 2-column grid of channel buttons at a FIXED width, so they
+         keep AOL's ratio and never balloon when the window is widened. */
+      .grid {
+        flex: 1;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: repeat(2, 200px);
+        gap: 7px 12px;
+        align-content: start;
+        justify-content: start;
+      }
+      .grid a { display: block; line-height: 0; }
+      .grid a img {
+        width: 200px; height: auto; display: block;
+        border: 1px solid transparent;
+      }
+      .grid a:hover img { border-color: var(--accent); }
+      .foot {
+        grid-column: 1 / -1;
+        margin-top: 8px;
+        font-size: 10px;
+        color: #888;
+        text-align: center;
+      }
+      /* An edited channel is marked with a red outline. */
+      .grid a.is-edited img { outline: 2px solid #cc0000; outline-offset: -1px; }
+      /* Right-click edit overlay. */
+      .edit-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+      .edit-box {
+        width: 340px;
+        padding: 12px;
+        background: #c0c0c0;
+        box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080,
+          inset 2px 2px #dfdfdf;
+        font: 11px var(--font);
+      }
+      .edit-title { font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+      .edit-box input {
+        width: 100%;
+        height: 22px;
+        box-sizing: border-box;
+        border: 2px inset #d0d0d0;
+        background: #fff;
+        font: 11px var(--font);
+        padding: 0 4px;
+        margin-bottom: 8px;
+      }
+      .edit-btns { display: flex; gap: 6px; }
+      .edit-box button {
+        font: 11px var(--font);
+        padding: 3px 12px;
+        background: #c0c0c0;
+        border: 1px solid;
+        border-color: #fff #808080 #808080 #fff;
+        cursor: pointer;
+      }
+      .edit-box button:active { border-color: #808080 #fff #fff #808080; }
+    </style>
+  </head>
+  <body>
+    <div class="side">
+      <img class="logo" src="ch/logo.png" alt="Channels" />
+      <a class="ret" href="https://www.aol.com">
+        <img src="misc/aol_running.png" alt="" />Return to Welcome
+      </a>
+      <div class="search">
+        <img src="ch/search.png" alt="" height="20" />
+        <input type="text" placeholder="Search Channels…" onkeydown="if(event.key==='Enter'&&this.value.trim())location.href='https://duckduckgo.com/?q='+encodeURIComponent(this.value)" />
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Each channel links to a fitting destination; right-click to edit.
+           data-default = original target, restored when an override is cleared. -->
+      <a href="https://www.aol.com" data-label="AOL Today" data-default="https://www.aol.com"><img src="ch/aol_today.png" alt="AOL Today" /></a>
+      <a href="https://www.reuters.com" data-label="News" data-default="https://www.reuters.com"><img src="ch/news.png" alt="News" /></a>
+      <a href="https://www.espn.com" data-label="Sports" data-default="https://www.espn.com"><img src="ch/sports.png" alt="Sports" /></a>
+      <a href="https://www.politico.com" data-label="Influence" data-default="https://www.politico.com"><img src="ch/influence.png" alt="Influence" /></a>
+      <a href="https://www.tripadvisor.com" data-label="Travel" data-default="https://www.tripadvisor.com"><img src="ch/travel.png" alt="Travel" /></a>
+      <a href="https://www.bbc.com/news/world" data-label="International" data-default="https://www.bbc.com/news/world"><img src="ch/international.png" alt="International" /></a>
+      <a href="https://www.marketwatch.com" data-label="Personal Finance" data-default="https://www.marketwatch.com"><img src="ch/personal_finance.png" alt="Personal Finance" /></a>
+      <a href="https://www.linkedin.com/jobs" data-label="WorkPlace" data-default="https://www.linkedin.com/jobs"><img src="ch/workplace.png" alt="WorkPlace" /></a>
+      <a href="https://www.theverge.com" data-label="Computing" data-default="https://www.theverge.com"><img src="ch/computing.png" alt="Computing" /></a>
+      <a href="https://en.wikipedia.org" data-label="Research & Learn" data-default="https://en.wikipedia.org"><img src="ch/research.png" alt="Research & Learn" /></a>
+      <a href="https://www.imdb.com" data-label="Entertainment" data-default="https://www.imdb.com"><img src="ch/entertainment.png" alt="Entertainment" /></a>
+      <a href="https://www.ign.com" data-label="Games" data-default="https://www.ign.com"><img src="ch/games.png" alt="Games" /></a>
+      <a href="https://www.reddit.com" data-label="Interests" data-default="https://www.reddit.com"><img src="ch/interests.png" alt="Interests" /></a>
+      <a href="https://www.goodhousekeeping.com" data-label="Lifestyles" data-default="https://www.goodhousekeeping.com"><img src="ch/lifestyles.png" alt="Lifestyles" /></a>
+      <a href="https://www.amazon.com" data-label="Shopping" data-default="https://www.amazon.com"><img src="ch/shopping.png" alt="Shopping" /></a>
+      <a href="https://www.webmd.com" data-label="Health" data-default="https://www.webmd.com"><img src="ch/health.png" alt="Health" /></a>
+      <a href="https://www.parents.com" data-label="Families" data-default="https://www.parents.com"><img src="ch/families.png" alt="Families" /></a>
+      <a href="https://pbskids.org" data-label="Kids Only" data-default="https://pbskids.org"><img src="ch/kids_only.png" alt="Kids Only" /></a>
+      <a href="https://www.yelp.com" data-label="Local" data-default="https://www.yelp.com"><img src="ch/local.png" alt="Local" /></a>
+      <div class="foot">© 1998 America Online, Inc. · AOL Keyword: Channels &nbsp;·&nbsp; right-click a channel to edit its link</div>
+    </div>
+
+    <!-- Edit overlay (window.prompt is unavailable in Electron). -->
+    <div id="edit" class="edit-overlay">
+      <div class="edit-box">
+        <div id="edit-title" class="edit-title">Channel link</div>
+        <input id="edit-input" type="text" spellcheck="false" />
+        <div class="edit-btns">
+          <button id="edit-save" type="button">Save</button>
+          <button id="edit-reset" type="button">Reset</button>
+          <button id="edit-cancel" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var KEY = 'reframe.aolChannels'
+        function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch (e) { return {} } }
+        function save(o) { try { localStorage.setItem(KEY, JSON.stringify(o)) } catch (e) {} }
+        var links = Array.prototype.slice.call(document.querySelectorAll('a[data-label]'))
+        function apply() {
+          var o = load()
+          links.forEach(function (a) {
+            var lbl = a.getAttribute('data-label')
+            if (o[lbl]) { a.href = o[lbl]; a.classList.add('is-edited') }
+            else { a.href = a.getAttribute('data-default'); a.classList.remove('is-edited') }
+          })
+        }
+        apply()
+        var ov = document.getElementById('edit')
+        var input = document.getElementById('edit-input')
+        var titleEl = document.getElementById('edit-title')
+        var current = null
+        function openEdit(a) {
+          current = a
+          var lbl = a.getAttribute('data-label')
+          titleEl.textContent = 'Channel link — ' + lbl
+          input.value = load()[lbl] || a.getAttribute('data-default')
+          ov.style.display = 'flex'
+          input.focus(); input.select()
+        }
+        function closeEdit() { ov.style.display = 'none'; current = null }
+        function commit(clear) {
+          if (!current) return
+          var lbl = current.getAttribute('data-label')
+          var o = load()
+          var url = clear ? '' : input.value.trim()
+          if (url) o[lbl] = url; else delete o[lbl]
+          save(o); apply(); closeEdit()
+        }
+        document.addEventListener('contextmenu', function (e) {
+          var a = e.target.closest ? e.target.closest('a[data-label]') : null
+          if (!a) return
+          e.preventDefault()
+          openEdit(a)
+        })
+        document.getElementById('edit-save').addEventListener('click', function () { commit(false) })
+        document.getElementById('edit-reset').addEventListener('click', function () { commit(true) })
+        document.getElementById('edit-cancel').addEventListener('click', closeEdit)
+        ov.addEventListener('mousedown', function (e) { if (e.target === ov) closeEdit() })
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') commit(false)
+          else if (e.key === 'Escape') closeEdit()
+        })
+      })()
+    </script>
+  </body>
+</html>

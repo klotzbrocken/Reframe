@@ -1,0 +1,765 @@
+/* =====================================================================
+ * AOL Desktop 4.0 for Windows (America Online, 1998)
+ *
+ * The AOL client shell: a Windows 95/98 window titled "America Online", its
+ * File/Edit/Window/Sign Off/Help menu bar, and the signature two-row toolbar —
+ * the colourful icon band (#006699) over a grey navigation + Keyword/URL row.
+ * The page view sits in AOL's teal MDI workspace.
+ *
+ * Reframe can't reach the real AOL service, so the icons that need it — Read,
+ * Write, Mail Center, My Files, My AOL, People (chat), Quotes, Perks, Weather —
+ * render greyed-out and inert. Internet, Channels, Favorites and Print work.
+ *
+ * Icon art: the original AOL 4.0 raster set (amaitland archive); labels + group
+ * colours are baked into each PNG, so they sit straight on the toolbar.
+ * ===================================================================== */
+
+body {
+  font-family: var(--aol-font);
+  font-size: 11px;
+  color: #000;
+  background: #c0c0c0;
+}
+
+/* Win98 bevel recipes (4-layer inset shadows). */
+:root {
+  --w98-raised: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+  --w98-pressed: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf,
+    inset 2px 2px #808080;
+  --w98-sunken: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf,
+    inset 2px 2px #0a0a0a;
+  --w98-window: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px #808080,
+    inset 2px 2px #fff;
+}
+
+/* ===================================================================== *
+ * Outer window — the "America Online" application frame.
+ * ===================================================================== */
+.ow-root {
+  background: #c0c0c0;
+  box-shadow: var(--w98-window);
+  padding: 3px;
+}
+
+/* Title bar: the shared Windows 95/98 caption from base.css (navy gradient +
+   raised 3D min/max/close), identical to the IE themes — no override here. The
+   window title is forced to "America Online" in App.tsx. */
+
+/* ===================================================================== *
+ * Menu bar — File / Edit / Window / Sign Off / Help (grey Win98 bar).
+ * ===================================================================== */
+.ow-menubar {
+  height: 19px;
+  padding: 1px 2px;
+  align-items: center;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+}
+.ow-menu__label {
+  padding: 2px 8px;
+  font: 11px var(--aol-font);
+  color: #000;
+  border-radius: 0;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: #000080;
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #c0c0c0;
+  border: 0;
+  box-shadow: var(--w98-raised);
+  border-radius: 0;
+  padding: 2px;
+  font: 11px var(--aol-font);
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #000080;
+  color: #fff;
+}
+.ow-menu__sep {
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+  margin: 3px 2px;
+}
+
+/* ===================================================================== *
+ * Toolbar — TWO rows in one flex container:
+ *  Row 1 (38px): the colourful AOL icon band on #006699.
+ *  Row 2 (30px): nav buttons + the Keyword/URL address bar on grey.
+ * A vertical gradient with a hard stop at 38px paints the two backgrounds;
+ * a full-width break element (before Back) forces the second line.
+ * ===================================================================== */
+.ow-toolbar {
+  position: relative;
+  min-height: 0;
+  height: auto;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 0;
+  padding: 0;
+  /* Row-1 fill is the last group's dark purple, so the filler between the last
+     icon (Weather) and the AOL logo matches the original toolbar; the icons
+     paint their own group colours over the left. Row 2 (below 38px) is grey. */
+  background: linear-gradient(
+    to bottom,
+    var(--aol-grpD) 0,
+    var(--aol-grpD) 38px,
+    #d6d6d6 38px,
+    #bcbcbc 68px
+  );
+  border-bottom: 2px solid var(--aol-blue-dark);
+}
+
+/* Icon-band buttons: the whole button IS the baked PNG (icon + label + colour). */
+.ow-toolbar .ow-btn {
+  flex: 0 0 auto;
+  height: 38px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  align-items: center;
+}
+.ow-toolbar .ow-btn:hover:not(:disabled),
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+  border: 0;
+}
+.ow-toolbar .ow-btn__label {
+  display: none;
+}
+.ow-toolbar .ow-btn__icon {
+  height: 38px;
+  width: auto;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto 38px;
+}
+
+/* Only the SERVICE-dependent icons grey out (they'd need the real AOL service).
+   The navigation icons keep their colour like the original, even when a
+   direction is momentarily unavailable. */
+.ow-toolbar .ow-btn:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.ow-toolbar .ow-btn[data-action='read']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='write']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='mailcenter']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='myfiles']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='myaol']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='people']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='quotes']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='perks']:disabled .ow-btn__icon {
+  filter: grayscale(1) opacity(0.45);
+}
+
+/* Row-1 icon widths (baked PNGs, 38px tall). */
+.ow-toolbar .ow-btn[data-action='read'] .ow-btn__icon { width: 41px; background-image: url('tb/read.png'); }
+.ow-toolbar .ow-btn[data-action='write'] .ow-btn__icon { width: 46px; background-image: url('tb/write.png'); }
+.ow-toolbar .ow-btn[data-action='mailcenter'] .ow-btn__icon { width: 73px; background-image: url('tb/mail_center.png'); }
+.ow-toolbar .ow-btn[data-action='print'] .ow-btn__icon { width: 45px; background-image: url('tb/print.png'); }
+.ow-toolbar .ow-btn[data-action='myfiles'] .ow-btn__icon { width: 60px; background-image: url('tb/my_files.png'); }
+.ow-toolbar .ow-btn[data-action='myaol'] .ow-btn__icon { width: 57px; background-image: url('tb/my_aol.png'); }
+.ow-toolbar .ow-btn[data-action='favorites'] .ow-btn__icon { width: 62px; background-image: url('tb/favorites.png'); }
+.ow-toolbar .ow-btn[data-action='internet'] .ow-btn__icon { width: 55px; background-image: url('tb/internet.png'); }
+.ow-toolbar .ow-btn[data-action='channels'] .ow-btn__icon { width: 62px; background-image: url('tb/channels.png'); }
+.ow-toolbar .ow-btn[data-action='people'] .ow-btn__icon { width: 82px; background-image: url('tb/people.png'); }
+.ow-toolbar .ow-btn[data-action='quotes'] .ow-btn__icon { width: 54px; background-image: url('tb/quotes.png'); }
+.ow-toolbar .ow-btn[data-action='perks'] .ow-btn__icon { width: 48px; background-image: url('tb/perks.png'); }
+.ow-toolbar .ow-btn[data-action='weather'] .ow-btn__icon { width: 64px; background-image: url('tb/weather.png'); }
+
+/* Group dividers (grooved) between colour groups. */
+.ow-toolbar .ow-toolbar-sep {
+  width: 0;
+  height: 38px;
+  margin: 0 2px;
+  border-left: 1px solid rgba(0, 0, 0, 0.35);
+  border-right: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+}
+
+/* The separator right before Back is the ROW BREAK: full width, zero height,
+   so Back…Home and the address bar wrap onto the grey second line. */
+.ow-toolbar .ow-toolbar-sep:has(+ .ow-btn[data-action='back']) {
+  flex-basis: 100%;
+  width: 100%;
+  height: 0;
+  margin: 0;
+  border: 0;
+}
+
+/* Row-2 nav buttons: small nav glyphs on the grey band. */
+.ow-toolbar .ow-btn[data-action='back'],
+.ow-toolbar .ow-btn[data-action='forward'],
+.ow-toolbar .ow-btn[data-action='stop'],
+.ow-toolbar .ow-btn[data-action='refresh'],
+.ow-toolbar .ow-btn[data-action='home'] {
+  height: 30px;
+  align-items: center;
+}
+.ow-toolbar .ow-btn[data-action='back'] .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='forward'] .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='stop'] .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='refresh'] .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='home'] .ow-btn__icon {
+  height: 21px;
+  background-size: auto 21px;
+}
+.ow-toolbar .ow-btn[data-action='back'] .ow-btn__icon { width: 24px; background-image: url('nav/back.png'); }
+.ow-toolbar .ow-btn[data-action='forward'] .ow-btn__icon { width: 27px; background-image: url('nav/forward.png'); }
+.ow-toolbar .ow-btn[data-action='stop'] .ow-btn__icon { width: 27px; background-image: url('nav/stop.png'); }
+.ow-toolbar .ow-btn[data-action='refresh'] .ow-btn__icon { width: 31px; background-image: url('nav/reload.png'); }
+.ow-toolbar .ow-btn[data-action='home'] .ow-btn__icon { width: 28px; background-image: url('nav/home.png'); }
+/* Nav buttons are colourful only when the action is available; Reframe disables
+   Back (no history), Forward (nothing ahead) and Stop (not loading), which grey
+   them out. Home and Reload stay active. */
+.ow-toolbar .ow-btn[data-action='back']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='forward']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='stop']:disabled .ow-btn__icon,
+.ow-toolbar .ow-btn[data-action='refresh']:disabled .ow-btn__icon {
+  filter: grayscale(1) opacity(0.5);
+}
+
+/* AOL throbber — in the toolbar (row 1), same 38px size as the icons, pinned to
+   the far right of the blue band. Static running-man logo idle; animated while a
+   page loads. Absolutely placed so it never affects the two-row wrap. */
+.ow-toolbar .ow-throbber {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+  /* The AOL logo sits in its own dark-blue box (as in the original), the
+     running-man animating only while a page loads. */
+  background: #0f3668 url('misc/aol-icon-4.png') center / auto 26px no-repeat;
+  border-left: 1px solid #0a2547;
+}
+.ow-toolbar .ow-throbber.is-active {
+  background-image: url('misc/aol_loading_image.gif');
+  background-size: auto 34px;
+}
+.ow-toolbar .ow-throbber__dot {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Address bar — the "Type Keyword or Web Address here and click Go" row.
+ * Unified: it flows on the grey second line after the nav buttons.
+ * ===================================================================== */
+.ow-addressbar {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  gap: 5px;
+  align-items: center;
+  padding: 0 6px 0 4px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+}
+.ow-address-label {
+  display: none;
+}
+/* Find ▼ chip before the field. */
+.ow-addressbar::before {
+  content: 'Find ▼';
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 2px 6px;
+  font: 11px var(--aol-font);
+  color: #000;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+}
+.ow-address-combo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  background: #fff;
+  box-shadow: var(--w98-sunken);
+  border: 0;
+  border-radius: 0;
+}
+.ow-address-favicon {
+  display: none;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent !important;
+  font: 11px var(--aol-font);
+  color: #000;
+  padding: 0 5px;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+.ow-address-input::placeholder {
+  color: #7a7a7a;
+}
+.ow-address-dropdown {
+  display: block;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 100%;
+  border: 0;
+  border-left: 1px solid #808080;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+  position: relative;
+}
+.ow-address-dropdown::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -30%);
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #000;
+}
+/* Go button (beveled). */
+.ow-go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 10px;
+  font: 700 11px var(--aol-font);
+  color: #000;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+  border: 0;
+  border-radius: 0;
+}
+.ow-go:active {
+  box-shadow: var(--w98-pressed);
+}
+.ow-go__icon {
+  display: none;
+}
+/* "Keyword" — a real, active beveled button (submits the field as a keyword). */
+.ow-addressbar .ow-keyword {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 20px;
+  padding: 0 8px;
+  font: 11px var(--aol-font);
+  color: #000;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+  border: 0;
+  border-radius: 0;
+}
+.ow-addressbar .ow-keyword:active {
+  box-shadow: var(--w98-pressed);
+}
+.ow-addressbar .ow-loc-links,
+.ow-addressbar .ow-loc-related,
+.ow-addressbar .ow-loc-bookmarks,
+.ow-addressbar .ow-loc-proxy {
+  display: none;
+}
+/* AOL had no separate Search box — the address bar IS the keyword/search field
+   (free text runs a search). Hide the toolbar's search box + its dot. */
+.ow-searchbox,
+.ow-toolbar-dot,
+.ow-bmtoggle {
+  display: none !important;
+}
+.ow-address-list {
+  border: 0;
+  box-shadow: var(--w98-raised);
+  background: #fff;
+  font: 11px var(--aol-font);
+}
+.ow-address-item:hover {
+  background: #000080;
+  color: #fff;
+}
+.ow-toolbar-dot {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Content — the page sits inside an AOL MDI child window that floats in the
+ * teal workspace: a Win98 window with its own title bar showing the page title.
+ * ===================================================================== */
+.ow-content {
+  background: var(--aol-workspace);
+  border-top: 1px solid #808080;
+}
+/* Grey scrim over the page while the address dropdown is open. */
+.ow-page-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: rgba(110, 110, 110, 0.55);
+}
+
+/* Channels toolbar dropdown — a Win98 menu of channels under the button. */
+.ow-channels-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+.ow-channels-menu {
+  position: fixed;
+  z-index: 41;
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  min-width: 160px;
+  max-height: 72vh;
+  overflow-y: auto;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+  font: 11px var(--aol-font);
+  color: #000;
+}
+.ow-channels-menu__head,
+.ow-channels-menu__item {
+  padding: 3px 18px 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ow-channels-menu__head {
+  font-weight: 700;
+  border-bottom: 1px solid #808080;
+  margin-bottom: 2px;
+}
+.ow-channels-menu__head:hover,
+.ow-channels-menu__item:hover {
+  background: #000080;
+  color: #fff;
+}
+.ow-channels-menu__dot {
+  color: #cc0000;
+  font-weight: 700;
+}
+.ow-channels-menu__edit {
+  padding: 2px 6px;
+}
+.ow-channels-menu__edit input {
+  width: 230px;
+  height: 20px;
+  border: 2px inset #d0d0d0;
+  background: #fff;
+  font: 11px var(--aol-font);
+  padding: 0 4px;
+}
+/* The child window — inset from the workspace edges, raised Win98 frame. */
+.ow-content__chrome {
+  inset: 12px 18px 18px 18px;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+  padding: 3px;
+}
+/* Its title bar — IDENTICAL to the outer window's Win98 caption (same navy
+   gradient, Tahoma text and 3D min/max/close buttons with SVG glyphs), just with
+   the AOL globe + the live page title. Draggable to move; double-click = maximise. */
+.ow-content__titlebar {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  gap: 4px;
+  padding: 2px 3px 2px 4px;
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+  color: #fff;
+  font-weight: 700;
+  font-family: Tahoma, 'Segoe UI', var(--aol-font);
+  font-size: 11px;
+  cursor: move;
+}
+.ow-content__titleicon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  background: url('misc/aol-icon-4.png') center / contain no-repeat;
+}
+.ow-content__titletext {
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ow-content__winbtns {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  cursor: default;
+}
+.ow-content__winbtn {
+  width: 16px;
+  height: 14px;
+  min-width: 16px;
+  padding: 0;
+  background-color: #c0c0c0;
+  background-repeat: no-repeat;
+  border: 1px solid;
+  border-color: #fff #808080 #808080 #fff;
+  border-radius: 0;
+}
+.ow-content__winbtn:active {
+  border-color: #808080 #fff #fff #808080;
+}
+.ow-content__winbtn[data-c='min'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E");
+  background-position: bottom 3px left 4px;
+}
+.ow-content__winbtn[data-c='max'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 2px left 3px;
+}
+.ow-content__chrome.is-max .ow-content__winbtn[data-c='max'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E");
+}
+.ow-content__winbtn[data-c='close'] {
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+  background-position: top 3px left 4px;
+}
+/* The page well below the title bar — a sunken client area. */
+.ow-content__frame {
+  margin-top: 2px;
+  box-shadow: var(--w98-sunken);
+}
+/* Bottom resize edge with a corner grip; sits BELOW the page view (which only
+   covers the frame), so it stays clickable over the native page. */
+.ow-content__resize {
+  flex: 0 0 9px;
+  align-self: stretch;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(-45deg, transparent 0 3px, #808080 3px 4px, transparent 4px 6px, #808080 6px 7px, transparent 7px)
+      right bottom / 12px 9px no-repeat;
+}
+.ow-content__chrome.is-max .ow-content__resize {
+  display: none;
+}
+/* Maximised: fill the whole workspace (no teal margin). */
+.ow-content__chrome.is-max {
+  inset: 0 !important;
+  padding: 2px;
+  box-shadow: none;
+}
+/* Minimised: the window itself is hidden; its stub in .ow-mdi-stubs (with the
+   others) represents it, so there's never a duplicate/overlap. */
+.ow-content__chrome.is-min {
+  display: none;
+}
+/* Closed: hidden — clicking a toolbar destination (Internet/Channels/Home…)
+   navigates and brings the window back. */
+.ow-content__chrome.is-closed {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Multi-window: each tab is an MDI window. Background windows (and the active
+ * one when minimised) appear as title-bar stubs along the workspace floor.
+ * ===================================================================== */
+.ow-mdi-stubs {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 4px;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  gap: 4px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+/* A minimised window = a mini Win98 title bar with icon, title and the three
+   window controls (restore / maximise / close), tiled so they never overlap. */
+.ow-mdi-stub {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 170px;
+  height: 20px;
+  padding: 0 2px 0 3px;
+  /* Inactive-window caption grey. */
+  background: linear-gradient(90deg, #7e7e9c 0%, #a6a6c0 100%);
+  color: #fff;
+  font: 700 11px var(--aol-font);
+  box-shadow: var(--w98-raised);
+}
+/* The active window's own minimised stub uses the active navy caption. */
+.ow-mdi-stub.is-min {
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+}
+.ow-mdi-stub__icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  background: url('misc/aol-icon-4.png') center / contain no-repeat;
+}
+.ow-mdi-stub__t {
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.ow-mdi-stub__btns {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 1px;
+}
+.ow-mdi-stub__b {
+  width: 14px;
+  height: 13px;
+  padding: 0;
+  background: #c0c0c0 center no-repeat;
+  background-size: 8px 7px;
+  border: 1px solid;
+  border-color: #fff #808080 #808080 #fff;
+  border-radius: 0;
+}
+.ow-mdi-stub__b:active {
+  border-color: #808080 #fff #fff #808080;
+}
+.ow-mdi-stub__b[data-c='restore'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E");
+}
+.ow-mdi-stub__b[data-c='max'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E");
+}
+.ow-mdi-stub__b[data-c='close'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E");
+}
+/* Reserve a strip at the workspace floor for the stubs, so the active (non-max)
+   window doesn't cover them. */
+.ow-content.has-stubs .ow-content__chrome:not(.is-max) {
+  bottom: 30px;
+}
+
+/* ===================================================================== *
+ * AOL dial-in overlay — the running man + a connecting progress bar.
+ * ===================================================================== */
+.ow-modem-offline:has(.ow-aoldial) {
+  background: #5c6b86;
+}
+.ow-aoldial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 320px;
+  padding: 22px 24px;
+  background: #c0c0c0;
+  box-shadow: var(--w98-raised);
+  font: 12px var(--aol-font);
+  color: #000;
+  text-align: center;
+}
+.ow-aoldial__run {
+  width: 64px;
+  height: 52px;
+  background: url('misc/dialup_pic1.png') center / contain no-repeat;
+}
+.ow-aoldial.is-dialing .ow-aoldial__run {
+  animation: aol-run 0.36s steps(1) infinite;
+}
+@keyframes aol-run {
+  0% { background-image: url('misc/dialup_pic1.png'); }
+  33% { background-image: url('misc/dialup_pic2.png'); }
+  66% { background-image: url('misc/dialup_pic3.png'); }
+}
+.ow-aoldial__title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--aol-accent);
+}
+.ow-aoldial__bar {
+  width: 100%;
+  height: 16px;
+  background: #fff;
+  box-shadow: var(--w98-sunken);
+  overflow: hidden;
+}
+.ow-aoldial.is-idle .ow-aoldial__bar {
+  visibility: hidden;
+}
+.ow-aoldial__fill {
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(90deg, #006699 0 10px, #0a7ab3 10px 12px);
+}
+.ow-aoldial.is-dialing .ow-aoldial__fill {
+  animation: aol-fill 4s linear forwards;
+}
+.ow-aoldial.is-connected .ow-aoldial__fill {
+  width: 100%;
+}
+@keyframes aol-fill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+.ow-aoldial__status {
+  color: #333;
+}
+.ow-aoldial.is-connected .ow-aoldial__status {
+  color: #cc0000;
+  font-weight: 700;
+}
+
+/* ===================================================================== *
+ * Status bar — grey Win98 strip.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 20px;
+  gap: 6px;
+  align-items: center;
+  padding: 2px 4px;
+  background: #c0c0c0;
+  border-top: 1px solid #dfdfdf;
+  box-shadow: var(--w98-raised);
+  font: 11px var(--aol-font);
+  color: #000;
+}
+.ow-status-text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 4px;
+  box-shadow: var(--w98-sunken);
+}
+.ow-statusbar .ow-progress {
+  display: none;
+}
+.ow-statusbar .ow-progress.is-active {
+  display: block;
+  width: 130px;
+  height: 14px;
+  flex: 0 0 auto;
+  box-shadow: var(--w98-sunken);
+  background: #fff;
+  overflow: hidden;
+}
+.ow-statusbar .ow-progress__bar {
+  height: 100%;
+  background: #000080;
+}
+.ow-statusbar .ow-zone {
+  flex: 0 0 auto;
+  gap: 4px;
+  align-items: center;
+}

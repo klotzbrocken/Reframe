@@ -9,6 +9,8 @@ const api: OldwebAPI = {
   goBack: (id) => ipcRenderer.invoke('shell:goBack', id),
   goForward: (id) => ipcRenderer.invoke('shell:goForward', id),
   openAbout: (id, themeId) => ipcRenderer.invoke('shell:openAbout', id, themeId),
+  openThemePage: (id, themeId, page) =>
+    ipcRenderer.invoke('shell:openThemePage', id, themeId, page),
   reload: (id) => ipcRenderer.invoke('shell:reload', id),
   stop: (id) => ipcRenderer.invoke('shell:stop', id),
   editCommand: (id, cmd) => ipcRenderer.invoke('shell:editCommand', id, cmd),
