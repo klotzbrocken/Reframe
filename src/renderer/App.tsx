@@ -18,7 +18,7 @@ import { SettingsDialog, type Settings } from './components/SettingsDialog'
 import { StatusBar } from './components/StatusBar'
 import { ModemStatus, type ModemPhase } from './components/ModemStatus'
 import { playDialup, dialupTimings, type DialupHandle, type ModemSpeed } from './shell/modem-sound'
-import { playUiSound, type UiSoundEvent } from './shell/ui-sounds'
+import { playUiSound, primeUiSound, type UiSoundEvent } from './shell/ui-sounds'
 import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
 import { DialGif } from './components/DialGif'
@@ -148,6 +148,23 @@ export function App() {
   const [manifest, setManifest] = useState<ThemeManifest | null>(null)
 
   const { state, actions, oldWeb } = useShell(() => playUi('click'))
+
+  // Wake the Web Audio context on the first user gesture, so UI sounds that fire
+  // from async events (the click on navigation) aren't muted by the autoplay
+  // policy — an AudioContext can only start from within a user gesture.
+  useEffect(() => {
+    const prime = (): void => {
+      primeUiSound()
+      window.removeEventListener('pointerdown', prime)
+      window.removeEventListener('keydown', prime)
+    }
+    window.addEventListener('pointerdown', prime)
+    window.addEventListener('keydown', prime)
+    return () => {
+      window.removeEventListener('pointerdown', prime)
+      window.removeEventListener('keydown', prime)
+    }
+  }, [])
 
   // Period UI sound: the theme's own wav for the event if it has one, otherwise
   // a synthesised era-appropriate default. Gated by the "UI sounds" setting.

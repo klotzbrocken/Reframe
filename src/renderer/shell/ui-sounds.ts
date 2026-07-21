@@ -26,6 +26,13 @@ function audio(): AudioContext | null {
   }
 }
 
+/** Create + resume the AudioContext from a real user gesture, so later sounds
+ *  that fire from async events (e.g. a click sound on navigation) aren't blocked
+ *  by the autoplay policy. Safe to call repeatedly. */
+export function primeUiSound(): void {
+  audio()
+}
+
 /** One tone with a fast attack/decay envelope, optionally gliding in pitch. */
 function tone(
   c: AudioContext,
