@@ -97,6 +97,8 @@ const DEFAULT_INSETS: ContentInsets = { top: 78, right: 0, bottom: 26, left: 0 }
  */
 const SPEEDS: Record<string, { down: number; up: number; latency: number }> = {
   full: { down: -1, up: -1, latency: 0 },
+  cable: { down: 187500, up: 48000, latency: 25 }, // ~1.5 Mbit/s cable
+  dsl: { down: 32000, up: 12000, latency: 50 }, // ~256 kbit/s ADSL
   isdn: { down: 8000, up: 8000, latency: 80 }, // 64 kbit/s ISDN
   '56k': { down: 7000, up: 4200, latency: 180 }, // 56k down / 33.6k up
   '28.8k': { down: 3500, up: 3500, latency: 320 }
