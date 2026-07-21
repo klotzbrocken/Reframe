@@ -28,7 +28,7 @@ export interface Settings {
   /** What the title-bar close button does. */
   closeAction?: 'quit' | 'minimize'
   /** "Time Warp Modem" simulated connection speed. */
-  connectionSpeed?: 'full' | 'isdn' | '56k' | '28.8k'
+  connectionSpeed?: 'full' | 'cable' | 'dsl' | 'isdn' | '56k' | '28.8k'
   /** Block ads & trackers using uBlock-Origin-style filter lists (opt-in). */
   adblock?: boolean
   /** Retro colour-depth reduction applied to page content, for all themes.
@@ -60,6 +60,8 @@ export interface Settings {
 // alongside the modem toggle so speed + modem sit together).
 const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string }[] = [
   { id: 'full', label: 'Off (full speed)' },
+  { id: 'cable', label: 'Cable (~1.5 Mbit/s)' },
+  { id: 'dsl', label: 'DSL (~256 kbit/s)' },
   { id: 'isdn', label: 'ISDN (64 kbit/s)' },
   { id: '56k', label: '56K Modem' },
   { id: '28.8k', label: '28.8 Modem' }

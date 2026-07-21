@@ -42,6 +42,8 @@ import {
 // "Time Warp Modem" speed choices shown in the Help menu (Help → Time Warp Modem).
 const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string }[] = [
   { id: 'full', label: 'Off' },
+  { id: 'cable', label: 'Cable (1.5M)' },
+  { id: 'dsl', label: 'DSL (256K)' },
   { id: 'isdn', label: 'ISDN (64K)' },
   { id: '56k', label: '56K' },
   { id: '28.8k', label: '28.8K' }
@@ -728,8 +730,13 @@ export function App() {
   // Modem widget is on by default (opt-out); at the default "full" speed it just
   // shows as always-online, so it's visible without forcing a dial-up.
   const modemOn = settings.modemExtension !== false
-  const modemArmed = modemOn && (settings.connectionSpeed ?? 'full') !== 'full'
-  const modemSpeed = (settings.connectionSpeed ?? 'full') as ModemSpeed | 'full'
+  // Only the real dial-up tiers do the handshake (sound + connect animation);
+  // the always-on broadband tiers (DSL, cable) just throttle bandwidth.
+  const isDialup = (['28.8k', '56k', 'isdn'] as string[]).includes(
+    settings.connectionSpeed ?? 'full'
+  )
+  const modemArmed = modemOn && isDialup
+  const modemSpeed = (isDialup ? settings.connectionSpeed : 'full') as ModemSpeed | 'full'
   const [modemPhase, setModemPhase] = useState<ModemPhase>('off')
   // Mac-lineage themes get the "Dial Up: The Struggle" GIF on white; every other
   // (Windows/PC) theme gets the retro-internet GIF on a #008C64 field.
