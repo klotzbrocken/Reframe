@@ -315,6 +315,25 @@ body,
   min-height: 0;
 }
 
+/* Indeterminate loading sweep for the status-bar progress bar. A theme supplies
+   the well's size and the bar's colour; this animates the bar sweeping across
+   while a page loads (themes that don't show .ow-progress are unaffected). */
+.ow-progress {
+  overflow: hidden;
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 40%;
+  animation: ow-loading-sweep 1.1s ease-in-out infinite;
+}
+@keyframes ow-loading-sweep {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(280%);
+  }
+}
+
 .ow-statusbar {
   display: flex;
   align-items: center;

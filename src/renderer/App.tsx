@@ -624,6 +624,27 @@ export function App() {
   const activeTab = state.tabs.find((t) => t.id === state.activeId) ?? null
   const loading = activeTab?.isLoading ?? false
 
+  // Period loading feedback: while a page loads, cycle the old status-bar phases
+  // ("Connecting…", "Waiting…", "Transferring…") so it reads like a dial-up
+  // browser working through a request. The actual line-by-line image reveal is
+  // handled by the Time Warp Modem (Chromium paints partial images as bytes
+  // arrive when the connection is throttled).
+  const [loadMsg, setLoadMsg] = useState('')
+  useEffect(() => {
+    if (!loading) {
+      setLoadMsg('')
+      return
+    }
+    const phases = ['Connecting to host…', 'Waiting for reply…', 'Transferring data…']
+    let i = 0
+    setLoadMsg(phases[0])
+    const id = window.setInterval(() => {
+      i = i + 1 < phases.length ? i + 1 : phases.length - 1 // hold on the last phase
+      setLoadMsg(phases[i])
+    }, 900)
+    return () => window.clearInterval(id)
+  }, [loading])
+
   // --- Archive Timeline: which Wayback snapshots really exist for this page. ---
   // The Wayback calendar API is queried one year at a time, so the timeline fills
   // in progressively as the user scrubs the year slider. It resets per page URL.
@@ -2099,7 +2120,7 @@ export function App() {
 
       {layout.showStatusBar !== false && (
         <StatusBar
-          text={state.statusText}
+          text={state.statusText || loadMsg}
           loading={loading}
           right={
             modemOn ? (
