@@ -2,6 +2,7 @@
   "id": "mosaic",
   "name": "NCSA Mosaic",
   "era": "1993 · Windows",
+  "scrollbar": "w95",
   "toolbar": [
     "open",
     "save",

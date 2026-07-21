@@ -75,7 +75,7 @@ export interface ThemeManifest {
   /** Period scrollbar look injected into page content (the web view's own
    *  scrollbars, styled via ::-webkit-scrollbar in the page preload). Omitted =
    *  the browser default. One of the shared OS looks in page.ts. */
-  scrollbar?: 'sys7' | 'sys7mono' | 'aqua10' | 'xp' | 'w95'
+  scrollbar?: 'sys7' | 'sys7mono' | 'sys8' | 'aqua10' | 'xp' | 'w95'
   /** The exact toolbar button row for this theme, in order. */
   toolbar?: ToolbarItem[]
   /** The exact menu-bar labels for this theme, in order. */
