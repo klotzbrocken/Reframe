@@ -2,6 +2,7 @@
   "id": "ie6",
   "name": "Internet Explorer 6.0",
   "era": "2001 · Windows XP",
+  "scrollbar": "xp",
   "toolbar": [
     "back",
     "forward",

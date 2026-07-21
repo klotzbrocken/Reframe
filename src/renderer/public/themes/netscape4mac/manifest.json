@@ -2,6 +2,7 @@
   "id": "netscape4mac",
   "name": "Netscape Navigator 4.x (Mac)",
   "era": "2000 · Mac OS 9",
+  "scrollbar": "sys7",
   "toolbar": [
     "back",
     "forward",

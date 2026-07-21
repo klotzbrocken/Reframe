@@ -96,10 +96,16 @@ export function sanitizeManifest(raw: unknown, fallbackId: string): ThemeManifes
         }))
     : undefined
 
+  const scrollbar =
+    typeof m.scrollbar === 'string' && ['sys7', 'sys7mono', 'aqua10', 'xp'].includes(m.scrollbar)
+      ? (m.scrollbar as ThemeManifest['scrollbar'])
+      : undefined
+
   return {
     ...(m as object),
     id,
     name,
+    scrollbar,
     homeUrl: safeUrl(m.homeUrl),
     toolbar: sanitizeToolbar(m.toolbar),
     menus: sanitizeStringArray(m.menus),

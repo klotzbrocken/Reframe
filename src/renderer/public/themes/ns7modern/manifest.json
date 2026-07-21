@@ -2,6 +2,7 @@
   "id": "ns7modern",
   "name": "Netscape 7.02 (Mac)",
   "era": "2003 · Mac OS X · Aqua",
+  "scrollbar": "aqua10",
   "toolbar": ["back", "forward", "refresh", "stop", "print"],
   "menus": ["File", "Edit", "View", "Go", "Bookmarks", "Tools", "Help"],
   "personalBar": [

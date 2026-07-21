@@ -2,6 +2,7 @@
   "id": "aol40mac",
   "name": "AOL Desktop 4.0 (Mac OS 9)",
   "era": "1998 · Mac OS 9",
+  "scrollbar": "sys7",
   "toolbar": [
     "read",
     "write",

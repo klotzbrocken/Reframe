@@ -2,6 +2,7 @@
   "id": "camino",
   "name": "Camino 2.0",
   "era": "2009 · Mac OS X",
+  "scrollbar": "aqua10",
   "toolbar": ["back", "forward", "refresh", "stop"],
   "menus": ["Camino", "File", "Edit", "View", "History", "Bookmarks", "Window", "Help"],
   "homeUrl": "https://www.google.com",

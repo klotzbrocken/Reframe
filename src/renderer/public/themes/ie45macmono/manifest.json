@@ -2,6 +2,7 @@
   "id": "ie45macmono",
   "name": "Internet Explorer 4.5 (Mac, monochrome)",
   "era": "1999 · Mac OS 8.5 · 1-bit",
+  "scrollbar": "sys7mono",
   "toolbar": [
     "back",
     "forward",

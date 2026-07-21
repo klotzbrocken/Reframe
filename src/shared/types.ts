@@ -116,6 +116,9 @@ export interface OldwebAPI {
   /** Per-origin display overrides: `{ origin: { depth?, typo? } }`; absent
    *  fields inherit the global default. */
   setDisplayBySite(bySite: Record<string, { depth?: string; typo?: string }>): Promise<void>
+  /** Set the period scrollbar look injected into page content (the active theme's
+   *  `scrollbar`: sys7 | sys7mono | aqua10 | xp; '' = browser default). */
+  setScrollbar(style: string): Promise<void>
   /** Archive Timeline: capture COUNT for each of the 12 months of `year` for `url`
    *  (index 0 = Jan). Fetched per year from the Wayback calendar API. */
   waybackMonths(url: string, year: number): Promise<number[]>
