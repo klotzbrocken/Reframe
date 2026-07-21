@@ -2,6 +2,7 @@
   "id": "ie302",
   "name": "Internet Explorer 3.02",
   "era": "1997 · Windows 95",
+  "scrollbar": "w95",
   "toolbar": [
     "back",
     "forward",

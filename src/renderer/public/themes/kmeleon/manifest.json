@@ -2,6 +2,7 @@
   "id": "kmeleon",
   "name": "K-Meleon 0.2",
   "era": "2000 · Windows 2000",
+  "scrollbar": "w95",
   "toolbar": ["back", "forward", "|", "stop", "refresh", "home", "|", "search", "favorites", "|", "print"],
   "menus": ["File", "View", "Go", "Favorites", "Help"],
   "homeUrl": "https://kmeleonbrowser.org",
