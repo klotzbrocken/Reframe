@@ -51,19 +51,6 @@ const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string 
 
 // Themes whose lineage is Mac/NeXT (vs. the Windows/PC themes). Drives which
 // dial-up GIF + backdrop the modem overlay shows.
-// A drawn classic hourglass wait cursor for the Windows themes — the standard
-// look (not a Plus! themed set), original art so nothing trademarked ships.
-const WIN_HOURGLASS =
-  'data:image/svg+xml,' +
-  encodeURIComponent(
-    "<svg xmlns='http://www.w3.org/2000/svg' width='14' height='20' viewBox='0 0 14 20' shape-rendering='crispEdges'>" +
-      "<rect x='2' y='0' width='10' height='2' fill='#000'/>" +
-      "<rect x='2' y='18' width='10' height='2' fill='#000'/>" +
-      "<path fill='#000' d='M3 2h8v3l-4 5 4 5v3H3v-3l4-5-4-5z'/>" +
-      "<path fill='#fff' d='M4 3h6v2L7 9 4 5zM4 17v-2l3-4 3 4v2z'/>" +
-      "<path fill='#d9b34d' d='M5 4h4l-2 3zM5.5 16.5L7 14l1.5 2.5z'/>" +
-      '</svg>'
-  )
 
 const MAC_THEMES = new Set([
   'safari',
@@ -777,14 +764,14 @@ export function App() {
   const isAol = themeId === 'aol40' || themeId === 'aol40mac'
 
   // Period wait cursor while a page loads (a global `* { cursor … !important }`
-  // rule beats each element's own). Windows themes get the standard hourglass
-  // (static); Mac themes get the classic watch, cycling its frames.
+  // rule beats each element's own). Windows themes get the XP hourglass
+  // (static, GPL open replica); Mac themes get the classic watch, cycling frames.
   useEffect(() => {
     if (!loading) return
     const style = document.createElement('style')
     document.head.appendChild(style)
     if (!MAC_THEMES.has(themeId)) {
-      style.textContent = `*{cursor:url("${WIN_HOURGLASS}") 7 10,progress!important}`
+      style.textContent = `*{cursor:url('/cursors/win/wait.png') 5 9,progress!important}`
       return () => style.remove()
     }
     let i = 0
