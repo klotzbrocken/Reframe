@@ -221,7 +221,8 @@ export function App() {
     { label: 'OldaVista', url: 'https://oldavista.com/' },
     // 68k.news is HTTP-only (its TLS cert doesn't match the host), so https
     // dead-ends on a cert error — keep the explicit http:// URL.
-    { label: '68k.news', url: 'http://68k.news/' }
+    { label: '68k.news', url: 'http://68k.news/' },
+    { label: 'Surf95', url: 'https://surf95.com/' }
   ]
   const normUrl = (u: string): string =>
     u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/+$/, '')
