@@ -133,6 +133,10 @@ export class BrowserShell {
     typo: 'off'
   }
   private displayBySite: Record<string, { depth?: string; typo?: string }> = {}
+  // The active theme's period scrollbar look (sys7 | sys7mono | aqua10 | xp),
+  // or '' for the browser default. Set by the renderer on every theme switch and
+  // pushed into every page preload with the display mode.
+  private scrollbarStyle = ''
 
   constructor(
     private win: BaseWindow,
@@ -834,14 +838,27 @@ export class BrowserShell {
     this.broadcastDisplay()
   }
 
+  /** Set the period scrollbar look for page content, and push it live. Called by
+   *  the renderer on every theme switch ('' clears it to the browser default). */
+  setScrollbarStyle(style: string): void {
+    this.scrollbarStyle = style || ''
+    this.broadcastDisplay()
+  }
+
   /** Effective mode for an origin: its override (depth/typo) over the global
-   *  default; dither always comes from the global setting. */
-  getPageDisplay(origin?: string): { depth: string; dither: boolean; typo: string } {
+   *  default; dither + scrollbar are global (per active theme). */
+  getPageDisplay(origin?: string): {
+    depth: string
+    dither: boolean
+    typo: string
+    scrollbar: string
+  } {
     const o = origin ? this.displayBySite[origin] : undefined
     return {
       depth: o?.depth ?? this.globalDisplay.depth,
       dither: this.globalDisplay.dither,
-      typo: o?.typo ?? this.globalDisplay.typo
+      typo: o?.typo ?? this.globalDisplay.typo,
+      scrollbar: this.scrollbarStyle
     }
   }
 

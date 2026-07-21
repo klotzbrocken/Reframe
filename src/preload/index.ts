@@ -25,6 +25,7 @@ const api: OldwebAPI = {
   setPageDisplay: (depth, dither, typo) =>
     ipcRenderer.invoke('shell:setPageDisplay', depth, dither, typo),
   setDisplayBySite: (bySite) => ipcRenderer.invoke('shell:setDisplayBySite', bySite),
+  setScrollbar: (style) => ipcRenderer.invoke('shell:setScrollbar', style),
   waybackMonths: (url, year) => ipcRenderer.invoke('wayback:months', url, year),
   print: (id) => ipcRenderer.invoke('shell:print', id),
   savePage: (id) => ipcRenderer.invoke('shell:savePage', id),

@@ -72,6 +72,10 @@ export interface ThemeManifest {
   id: string
   name: string
   era?: string
+  /** Period scrollbar look injected into page content (the web view's own
+   *  scrollbars, styled via ::-webkit-scrollbar in the page preload). Omitted =
+   *  the browser default. One of the shared OS looks in page.ts. */
+  scrollbar?: 'sys7' | 'sys7mono' | 'aqua10' | 'xp'
   /** The exact toolbar button row for this theme, in order. */
   toolbar?: ToolbarItem[]
   /** The exact menu-bar labels for this theme, in order. */

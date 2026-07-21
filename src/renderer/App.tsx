@@ -526,6 +526,9 @@ export function App() {
         // Track the active theme in the Dock/taskbar icon (main falls back to the
         // Reframe icon for themes without a dedicated one).
         window.oldweb.setAppIcon(themeEngine.getId() ?? themeId)
+        // Push the theme's period scrollbar look into every page's web view
+        // ('' = browser default for themes that don't set one).
+        window.oldweb.setScrollbar(m?.scrollbar ?? '')
       })
       .catch(() => setManifest(null))
   }, [themeId])

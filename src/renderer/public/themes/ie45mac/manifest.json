@@ -2,6 +2,7 @@
   "id": "ie45mac",
   "name": "Internet Explorer 4.5 (Mac)",
   "era": "1999 · Mac OS 8.5",
+  "scrollbar": "sys7",
   "toolbar": [
     "back",
     "forward",

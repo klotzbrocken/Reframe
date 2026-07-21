@@ -153,9 +153,173 @@ function typographyCss(level: string | undefined): string {
   return rules.join('')
 }
 
+// --- Period scrollbars (::-webkit-scrollbar) --------------------------------
+// The web view's OWN scrollbars, restyled to a chosen OS look. Old browsers
+// always showed a chunky, opaque scrollbar (never today's fading overlay), so
+// we force a classic 16px bar and paint the track, thumb and arrow buttons to
+// match the theme's era. The shapes follow the survey at
+// https://scrollbars.matoseb.com, redrawn here as original CSS + inline SVG so
+// no third-party sprite art ships. `!important` beats a site's own scrollbar
+// rules (best-effort — a site's `!important` still wins, like the display FX).
+
+/** Wrap an SVG body into a `url("data:…")` background value (w×h default 16). */
+function svgBg(body: string, w = 16, h = 16): string {
+  const svg =
+    "<svg xmlns='http://www.w3.org/2000/svg' width='" + w + "' height='" + h + "'>" + body + '</svg>'
+  return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")'
+}
+const triUp = (c: string): string => svgBg("<path d='M8 5 4 11h8z' fill='" + c + "'/>")
+const triDn = (c: string): string => svgBg("<path d='M8 11 4 5h8z' fill='" + c + "'/>")
+const triLf = (c: string): string => svgBg("<path d='M5 8 11 4v8z' fill='" + c + "'/>")
+const triRt = (c: string): string => svgBg("<path d='M11 8 5 4v8z' fill='" + c + "'/>")
+// A 3-line grip: horizontal lines for a vertical thumb, vertical for horizontal.
+const gripH = (c: string): string =>
+  svgBg(
+    "<g fill='" + c + "'><rect x='4' y='6' width='8' height='1'/><rect x='4' y='8' width='8' height='1'/><rect x='4' y='10' width='8' height='1'/></g>"
+  )
+const gripV = (c: string): string =>
+  svgBg(
+    "<g fill='" + c + "'><rect x='6' y='4' width='1' height='8'/><rect x='8' y='4' width='1' height='8'/><rect x='10' y='4' width='1' height='8'/></g>"
+  )
+// A 2×2 stipple tile (two opposite pixels filled) — the classic 50% dither.
+const stipple = (c: string): string =>
+  svgBg(
+    "<g fill='" +
+      c +
+      "'><rect width='1' height='1'/><rect x='2' y='1' width='1' height='1'/><rect y='2' width='1' height='1'/><rect x='2' y='3' width='1' height='1'/></g>",
+    4,
+    4
+  )
+/** Two stacked background layers (glyph over fill) for a thumb or button. */
+function layer(top: string, bottom: string): string {
+  return (
+    'background-image:' +
+    top +
+    ',' +
+    bottom +
+    '!important;background-repeat:no-repeat,repeat!important;background-position:center,center!important'
+  )
+}
+
+function scrollbarCss(style: string | undefined): string {
+  if (!style) return ''
+  // Force a classic bar and set up one arrow button at each end (hide the extra
+  // double-button slots so we don't get paired arrows).
+  const base =
+    '::-webkit-scrollbar{width:16px!important;height:16px!important}' +
+    '::-webkit-scrollbar-button:vertical:start:increment,::-webkit-scrollbar-button:vertical:end:decrement,' +
+    '::-webkit-scrollbar-button:horizontal:start:increment,::-webkit-scrollbar-button:horizontal:end:decrement{display:none!important}' +
+    '::-webkit-scrollbar-button:vertical:decrement,::-webkit-scrollbar-button:vertical:increment{display:block!important;height:16px!important}' +
+    '::-webkit-scrollbar-button:horizontal:decrement,::-webkit-scrollbar-button:horizontal:increment{display:block!important;width:16px!important}'
+
+  // Gradient-thumb looks (XP Luna, Mac OS X 10.0 Aqua). Palettes sampled from the
+  // reference survey's own sprites, redrawn here as CSS gradients + inline SVG.
+  if (style === 'xp' || style === 'aqua10') {
+    const aqua = style === 'aqua10'
+    // Aqua: dark-edged blue gel with an off-centre cyan specular highlight.
+    // XP Luna: cool light blue with a soft highlight.
+    const grad = aqua
+      ? 'linear-gradient(to right,#12379c 0,#2f74e8 12%,#4f9bf6 34%,#7cc4ff 60%,#9fe8ff 80%,#7fc8f7 100%)'
+      : 'linear-gradient(to right,#8ea6ec 0,#c3d4fe 22%,#dcebff 45%,#bcd0f9 72%,#93abec 100%)'
+    // Both scrollbars run in a shallow grey/beige tube, lit down the middle.
+    const trackGrad = aqua
+      ? 'linear-gradient(to right,#b6b6b6,#fbfbfb 46%,#e6e6e6)'
+      : 'linear-gradient(to right,#e9e6dc,#fbfbf7 55%,#efece4)'
+    const bd = aqua ? '#0a1f9e' : '#5f7fc8'
+    const arrow = aqua ? '#333333' : '#3f56a0'
+    const grip = '#5872b8'
+    const track =
+      '::-webkit-scrollbar-track{background:' +
+      trackGrad +
+      '!important}::-webkit-scrollbar-corner{background:' +
+      trackGrad +
+      '!important}'
+    const round = aqua ? 'border-radius:9px!important;' : ''
+    const gloss = aqua
+      ? 'box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -2px 3px rgba(0,0,60,.3)!important;'
+      : ''
+    // Aqua's gel thumb has no grip ridges; XP does.
+    const thumbV = aqua
+      ? '::-webkit-scrollbar-thumb:vertical{background:' + grad + '!important}'
+      : '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(grip), grad) + '}'
+    const thumbH = aqua
+      ? '::-webkit-scrollbar-thumb:horizontal{background:' + grad + '!important}'
+      : '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(grip), grad) + '}'
+    const btn = (glyph: string, dir: 'v-dec' | 'v-inc' | 'h-dec' | 'h-inc'): string => {
+      const sel =
+        dir === 'v-dec'
+          ? '::-webkit-scrollbar-button:vertical:decrement'
+          : dir === 'v-inc'
+            ? '::-webkit-scrollbar-button:vertical:increment'
+            : dir === 'h-dec'
+              ? '::-webkit-scrollbar-button:horizontal:decrement'
+              : '::-webkit-scrollbar-button:horizontal:increment'
+      // Aqua's arrow buttons are plain grey tube caps; XP's carry the gel gradient.
+      const body = aqua
+        ? 'background:' + glyph + ' center no-repeat,' + trackGrad + '!important'
+        : layer(glyph, grad) + ';border:1px solid ' + bd + '!important'
+      return sel + '{' + body + '}'
+    }
+    return (
+      base +
+      track +
+      '::-webkit-scrollbar-thumb{border:1px solid ' + bd + '!important;' + round + gloss + 'min-height:28px!important}' +
+      thumbV +
+      thumbH +
+      btn(triUp(arrow), 'v-dec') +
+      btn(triDn(arrow), 'v-inc') +
+      btn(triLf(arrow), 'h-dec') +
+      btn(triRt(arrow), 'h-inc')
+    )
+  }
+
+  // Classic Mac looks (System 7, and its 1-bit monochrome sibling for System 6).
+  // Palette sampled from the reference sprite: a 25% grey stippled track, a grey
+  // thumb with periwinkle grip ridges and bevel, lighter-grey boxed arrows. The
+  // monochrome sibling reduces the same shapes to pure black on white.
+  const mono = style === 'sys7mono'
+  const ink = '#000'
+  // Thumb: grey face, periwinkle grip + 3D bevel (light #ccccff / dark #333366).
+  const thumbFace = mono ? '#fff' : '#aaaaaa'
+  const ridge = mono ? '#000' : '#666699'
+  const thumbBevel = mono ? '' : 'box-shadow:inset 1px 1px #ccccff,inset -1px -1px #333366!important;'
+  // Arrow buttons: lighter grey face with a white/grey bevel.
+  const btnFace = mono ? '#fff' : '#dddddd'
+  const btnBevel = mono ? '' : 'box-shadow:inset 1px 1px #fff,inset -1px -1px #777!important;'
+  const trackFill = mono ? stipple('#000') : stipple('#777777')
+  const btn = (sel: string, glyph: string): string =>
+    sel +
+    '{background:' +
+    btnFace +
+    '!important;border:1px solid ' +
+    ink +
+    '!important;' +
+    btnBevel +
+    'background-image:' +
+    glyph +
+    '!important;background-repeat:no-repeat!important;background-position:center!important}'
+  const thumb =
+    'background:' + thumbFace + '!important;border:1px solid ' + ink + '!important;' + thumbBevel
+  return (
+    base +
+    '::-webkit-scrollbar-track{background:' + trackFill + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
+    '::-webkit-scrollbar-corner{background:' + thumbFace + '!important}' +
+    '::-webkit-scrollbar-thumb{' + thumb + 'min-height:24px!important}' +
+    '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(ridge), thumbFace) + ';' + thumbBevel + 'border:1px solid ' + ink + '!important}' +
+    '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(ridge), thumbFace) + ';' + thumbBevel + 'border:1px solid ' + ink + '!important}' +
+    btn('::-webkit-scrollbar-button:vertical:decrement', triUp(ink)) +
+    btn('::-webkit-scrollbar-button:vertical:increment', triDn(ink)) +
+    btn('::-webkit-scrollbar-button:horizontal:decrement', triLf(ink)) +
+    btn('::-webkit-scrollbar-button:horizontal:increment', triRt(ink))
+  )
+}
+
 let filterKey: string | null = null
 let typoKey: string | null = null
-function applyDisplay(mode: { depth?: string; dither?: boolean; typo?: string } | null): void {
+let scrollKey: string | null = null
+function applyDisplay(
+  mode: { depth?: string; dither?: boolean; typo?: string; scrollbar?: string } | null
+): void {
   const drop = (k: string | null): null => {
     try {
       if (k) webFrame.removeInsertedCSS(k)
@@ -166,6 +330,7 @@ function applyDisplay(mode: { depth?: string; dither?: boolean; typo?: string } 
   }
   filterKey = drop(filterKey)
   typoKey = drop(typoKey)
+  scrollKey = drop(scrollKey)
   const fcss = displayCss(mode)
   if (fcss) {
     try {
@@ -178,6 +343,14 @@ function applyDisplay(mode: { depth?: string; dither?: boolean; typo?: string } 
   if (tcss) {
     try {
       typoKey = webFrame.insertCSS(tcss)
+    } catch {
+      /* ignore */
+    }
+  }
+  const scss = scrollbarCss(mode?.scrollbar)
+  if (scss) {
+    try {
+      scrollKey = webFrame.insertCSS(scss)
     } catch {
       /* ignore */
     }
