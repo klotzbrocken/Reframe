@@ -18,6 +18,7 @@ import { SettingsDialog, type Settings } from './components/SettingsDialog'
 import { StatusBar } from './components/StatusBar'
 import { ModemStatus, type ModemPhase } from './components/ModemStatus'
 import { playDialup, dialupTimings, type DialupHandle, type ModemSpeed } from './shell/modem-sound'
+import { playUiSound, type UiSoundEvent } from './shell/ui-sounds'
 import { TabStrip } from './components/TabStrip'
 import { Throbber } from './components/Throbber'
 import { DialGif } from './components/DialGif'
@@ -144,9 +145,17 @@ export function App() {
   })
   const [manifest, setManifest] = useState<ThemeManifest | null>(null)
 
-  const { state, actions, oldWeb } = useShell(() =>
-    themeEngine.playSound('navigate')
-  )
+  const { state, actions, oldWeb } = useShell(() => playUi('click'))
+
+  // Period UI sound: the theme's own wav for the event if it has one, otherwise
+  // a synthesised era-appropriate default. Gated by the "UI sounds" setting.
+  const playUi = (event: UiSoundEvent): void => {
+    if (settings.uiSounds === false) return
+    const vol = 0.35
+    if (!themeEngine.playSound(event, vol)) {
+      playUiSound(event, MAC_THEMES.has(themeId) ? 'mac' : 'win', vol)
+    }
+  }
 
   const [addrHistory, setAddrHistory] = useState<string[]>([])
   const submitAddress = (input: string): void => {
@@ -160,6 +169,7 @@ export function App() {
     // opens a NEW window (tab) instead of navigating the minimised one — so
     // several windows can be open at once.
     if (mdi === 'min') {
+      playUi('open')
       void window.oldweb.createTab(stripWaybackDisplay(input.trim()))
       return
     }
@@ -1058,7 +1068,13 @@ export function App() {
     security: { label: labels.security, onClick: () => setSecurityOpen(true) },
     shop: { label: labels.shop, onClick: () => gatedNavigate('https://www.amazon.com') },
     // Opera 3.x toolbar actions (period MDI features map to the closest action).
-    new: { label: labels.new, onClick: actions.newTab },
+    new: {
+      label: labels.new,
+      onClick: () => {
+        playUi('open')
+        actions.newTab()
+      }
+    },
     open: {
       label: labels.open,
       // The main process shows the dialog AND loads the file into the active
@@ -1599,8 +1615,14 @@ export function App() {
       activeId={state.activeId}
       newTabLabel={labels.newTab}
       onActivate={actions.activate}
-      onClose={actions.closeTab}
-      onNew={actions.newTab}
+      onClose={(id) => {
+        playUi('close')
+        actions.closeTab(id)
+      }}
+      onNew={() => {
+        playUi('open')
+        actions.newTab()
+      }}
     />
   )
 
@@ -1703,6 +1725,7 @@ export function App() {
             data-c="close"
             title="Close"
             onClick={() => {
+              playUi('close')
               // With several windows open, close this one (its tab) and fall to
               // the next; otherwise just hide it (navigation brings it back).
               if (activeTab && state.tabs.length > 1) actions.closeTab(activeTab.id)

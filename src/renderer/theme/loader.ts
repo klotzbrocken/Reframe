@@ -102,16 +102,20 @@ export class ThemeEngine {
     return manifest
   }
 
-  /** Play a themed UI sound, if the current theme defines one for `event`. */
-  playSound(event: string): void {
+  /** Play a themed UI sound if the current theme defines one for `event`.
+   *  Returns true when a custom sound was found (so callers can fall back to a
+   *  synthesised default only when the theme has none). */
+  playSound(event: string, volume = 0.4): boolean {
     const file = this.manifest?.sounds?.[event]
-    if (!file || !this.currentId) return
+    if (!file || !this.currentId) return false
     try {
       const audio = new Audio(`/themes/${this.currentId}/sounds/${file}`)
-      audio.volume = 0.4
+      audio.volume = Math.max(0, Math.min(1, volume))
       void audio.play().catch(() => {})
+      return true
     } catch {
       /* sound is best-effort */
+      return false
     }
   }
 }
