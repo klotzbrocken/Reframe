@@ -716,6 +716,30 @@ export function App() {
   // The AOL themes replace the generic dial-up overlay with AOL's own connecting
   // animation (the running man) + status.
   const isAol = themeId === 'aol40' || themeId === 'aol40mac'
+
+  // Period wait cursor: while a page loads, spin the era-appropriate busy cursor
+  // over the whole chrome (Win98 hourglass / classic Mac watch), cycling its
+  // frames. A global `* { cursor … !important }` rule beats each element's own.
+  useEffect(() => {
+    if (!loading) return
+    const mac = MAC_THEMES.has(themeId)
+    const set = mac ? 'mac' : 'win'
+    const frames = mac ? 8 : 10
+    const hot = mac ? 15 : 16
+    const style = document.createElement('style')
+    document.head.appendChild(style)
+    let i = 0
+    const tick = (): void => {
+      style.textContent = `*{cursor:url('/cursors/${set}/wait${i}.png') ${hot} ${hot},progress!important}`
+      i = (i + 1) % frames
+    }
+    tick()
+    const id = window.setInterval(tick, 110)
+    return () => {
+      window.clearInterval(id)
+      style.remove()
+    }
+  }, [loading, themeId])
   // Holds the dial-up overlay open for a beat after connect so the Mac GIF's
   // final frame plays exactly as the line comes up (see DialGif + startDial).
   const [modemEndFrame, setModemEndFrame] = useState(false)
