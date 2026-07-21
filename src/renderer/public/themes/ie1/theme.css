@@ -188,7 +188,9 @@ body {
   height: 21px;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: auto 21px; /* native aspect, ~21px tall */
+  /* Authentic 16x16 IE 1.0 toolbar icons (extracted from iexplore.exe) render
+     at native size, centred in the button — integer scale keeps them crisp. */
+  background-size: 16px 16px;
   image-rendering: pixelated;
 }
 .ow-btn[data-action='open'] .ow-btn__icon {
