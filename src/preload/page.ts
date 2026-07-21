@@ -215,6 +215,37 @@ function scrollbarCss(style: string | undefined): string {
     '::-webkit-scrollbar-button:vertical:decrement,::-webkit-scrollbar-button:vertical:increment{display:block!important;height:16px!important}' +
     '::-webkit-scrollbar-button:horizontal:decrement,::-webkit-scrollbar-button:horizontal:increment{display:block!important;width:16px!important}'
 
+  // Mac OS 8/9 Platinum: a recessed grey tube, a periwinkle thumb with grip
+  // ridges, and — unlike every other bar here — BOTH arrow buttons paired at the
+  // bottom (the classic Platinum layout). Palette sampled from the reference
+  // sprite. Uses its own button config, so it doesn't share `base`.
+  if (style === 'sys8') {
+    const trackGrad = 'linear-gradient(to right,#8f8f8f,#b4b4b4 42%,#a0a0a0)'
+    const thumbGrad = 'linear-gradient(to right,#cdccff,#9c99ff 50%,#6f6cd6)'
+    const btnFace = 'linear-gradient(to right,#e6e6e6,#c4c4c4)'
+    const btnBox =
+      'background:' +
+      btnFace +
+      '!important;border:1px solid #000!important;box-shadow:inset 1px 1px #fff,inset -1px -1px #777!important;background-repeat:no-repeat!important;background-position:center!important'
+    return (
+      '::-webkit-scrollbar{width:16px!important;height:16px!important;background:#aaa!important}' +
+      // Pair both arrows at the end (bottom / right); hide the start-side slots.
+      '::-webkit-scrollbar-button:vertical:start:decrement,::-webkit-scrollbar-button:vertical:start:increment,' +
+      '::-webkit-scrollbar-button:horizontal:start:decrement,::-webkit-scrollbar-button:horizontal:start:increment{display:none!important}' +
+      '::-webkit-scrollbar-button:vertical:end:decrement,::-webkit-scrollbar-button:vertical:end:increment{display:block!important;height:16px!important;' + btnBox + '}' +
+      '::-webkit-scrollbar-button:horizontal:end:decrement,::-webkit-scrollbar-button:horizontal:end:increment{display:block!important;width:16px!important;' + btnBox + '}' +
+      '::-webkit-scrollbar-button:vertical:end:decrement{background-image:' + triUp('#000') + '!important}' +
+      '::-webkit-scrollbar-button:vertical:end:increment{background-image:' + triDn('#000') + '!important}' +
+      '::-webkit-scrollbar-button:horizontal:end:decrement{background-image:' + triLf('#000') + '!important}' +
+      '::-webkit-scrollbar-button:horizontal:end:increment{background-image:' + triRt('#000') + '!important}' +
+      '::-webkit-scrollbar-track{background:' + trackGrad + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
+      '::-webkit-scrollbar-corner{background:' + trackGrad + '!important}' +
+      '::-webkit-scrollbar-thumb{background:' + thumbGrad + '!important;border:1px solid #322e9c!important;min-height:24px!important}' +
+      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH('#322e9c'), thumbGrad) + ';border:1px solid #322e9c!important}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV('#322e9c'), thumbGrad) + ';border:1px solid #322e9c!important}'
+    )
+  }
+
   // Gradient-thumb looks (XP Luna, Mac OS X 10.0 Aqua). Palettes sampled from the
   // reference survey's own sprites, redrawn here as CSS gradients + inline SVG.
   if (style === 'xp' || style === 'aqua10') {

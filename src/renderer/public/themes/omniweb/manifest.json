@@ -2,6 +2,7 @@
   "id": "omniweb",
   "name": "OmniWeb 3.0",
   "era": "1999 · NeXTSTEP / Rhapsody",
+  "scrollbar": "sys8",
   "toolbar": [
     "back",
     "forward",
