@@ -273,7 +273,13 @@ export class BrowserShell {
   activateTab(id: number): void {
     const tab = this.tabs.get(id)
     if (!tab) return
-    for (const [tid, t] of this.tabs) t.view.setVisible(tid === id)
+    for (const [tid, t] of this.tabs) {
+      const isActive = tid === id
+      t.view.setVisible(isActive)
+      // Mute background tabs so audio/video in a hidden tab doesn't keep burning
+      // CPU and battery; the active tab plays normally.
+      if (!t.view.webContents.isDestroyed()) t.view.webContents.setAudioMuted(!isActive)
+    }
     // Raise the active view above the chrome view (chrome stays at index 0).
     this.win.contentView.addChildView(tab.view)
     // …unless the chrome is meant to float on top (open menu, dialog, splash):
@@ -568,16 +574,17 @@ export class BrowserShell {
   }
 
   /** Attach the CDP debugger (idempotent) and register the window.chrome shim so
-   *  it runs at the start of every future document. Also enables the Network
-   *  domain so speed throttling reuses the same attachment. Returns false when the
-   *  debugger can't be attached (e.g. DevTools is open) so callers degrade. */
+   *  it runs at the start of every future document. Only the Page domain is
+   *  enabled here; the heavier Network domain (which buffers per-request data) is
+   *  turned on lazily by applySpeed, only while the modem is actually throttling.
+   *  Returns false when the debugger can't be attached (e.g. DevTools is open) so
+   *  callers degrade. */
   ensureDebugger(wc: WebContents): boolean {
     if (wc.isDestroyed()) return false
     try {
       if (!wc.debugger.isAttached()) {
         wc.debugger.attach('1.3')
         void wc.debugger.sendCommand('Page.enable')
-        void wc.debugger.sendCommand('Network.enable')
         void wc.debugger.sendCommand('Page.addScriptToEvaluateOnNewDocument', {
           source: CHROME_SHIM
         })
@@ -592,18 +599,24 @@ export class BrowserShell {
     const wc = tab.view.webContents
     if (wc.isDestroyed()) return
     const p = SPEEDS[this.speed] ?? SPEEDS.full
-    // The debugger is attached up front (for the Chrome shim); reuse it here.
-    // `full` maps to down/up = -1, which clears throttling, so this is a no-op at
-    // full speed rather than a special case.
     if (!this.ensureDebugger(wc)) return
     tab.dbgAttached = true
+    // `full` maps to down/up = -1 (no throttle). Only enable the Network domain
+    // while actually throttling; at full speed disable it again so Chromium stops
+    // buffering per-request data for every tab.
+    const throttled = p.down >= 0
     try {
-      await wc.debugger.sendCommand('Network.emulateNetworkConditions', {
-        offline: false,
-        latency: p.latency,
-        downloadThroughput: p.down,
-        uploadThroughput: p.up
-      })
+      if (throttled) {
+        await wc.debugger.sendCommand('Network.enable')
+        await wc.debugger.sendCommand('Network.emulateNetworkConditions', {
+          offline: false,
+          latency: p.latency,
+          downloadThroughput: p.down,
+          uploadThroughput: p.up
+        })
+      } else {
+        await wc.debugger.sendCommand('Network.disable').catch(() => {})
+      }
     } catch {
       /* debugger unavailable — skip throttling */
     }
