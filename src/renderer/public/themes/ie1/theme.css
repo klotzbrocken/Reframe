@@ -258,13 +258,15 @@ body {
 .ow-toolbar .ow-throbber {
   display: block;
   position: absolute;
-  top: 3px;
-  right: 4px;
-  width: 58px;
-  height: 60px;
+  /* Flush to the top-right of the chrome and tall enough to span BOTH the
+     toolbar and the address-bar rows (as in IE 1.0) — no narrow margin frame. */
+  top: 1px;
+  right: 1px;
+  width: 62px;
+  height: 62px;
   z-index: 50;
   /* one frame == well width (58px); flag sits at the top of the well */
-  background: var(--ie1-face) url('assets/flag_sprite.png') 0 top / 464px 51px no-repeat;
+  background: var(--ie1-face) url('assets/flag_sprite.png') center top / 464px 51px no-repeat;
   box-shadow: var(--w95-sunken);
 }
 .ow-toolbar .ow-throbber.is-active {
