@@ -52,6 +52,8 @@ export interface Settings {
   modemSound?: 'us' | 'europe' | 'synth' | 'custom'
   /** Custom dial-up recording (mp3/ogg/m4a) URL, used when modemSound='custom'. */
   modemSampleUrl?: string
+  /** Period UI sounds (clicks, chimes, error beeps). Default on. */
+  uiSounds?: boolean
 }
 
 // Mirrors SPEED_OPTS in App.tsx (the connection-speed control is surfaced here
@@ -115,6 +117,7 @@ export function SettingsDialog({
   const [labelFontSize, setLabelFontSize] = useState(settings.labelFontSize || 'normal')
   const [closeAction, setCloseAction] = useState(settings.closeAction || 'quit')
   const [adblock, setAdblock] = useState(settings.adblock ?? false)
+  const [uiSounds, setUiSounds] = useState(settings.uiSounds !== false)
   const [colorDepth, setColorDepth] = useState(
     settings.colorDepth && settings.colorDepth !== 'auto' ? settings.colorDepth : 'off'
   )
@@ -247,6 +250,15 @@ export function SettingsDialog({
             <label className="ow-field ow-field--check">
               <input type="checkbox" checked={adblock} onChange={(e) => setAdblock(e.target.checked)} />
               <span>Block ads &amp; trackers</span>
+            </label>
+
+            <label className="ow-field ow-field--check">
+              <input
+                type="checkbox"
+                checked={uiSounds}
+                onChange={(e) => setUiSounds(e.target.checked)}
+              />
+              <span>Period UI sounds (clicks, chimes, errors)</span>
             </label>
 
             <div className="ow-field--sep ow-field--wide">Retro display (web pages)</div>
@@ -427,6 +439,8 @@ export function SettingsDialog({
                 labelFontSize: labelFontSize as FontSize,
                 closeAction: closeAction as 'quit' | 'minimize',
                 adblock: adblock || undefined,
+                // Default-on: persist `false` only when the user turns it off.
+                uiSounds: uiSounds ? undefined : false,
                 // Off is the default — persist only an explicit reduced depth.
                 colorDepth: colorDepth === 'off' ? undefined : colorDepth,
                 // Default-on: persist `false` only when the page dither is off.
