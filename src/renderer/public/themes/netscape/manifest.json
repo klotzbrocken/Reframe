@@ -2,6 +2,7 @@
   "id": "netscape",
   "name": "Netscape Communicator 4.7",
   "era": "1999 · Windows 9x",
+  "scrollbar": "w95",
   "toolbar": [
     "back",
     "forward",

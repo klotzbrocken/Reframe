@@ -2,6 +2,7 @@
   "id": "opera",
   "name": "Opera 3.60",
   "era": "2000 · Windows",
+  "scrollbar": "w95",
   "toolbar": [
     "new",
     "open",

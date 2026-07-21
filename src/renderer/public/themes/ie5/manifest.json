@@ -2,6 +2,7 @@
   "id": "ie5",
   "name": "Internet Explorer 5",
   "era": "1999 · Windows 98",
+  "scrollbar": "w95",
   "toolbar": [
     "back",
     "forward",

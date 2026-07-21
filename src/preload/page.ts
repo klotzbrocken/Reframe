@@ -181,7 +181,7 @@ const gripV = (c: string): string =>
   svgBg(
     "<g fill='" + c + "'><rect x='6' y='4' width='1' height='8'/><rect x='8' y='4' width='1' height='8'/><rect x='10' y='4' width='1' height='8'/></g>"
   )
-// A 2×2 stipple tile (two opposite pixels filled) — the classic 50% dither.
+// A 4×4 stipple tile at 25% density (the System 7 track texture).
 const stipple = (c: string): string =>
   svgBg(
     "<g fill='" +
@@ -190,6 +190,9 @@ const stipple = (c: string): string =>
     4,
     4
   )
+// A 2×2 checkerboard at 50% density (the Windows 95 track texture).
+const dither = (c: string): string =>
+  svgBg("<g fill='" + c + "'><rect width='1' height='1'/><rect x='1' y='1' width='1' height='1'/></g>", 2, 2)
 /** Two stacked background layers (glyph over fill) for a thumb or button. */
 function layer(top: string, bottom: string): string {
   return (
@@ -262,6 +265,7 @@ function scrollbarCss(style: string | undefined): string {
     }
     return (
       base +
+      '::-webkit-scrollbar{background:' + (aqua ? '#e0e0e0' : '#efece4') + '!important}' +
       track +
       '::-webkit-scrollbar-thumb{border:1px solid ' + bd + '!important;' + round + gloss + 'min-height:28px!important}' +
       thumbV +
@@ -270,6 +274,34 @@ function scrollbarCss(style: string | undefined): string {
       btn(triDn(arrow), 'v-inc') +
       btn(triLf(arrow), 'h-dec') +
       btn(triRt(arrow), 'h-inc')
+    )
+  }
+
+  // Windows 95/98/2000: a silver 50%-dithered track over white, a plain raised
+  // silver thumb + arrow buttons with the canonical two-tone 3D bevel.
+  if (style === 'w95') {
+    const silver = '#c0c0c0'
+    // The classic raised bevel: white/silver top-left, grey/black bottom-right.
+    const raise =
+      'box-shadow:inset -1px -1px #000,inset 1px 1px #c0c0c0,inset -2px -2px #808080,inset 2px 2px #fff!important;'
+    const box = 'background:' + silver + '!important;' + raise
+    const btn = (sel: string, glyph: string): string =>
+      sel +
+      '{' +
+      box +
+      'background-image:' +
+      glyph +
+      '!important;background-repeat:no-repeat!important;background-position:center!important}'
+    return (
+      base +
+      '::-webkit-scrollbar{background:#fff!important}' +
+      '::-webkit-scrollbar-track{background:#fff!important;background-image:' + dither(silver) + '!important}' +
+      '::-webkit-scrollbar-corner{background:' + silver + '!important}' +
+      '::-webkit-scrollbar-thumb{' + box + 'min-height:20px!important}' +
+      btn('::-webkit-scrollbar-button:vertical:decrement', triUp('#000')) +
+      btn('::-webkit-scrollbar-button:vertical:increment', triDn('#000')) +
+      btn('::-webkit-scrollbar-button:horizontal:decrement', triLf('#000')) +
+      btn('::-webkit-scrollbar-button:horizontal:increment', triRt('#000'))
     )
   }
 
@@ -286,6 +318,9 @@ function scrollbarCss(style: string | undefined): string {
   // Arrow buttons: lighter grey face with a white/grey bevel.
   const btnFace = mono ? '#fff' : '#dddddd'
   const btnBevel = mono ? '' : 'box-shadow:inset 1px 1px #fff,inset -1px -1px #777!important;'
+  // Stipple dots over an OPAQUE base (white for mono, #ddd for colour) — without
+  // the base colour the 75%-transparent tile lets the page show through.
+  const trackBase = mono ? '#fff' : '#dddddd'
   const trackFill = mono ? stipple('#000') : stipple('#777777')
   const btn = (sel: string, glyph: string): string =>
     sel +
@@ -302,7 +337,8 @@ function scrollbarCss(style: string | undefined): string {
     'background:' + thumbFace + '!important;border:1px solid ' + ink + '!important;' + thumbBevel
   return (
     base +
-    '::-webkit-scrollbar-track{background:' + trackFill + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
+    '::-webkit-scrollbar{background:' + trackBase + '!important}' +
+    '::-webkit-scrollbar-track{background:' + trackBase + '!important;background-image:' + trackFill + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
     '::-webkit-scrollbar-corner{background:' + thumbFace + '!important}' +
     '::-webkit-scrollbar-thumb{' + thumb + 'min-height:24px!important}' +
     '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(ridge), thumbFace) + ';' + thumbBevel + 'border:1px solid ' + ink + '!important}' +

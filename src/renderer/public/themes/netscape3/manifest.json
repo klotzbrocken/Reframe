@@ -2,6 +2,7 @@
   "id": "netscape3",
   "name": "Netscape Navigator 3.04 Gold",
   "era": "1997 · Windows 95",
+  "scrollbar": "w95",
   "toolbar": [
     "back",
     "forward",

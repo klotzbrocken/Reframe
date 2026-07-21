@@ -2,6 +2,7 @@
   "id": "netscape6",
   "name": "Netscape Communicator 6.0",
   "era": "2000 · Windows",
+  "scrollbar": "w95",
   "toolbar": ["back", "forward", "refresh", "stop", "search", "print"],
   "menus": ["File", "Edit", "View", "Search", "Go", "Bookmarks", "Tasks", "Help"],
   "personalBar": [

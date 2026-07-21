@@ -2,6 +2,7 @@
   "id": "ie1",
   "name": "Internet Explorer 1.0",
   "era": "1995 · Windows 95",
+  "scrollbar": "w95",
   "toolbar": [
     "open",
     "home",

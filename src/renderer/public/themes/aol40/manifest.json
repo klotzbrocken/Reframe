@@ -2,6 +2,7 @@
   "id": "aol40",
   "name": "AOL Desktop 4.0",
   "era": "1998 · Windows",
+  "scrollbar": "w95",
   "toolbar": [
     "read",
     "write",
