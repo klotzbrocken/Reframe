@@ -215,96 +215,81 @@ function scrollbarCss(style: string | undefined): string {
     '::-webkit-scrollbar-button:vertical:decrement,::-webkit-scrollbar-button:vertical:increment{display:block!important;height:16px!important}' +
     '::-webkit-scrollbar-button:horizontal:decrement,::-webkit-scrollbar-button:horizontal:increment{display:block!important;width:16px!important}'
 
-  // Mac OS 8/9 Platinum: a recessed grey tube, a periwinkle thumb with grip
-  // ridges, and — unlike every other bar here — BOTH arrow buttons paired at the
-  // bottom (the classic Platinum layout). Palette sampled from the reference
-  // sprite. Uses its own button config, so it doesn't share `base`.
+  // Mac OS 8/9 Platinum: a flat grey track, one arrow at each end, and a
+  // periwinkle thumb with grip ridges. Colours sampled from the reference chart
+  // (track #aaa, thumb #ccccff→#9896ff highlight, grip #6563cf, grey raised arrows).
   if (style === 'sys8') {
-    const trackGrad = 'linear-gradient(to right,#8f8f8f,#b4b4b4 42%,#a0a0a0)'
-    const thumbGrad = 'linear-gradient(to right,#cdccff,#9c99ff 50%,#6f6cd6)'
-    const btnFace = 'linear-gradient(to right,#e6e6e6,#c4c4c4)'
-    const btnBox =
-      'background:' +
+    const track = '#aaaaaa'
+    const thumbV = 'linear-gradient(to bottom,#ccccff,#9896ff 52%,#8785e6)'
+    const thumbHb = 'linear-gradient(to right,#ccccff,#9896ff 52%,#8785e6)'
+    const btnFace = 'linear-gradient(to bottom,#ececec,#c8c8c8)'
+    const btn = (sel: string, glyph: string): string =>
+      sel +
+      '{background:' +
       btnFace +
-      '!important;border:1px solid #000!important;box-shadow:inset 1px 1px #fff,inset -1px -1px #777!important;background-repeat:no-repeat!important;background-position:center!important'
+      '!important;border:1px solid #000!important;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080!important;background-image:' +
+      glyph +
+      '!important;background-repeat:no-repeat!important;background-position:center!important}'
     return (
-      '::-webkit-scrollbar{width:16px!important;height:16px!important;background:#aaa!important}' +
-      // Pair both arrows at the end (bottom / right); hide the start-side slots.
-      '::-webkit-scrollbar-button:vertical:start:decrement,::-webkit-scrollbar-button:vertical:start:increment,' +
-      '::-webkit-scrollbar-button:horizontal:start:decrement,::-webkit-scrollbar-button:horizontal:start:increment{display:none!important}' +
-      '::-webkit-scrollbar-button:vertical:end:decrement,::-webkit-scrollbar-button:vertical:end:increment{display:block!important;height:16px!important;' + btnBox + '}' +
-      '::-webkit-scrollbar-button:horizontal:end:decrement,::-webkit-scrollbar-button:horizontal:end:increment{display:block!important;width:16px!important;' + btnBox + '}' +
-      '::-webkit-scrollbar-button:vertical:end:decrement{background-image:' + triUp('#000') + '!important}' +
-      '::-webkit-scrollbar-button:vertical:end:increment{background-image:' + triDn('#000') + '!important}' +
-      '::-webkit-scrollbar-button:horizontal:end:decrement{background-image:' + triLf('#000') + '!important}' +
-      '::-webkit-scrollbar-button:horizontal:end:increment{background-image:' + triRt('#000') + '!important}' +
-      '::-webkit-scrollbar-track{background:' + trackGrad + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
-      '::-webkit-scrollbar-corner{background:' + trackGrad + '!important}' +
-      '::-webkit-scrollbar-thumb{background:' + thumbGrad + '!important;border:1px solid #322e9c!important;min-height:24px!important}' +
-      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH('#322e9c'), thumbGrad) + ';border:1px solid #322e9c!important}' +
-      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV('#322e9c'), thumbGrad) + ';border:1px solid #322e9c!important}'
+      base +
+      '::-webkit-scrollbar{background:' + track + '!important}' +
+      '::-webkit-scrollbar-track{background:' + track + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
+      '::-webkit-scrollbar-corner{background:' + track + '!important}' +
+      '::-webkit-scrollbar-thumb{border:1px solid #000!important;min-height:20px!important}' +
+      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH('#6563cf'), thumbV) + ';border:1px solid #000!important}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV('#6563cf'), thumbHb) + ';border:1px solid #000!important}' +
+      btn('::-webkit-scrollbar-button:vertical:decrement', triUp('#000')) +
+      btn('::-webkit-scrollbar-button:vertical:increment', triDn('#000')) +
+      btn('::-webkit-scrollbar-button:horizontal:decrement', triLf('#000')) +
+      btn('::-webkit-scrollbar-button:horizontal:increment', triRt('#000'))
     )
   }
 
-  // Gradient-thumb looks (XP Luna, Mac OS X 10.0 Aqua). Palettes sampled from the
-  // reference survey's own sprites, redrawn here as CSS gradients + inline SVG.
-  if (style === 'xp' || style === 'aqua10') {
-    const aqua = style === 'aqua10'
-    // Aqua: dark-edged blue gel with an off-centre cyan specular highlight.
-    // XP Luna: cool light blue with a soft highlight.
-    const grad = aqua
-      ? 'linear-gradient(to right,#12379c 0,#2f74e8 12%,#4f9bf6 34%,#7cc4ff 60%,#9fe8ff 80%,#7fc8f7 100%)'
-      : 'linear-gradient(to right,#8ea6ec 0,#c3d4fe 22%,#dcebff 45%,#bcd0f9 72%,#93abec 100%)'
-    // Both scrollbars run in a shallow grey/beige tube, lit down the middle.
-    const trackGrad = aqua
-      ? 'linear-gradient(to right,#b6b6b6,#fbfbfb 46%,#e6e6e6)'
-      : 'linear-gradient(to right,#e9e6dc,#fbfbf7 55%,#efece4)'
-    const bd = aqua ? '#0a1f9e' : '#5f7fc8'
-    const arrow = aqua ? '#333333' : '#3f56a0'
+  // Mac OS X 10.x Aqua: a WHITE track, a blue-gel capsule thumb, and BOTH arrows
+  // paired at the bottom (matching the reference chart). Its own button config.
+  if (style === 'aqua10') {
+    const gelV = 'linear-gradient(to right,#1f6fe0 0,#4f9bf6 26%,#93d0ff 52%,#e6f4ff 68%,#7fbdf5 100%)'
+    const gelH = 'linear-gradient(to bottom,#1f6fe0 0,#4f9bf6 26%,#93d0ff 52%,#e6f4ff 68%,#7fbdf5 100%)'
+    const btnBox =
+      'background:#fbfbfb!important;box-shadow:inset 0 0 0 1px #d0d0d0!important;background-repeat:no-repeat!important;background-position:center!important'
+    return (
+      '::-webkit-scrollbar{width:16px!important;height:16px!important;background:#fff!important}' +
+      '::-webkit-scrollbar-button:vertical:start:decrement,::-webkit-scrollbar-button:vertical:start:increment,' +
+      '::-webkit-scrollbar-button:horizontal:start:decrement,::-webkit-scrollbar-button:horizontal:start:increment{display:none!important}' +
+      '::-webkit-scrollbar-button:vertical:end:decrement,::-webkit-scrollbar-button:vertical:end:increment{display:block!important;height:15px!important;' + btnBox + '}' +
+      '::-webkit-scrollbar-button:horizontal:end:decrement,::-webkit-scrollbar-button:horizontal:end:increment{display:block!important;width:15px!important;' + btnBox + '}' +
+      '::-webkit-scrollbar-button:vertical:end:decrement{background-image:' + triUp('#555') + '!important}' +
+      '::-webkit-scrollbar-button:vertical:end:increment{background-image:' + triDn('#555') + '!important}' +
+      '::-webkit-scrollbar-button:horizontal:end:decrement{background-image:' + triLf('#555') + '!important}' +
+      '::-webkit-scrollbar-button:horizontal:end:increment{background-image:' + triRt('#555') + '!important}' +
+      '::-webkit-scrollbar-track{background:#fff!important;box-shadow:inset 1px 0 #d4d4d4,inset -1px 0 #d4d4d4!important}' +
+      '::-webkit-scrollbar-corner{background:#fff!important}' +
+      '::-webkit-scrollbar-thumb{border-radius:8px!important;border:1px solid #1a5fc4!important;min-height:28px!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.85)!important}' +
+      '::-webkit-scrollbar-thumb:vertical{background:' + gelV + '!important}' +
+      '::-webkit-scrollbar-thumb:horizontal{background:' + gelH + '!important}'
+    )
+  }
+
+  // Windows XP Luna: cool light-blue gel with a grip, in a warm-grey tube.
+  if (style === 'xp') {
+    const grad = 'linear-gradient(to right,#8ea6ec 0,#c3d4fe 22%,#dcebff 45%,#bcd0f9 72%,#93abec 100%)'
+    const trackGrad = 'linear-gradient(to right,#e9e6dc,#fbfbf7 55%,#efece4)'
+    const bd = '#5f7fc8'
+    const arrow = '#3f56a0'
     const grip = '#5872b8'
-    const track =
-      '::-webkit-scrollbar-track{background:' +
-      trackGrad +
-      '!important}::-webkit-scrollbar-corner{background:' +
-      trackGrad +
-      '!important}'
-    const round = aqua ? 'border-radius:9px!important;' : ''
-    const gloss = aqua
-      ? 'box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -2px 3px rgba(0,0,60,.3)!important;'
-      : ''
-    // Aqua's gel thumb has no grip ridges; XP does.
-    const thumbV = aqua
-      ? '::-webkit-scrollbar-thumb:vertical{background:' + grad + '!important}'
-      : '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(grip), grad) + '}'
-    const thumbH = aqua
-      ? '::-webkit-scrollbar-thumb:horizontal{background:' + grad + '!important}'
-      : '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(grip), grad) + '}'
-    const btn = (glyph: string, dir: 'v-dec' | 'v-inc' | 'h-dec' | 'h-inc'): string => {
-      const sel =
-        dir === 'v-dec'
-          ? '::-webkit-scrollbar-button:vertical:decrement'
-          : dir === 'v-inc'
-            ? '::-webkit-scrollbar-button:vertical:increment'
-            : dir === 'h-dec'
-              ? '::-webkit-scrollbar-button:horizontal:decrement'
-              : '::-webkit-scrollbar-button:horizontal:increment'
-      // Aqua's arrow buttons are plain grey tube caps; XP's carry the gel gradient.
-      const body = aqua
-        ? 'background:' + glyph + ' center no-repeat,' + trackGrad + '!important'
-        : layer(glyph, grad) + ';border:1px solid ' + bd + '!important'
-      return sel + '{' + body + '}'
-    }
+    const btn = (glyph: string, sel: string): string =>
+      sel + '{' + layer(glyph, grad) + ';border:1px solid ' + bd + '!important}'
     return (
       base +
-      '::-webkit-scrollbar{background:' + (aqua ? '#e0e0e0' : '#efece4') + '!important}' +
-      track +
-      '::-webkit-scrollbar-thumb{border:1px solid ' + bd + '!important;' + round + gloss + 'min-height:28px!important}' +
-      thumbV +
-      thumbH +
-      btn(triUp(arrow), 'v-dec') +
-      btn(triDn(arrow), 'v-inc') +
-      btn(triLf(arrow), 'h-dec') +
-      btn(triRt(arrow), 'h-inc')
+      '::-webkit-scrollbar{background:#efece4!important}' +
+      '::-webkit-scrollbar-track{background:' + trackGrad + '!important}::-webkit-scrollbar-corner{background:' + trackGrad + '!important}' +
+      '::-webkit-scrollbar-thumb{border:1px solid ' + bd + '!important;min-height:28px!important}' +
+      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(grip), grad) + '}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(grip), grad) + '}' +
+      btn(triUp(arrow), '::-webkit-scrollbar-button:vertical:decrement') +
+      btn(triDn(arrow), '::-webkit-scrollbar-button:vertical:increment') +
+      btn(triLf(arrow), '::-webkit-scrollbar-button:horizontal:decrement') +
+      btn(triRt(arrow), '::-webkit-scrollbar-button:horizontal:increment')
     )
   }
 
