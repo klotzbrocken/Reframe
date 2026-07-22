@@ -1,0 +1,574 @@
+/*
+ * Netscape Navigator 1.1 (1994) — the early Navigator chrome. Shares the silver
+ * Win-era face (#c0c0c0) and bevel recipes with the 3.04 theme it was derived
+ * from, but with the 1.x layout: a text-labelled toolbar (Back/Forward/Home/
+ * Reload/Images/Open/Print/Find/Stop), a "Location:" bar, the six Directory
+ * quick-link buttons, and — in place of the trademarked "N" logo — an original
+ * CSS throbber (a dark starfield that streaks with meteors while loading).
+ */
+
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  src: url('fonts/ms_sans_serif.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  src: url('fonts/ms_sans_serif_bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+body {
+  font-family: var(--ow-font);
+  font-size: 11px;
+  color: #000000;
+  background: #c0c0c0;
+  -webkit-font-smoothing: none;
+}
+
+/* Win95 text selection (navy / white) — not the browser default rose. */
+::selection {
+  background: #000080;
+  color: #ffffff;
+}
+
+/* Raised outer window frame (Win95 four-inset bevel). */
+.ow-root {
+  background: #c0c0c0;
+  padding: 3px;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+
+/* ===================================================================== *
+ * Title bar — base.css draws the navy Win95/98 bar; only the Netscape
+ * page icon and the white caption text are ours.
+ * ===================================================================== */
+.ow-titlebar__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 0;
+  background: url('assets/title_icon.png') center / contain no-repeat;
+  image-rendering: pixelated;
+  box-shadow: none;
+}
+.ow-titlebar__text {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 0 4px;
+}
+
+/* ===================================================================== *
+ * Menu bar — File Edit View Go Bookmarks Options Directory Window Help.
+ * ===================================================================== */
+.ow-menubar {
+  height: 19px;
+  padding: 1px 2px 0;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  box-shadow: 0 1px 0 #ffffff;
+}
+.ow-menu__label {
+  padding: 2px 7px;
+  font-size: 11px;
+  color: #000000;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: #000080;
+  color: #ffffff;
+}
+.ow-menu__dropdown {
+  background: #c0c0c0;
+  border: 0;
+  border-radius: 0;
+  padding: 2px;
+  font-size: 11px;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf,
+    2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+.ow-menu__item {
+  padding: 3px 20px 3px 18px;
+  border-radius: 0;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: #000080;
+  color: #ffffff;
+}
+.ow-menu__item.is-disabled {
+  color: #808080;
+  text-shadow: 1px 1px 0 #ffffff;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #ffffff;
+  margin: 3px 2px;
+}
+/* Throbber lives in the Location row (the "N" box), not the menu/tool bars. */
+.ow-menubar .ow-throbber,
+.ow-toolbar .ow-throbber {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Toolbar — ten raised bevel buttons (40×23 glyph + label), 8px groups.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 48px;
+  padding: 4px;
+  gap: 2px;
+  align-items: flex-start;
+  background: #c0c0c0;
+  border-top: 1px solid #ffffff;
+  border-bottom: 1px solid #808080;
+}
+.ow-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 3px 5px 2px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #c0c0c0;
+  color: #000000;
+  cursor: default;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+.ow-btn:active:not(:disabled) {
+  padding: 4px 4px 1px 6px;
+  box-shadow:
+    inset 1px 1px #0a0a0a,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #808080,
+    inset -2px -2px #dfdfdf;
+}
+.ow-btn:disabled {
+  color: #808080;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+.ow-btn__icon {
+  width: 40px;
+  height: 23px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 40px 23px;
+  image-rendering: pixelated;
+}
+.ow-btn__label {
+  font-size: 11px;
+  line-height: 11px;
+  white-space: nowrap;
+}
+
+.ow-btn[data-action='back'] .ow-btn__icon {
+  background-image: url('assets/back.png');
+}
+.ow-btn[data-action='back']:disabled .ow-btn__icon {
+  background-image: url('assets/back_off.png');
+}
+.ow-btn[data-action='forward'] .ow-btn__icon {
+  background-image: url('assets/forward.png');
+}
+.ow-btn[data-action='forward']:disabled .ow-btn__icon {
+  background-image: url('assets/forward_off.png');
+}
+.ow-btn[data-action='home'] .ow-btn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-btn[data-action='nsedit'] .ow-btn__icon {
+  background-image: url('assets/edit.png');
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/reload.png');
+}
+.ow-btn[data-action='images'] .ow-btn__icon {
+  background-image: url('assets/images.png');
+}
+.ow-btn[data-action='open'] .ow-btn__icon {
+  background-image: url('assets/open.png');
+}
+.ow-btn[data-action='print'] .ow-btn__icon {
+  background-image: url('assets/print.png');
+}
+.ow-btn[data-action='find'] .ow-btn__icon {
+  background-image: url('assets/find.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='stop']:disabled .ow-btn__icon {
+  background-image: url('assets/stop_off.png');
+}
+
+/* Small spacer between button groups (no groove — plain gap). */
+.ow-toolbar-sep {
+  align-self: stretch;
+  width: 2px;
+  background: transparent;
+  border: 0;
+}
+.ow-toolbar__spacer {
+  flex: 1;
+}
+
+/* ===================================================================== *
+ * Location row — globe · "Location:" · sunken input · dropdown · "N" throbber.
+ * ===================================================================== */
+.ow-addressbar {
+  position: relative;
+  height: 30px;
+  padding: 4px 52px 3px 3px;
+  gap: 5px;
+  align-items: center;
+  background: #c0c0c0;
+  border-top: 1px solid #ffffff;
+}
+.ow-addressbar::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  background: url('assets/loc_globe.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.ow-address-label {
+  font-size: 11px;
+  color: #000000;
+}
+.ow-address-combo {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 23px;
+  background: #ffffff;
+  border: 0;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #0a0a0a,
+    inset -2px -2px #dfdfdf;
+}
+.ow-address-favicon {
+  display: none;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #000000;
+  padding: 0 4px;
+}
+.ow-address-dropdown {
+  flex: 0 0 auto;
+  width: 17px;
+  align-self: stretch;
+  margin-left: 1px;
+  border: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+.ow-address-dropdown::after {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #000000;
+}
+.ow-address-dropdown:active {
+  box-shadow:
+    inset 1px 1px #0a0a0a,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #808080,
+    inset -2px -2px #dfdfdf;
+}
+.ow-address-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 1px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #000000;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+.ow-address-item {
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.ow-address-item:hover {
+  background: #000080;
+  color: #ffffff;
+}
+.ow-loc-bookmarks,
+.ow-loc-proxy,
+.ow-loc-related,
+.ow-loc-links {
+  display: none;
+}
+
+/* The spinning "N" throbber — boxed at the right, spanning the Location AND
+   Directory rows (absolutely positioned so it overhangs into the row below). */
+.ow-go {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 46px;
+  height: 46px; /* square; a few px of Directory row show below it */
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: #000000;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #0a0a0a,
+    inset -2px -2px #dfdfdf;
+  font-size: 0;
+  color: transparent;
+  cursor: pointer;
+}
+/* A period-evocative CSS throbber (no branded "N" logo): a dark starfield that
+   idles, then streaks with shooting-star meteors while a page loads. */
+.ow-go__icon {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  background-color: #06001a;
+  background-image:
+    radial-gradient(1px 1px at 6px 8px, #ffffff, transparent),
+    radial-gradient(1px 1px at 22px 5px, #cdd6ff, transparent),
+    radial-gradient(1px 1px at 31px 20px, #ffffff, transparent),
+    radial-gradient(1px 1px at 12px 28px, #bcc6ff, transparent),
+    radial-gradient(1px 1px at 34px 33px, #ffffff, transparent),
+    radial-gradient(1px 1px at 18px 17px, #99a6dd, transparent);
+}
+.ow-go__icon::before,
+.ow-go__icon::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #8fd0ff, #ffffff);
+  transform: rotate(35deg);
+  opacity: 0;
+}
+.ow-root[data-loading] .ow-go__icon::before {
+  animation: ns1-meteor 0.85s linear infinite;
+}
+.ow-root[data-loading] .ow-go__icon::after {
+  animation: ns1-meteor 0.85s linear infinite 0.42s;
+}
+@keyframes ns1-meteor {
+  0% {
+    opacity: 0;
+    top: -4px;
+    left: -16px;
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    top: 40px;
+    left: 46px;
+  }
+}
+
+/* ===================================================================== *
+ * Directory row (personal bar) — six small raised text buttons.
+ * ===================================================================== */
+.ow-personalbar {
+  padding: 0 52px 3px 3px;
+  gap: 3px;
+  align-items: center;
+  background: #c0c0c0;
+}
+.ow-personalbar::before {
+  display: none;
+}
+.ow-pbar-btn {
+  height: 20px;
+  padding: 1px 8px 2px;
+  border: 0;
+  border-radius: 0;
+  background: #c0c0c0;
+  color: #000000;
+  font-size: 11px;
+  cursor: default;
+  box-shadow:
+    inset -1px -1px #0a0a0a,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #808080,
+    inset 2px 2px #dfdfdf;
+}
+.ow-pbar-btn:active {
+  box-shadow:
+    inset 1px 1px #0a0a0a,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #808080,
+    inset -2px -2px #dfdfdf;
+}
+.ow-pbar-btn__icon {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Content area — sunken well.
+ * ===================================================================== */
+.ow-content {
+  margin: 0 3px;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #0a0a0a,
+    inset -2px -2px #dfdfdf;
+}
+
+/* ===================================================================== *
+ * Status bar — left icons · text · progress · right icons (all sunken).
+ * ===================================================================== */
+.ow-statusbar {
+  height: 24px;
+  padding: 3px;
+  gap: 3px;
+  align-items: stretch;
+  font-size: 11px;
+  background: #c0c0c0;
+}
+.ow-statusbar::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 40px;
+  background:
+    url('assets/status_security.png') 5px center / 18px 15px no-repeat,
+    url('assets/status_dir.png') 21px center / 18px 15px no-repeat,
+    #c0c0c0;
+  image-rendering: pixelated;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #0a0a0a,
+    inset -2px -2px #dfdfdf;
+}
+.ow-status-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  background: #c0c0c0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #0a0a0a,
+    inset -2px -2px #dfdfdf;
+}
+.ow-progress {
+  position: relative;
+  width: 132px;
+  flex: 0 0 auto;
+  align-self: stretch;
+  background: #c0c0c0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  margin: 0;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #0a0a0a,
+    inset -2px -2px #dfdfdf;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #000080;
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 45%;
+  animation: ns3-progress 1.2s linear infinite;
+}
+@keyframes ns3-progress {
+  0% {
+    width: 8%;
+  }
+  100% {
+    width: 92%;
+  }
+}
+/* Right icon pane (mail + help). */
+.ow-zone {
+  width: 46px;
+  flex: 0 0 auto;
+  display: block;
+  color: transparent;
+  font-size: 0;
+  background:
+    url('assets/status_mail.png') 6px center / 20px 14px no-repeat,
+    url('assets/status_help.png') 31px center / 12px 15px no-repeat,
+    #c0c0c0;
+  image-rendering: pixelated;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #0a0a0a,
+    inset -2px -2px #dfdfdf;
+}
+.ow-zone__lock {
+  display: none;
+}
+
+.ow-tabstrip {
+  display: none;
+}

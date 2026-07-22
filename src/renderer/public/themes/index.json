@@ -1,23 +1,112 @@
 [
-  { "id": "mosaic", "name": "NCSA Mosaic", "era": "1993 · Windows" },
-  { "id": "ie1", "name": "Internet Explorer 1.0", "era": "1995 · Windows 95" },
-  { "id": "ie302", "name": "Internet Explorer 3.02", "era": "1997 · Windows 95" },
-  { "id": "netscape3", "name": "Netscape Navigator 3.04 Gold", "era": "1997 · Windows 95" },
-  { "id": "ie4mac", "name": "Internet Explorer 4.01 (Mac)", "era": "1998 · Mac OS 9" },
-  { "id": "aol40", "name": "AOL Desktop 4.0", "era": "1998 · Windows" },
-  { "id": "aol40mac", "name": "AOL Desktop 4.0 (Mac OS 9)", "era": "1998 · Mac OS 9" },
-  { "id": "ie5", "name": "Internet Explorer 5", "era": "1999 · Windows 98" },
-  { "id": "ie45mac", "name": "Internet Explorer 4.5 (Mac)", "era": "1999 · Mac OS 8.5" },
-  { "id": "ie45macmono", "name": "Internet Explorer 4.5 (Mac, 1bit)", "era": "1999 · Mac OS 8.5 · 1-bit" },
-  { "id": "netscape", "name": "Netscape Communicator 4.7", "era": "1999 · Windows 9x" },
-  { "id": "omniweb", "name": "OmniWeb 3.0", "era": "1999 · NeXTSTEP / Rhapsody" },
-  { "id": "netscape4mac", "name": "Netscape Navigator 4.x (Mac)", "era": "2000 · Mac OS 9" },
-  { "id": "netscape6", "name": "Netscape Communicator 6.0", "era": "2000 · Windows" },
-  { "id": "opera", "name": "Opera 3.60", "era": "2000 · Windows" },
-  { "id": "ie6", "name": "Internet Explorer 6.0", "era": "2001 · Windows XP" },
-  { "id": "kmeleon", "name": "K-Meleon 0.2", "era": "2001 · Windows 98" },
-  { "id": "ns7modern", "name": "Netscape 7.02 (Mac)", "era": "2003 · Mac OS X · Aqua" },
-  { "id": "safari", "name": "Safari 1.0", "era": "2003 · Mac OS X" },
-  { "id": "firefox", "name": "Firefox 1.0", "era": "2004 · cross-platform" },
-  { "id": "camino", "name": "Camino 2.0", "era": "2009 · Mac OS X" }
+  {
+    "id": "mosaic",
+    "name": "NCSA Mosaic",
+    "era": "1993 \u00b7 Windows"
+  },
+  {
+    "id": "netscape1",
+    "name": "Netscape Navigator 1.1",
+    "era": "1994 \u00b7 Windows / X11"
+  },
+  {
+    "id": "ie1",
+    "name": "Internet Explorer 1.0",
+    "era": "1995 \u00b7 Windows 95"
+  },
+  {
+    "id": "ie302",
+    "name": "Internet Explorer 3.02",
+    "era": "1997 \u00b7 Windows 95"
+  },
+  {
+    "id": "netscape3",
+    "name": "Netscape Navigator 3.04 Gold",
+    "era": "1997 \u00b7 Windows 95"
+  },
+  {
+    "id": "ie4mac",
+    "name": "Internet Explorer 4.01 (Mac)",
+    "era": "1998 \u00b7 Mac OS 9"
+  },
+  {
+    "id": "aol40",
+    "name": "AOL Desktop 4.0",
+    "era": "1998 \u00b7 Windows"
+  },
+  {
+    "id": "aol40mac",
+    "name": "AOL Desktop 4.0 (Mac OS 9)",
+    "era": "1998 \u00b7 Mac OS 9"
+  },
+  {
+    "id": "ie5",
+    "name": "Internet Explorer 5",
+    "era": "1999 \u00b7 Windows 98"
+  },
+  {
+    "id": "ie45mac",
+    "name": "Internet Explorer 4.5 (Mac)",
+    "era": "1999 \u00b7 Mac OS 8.5"
+  },
+  {
+    "id": "ie45macmono",
+    "name": "Internet Explorer 4.5 (Mac, 1bit)",
+    "era": "1999 \u00b7 Mac OS 8.5 \u00b7 1-bit"
+  },
+  {
+    "id": "netscape",
+    "name": "Netscape Communicator 4.7",
+    "era": "1999 \u00b7 Windows 9x"
+  },
+  {
+    "id": "omniweb",
+    "name": "OmniWeb 3.0",
+    "era": "1999 \u00b7 NeXTSTEP / Rhapsody"
+  },
+  {
+    "id": "netscape4mac",
+    "name": "Netscape Navigator 4.x (Mac)",
+    "era": "2000 \u00b7 Mac OS 9"
+  },
+  {
+    "id": "netscape6",
+    "name": "Netscape Communicator 6.0",
+    "era": "2000 \u00b7 Windows"
+  },
+  {
+    "id": "opera",
+    "name": "Opera 3.60",
+    "era": "2000 \u00b7 Windows"
+  },
+  {
+    "id": "ie6",
+    "name": "Internet Explorer 6.0",
+    "era": "2001 \u00b7 Windows XP"
+  },
+  {
+    "id": "kmeleon",
+    "name": "K-Meleon 0.2",
+    "era": "2001 \u00b7 Windows 98"
+  },
+  {
+    "id": "ns7modern",
+    "name": "Netscape 7.02 (Mac)",
+    "era": "2003 \u00b7 Mac OS X \u00b7 Aqua"
+  },
+  {
+    "id": "safari",
+    "name": "Safari 1.0",
+    "era": "2003 \u00b7 Mac OS X"
+  },
+  {
+    "id": "firefox",
+    "name": "Firefox 1.0",
+    "era": "2004 \u00b7 cross-platform"
+  },
+  {
+    "id": "camino",
+    "name": "Camino 2.0",
+    "era": "2009 \u00b7 Mac OS X"
+  }
 ]

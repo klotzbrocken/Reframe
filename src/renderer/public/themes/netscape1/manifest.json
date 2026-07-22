@@ -1,0 +1,95 @@
+{
+  "id": "netscape1",
+  "name": "Netscape Navigator 1.1",
+  "era": "1994 \u00b7 Windows / X11",
+  "scrollbar": "w95",
+  "toolbar": [
+    "back",
+    "forward",
+    "|",
+    "home",
+    "|",
+    "refresh",
+    "images",
+    "|",
+    "open",
+    "print",
+    "find",
+    "|",
+    "stop"
+  ],
+  "menus": [
+    "File",
+    "Edit",
+    "View",
+    "Go",
+    "Bookmarks",
+    "Options",
+    "Directory",
+    "Help"
+  ],
+  "homeUrl": "https://www.mozilla.org",
+  "oldWebDate": "19941215",
+  "layout": {
+    "tabsPosition": "top",
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": false,
+    "showFavicon": false
+  },
+  "personalBar": [
+    {
+      "label": "What's New!",
+      "url": "https://www.mozilla.org/en-US/firefox/new/"
+    },
+    {
+      "label": "What's Cool!",
+      "url": "https://www.awwwards.com"
+    },
+    {
+      "label": "Handbook",
+      "url": "https://en.wikipedia.org/wiki/Netscape_Navigator"
+    },
+    {
+      "label": "Net Search",
+      "url": "https://duckduckgo.com"
+    },
+    {
+      "label": "Net Directory",
+      "url": "https://dmoztools.net"
+    },
+    {
+      "label": "Newsgroups",
+      "url": "https://groups.google.com"
+    }
+  ],
+  "throbber": {
+    "kind": "image",
+    "label": "Netscape"
+  },
+  "labels": {
+    "address": "Location:",
+    "go": "",
+    "back": "Back",
+    "forward": "Forward",
+    "home": "Home",
+    "reload": "Reload",
+    "images": "Images",
+    "open": "Open",
+    "print": "Print",
+    "find": "Find",
+    "stop": "Stop"
+  },
+  "sounds": {},
+  "vars": {
+    "--ow-face": "#c0c0c0",
+    "--ow-face-light": "#dfdfdf",
+    "--ow-face-dark": "#808080",
+    "--ow-face-darker": "#0a0a0a",
+    "--ow-field": "#ffffff",
+    "--ow-text": "#000000",
+    "--ow-highlight": "#000080",
+    "--ow-titlebar": "#000080",
+    "--ow-font": "'Pixelated MS Sans Serif', 'MS Sans Serif', Tahoma, Geneva, sans-serif"
+  }
+}
