@@ -597,7 +597,20 @@ export function App() {
     })
   }, [])
 
-  useLayoutEffect(report, [report, state.tabs.length, themeId, manifest, hotlistOpen, mdi])
+  // Measure now, then again shortly after — some chrome rows (e.g. a theme's
+  // favorites bar) or web fonts settle a frame or two later, which shifts the
+  // content box DOWN without changing its size; the ResizeObserver won't catch a
+  // pure position shift, so the page view could stay placed too high (overlapping
+  // the address bar). The delayed re-measures reposition it once layout is final.
+  useLayoutEffect(() => {
+    report()
+    const t1 = window.setTimeout(report, 120)
+    const t2 = window.setTimeout(report, 400)
+    return () => {
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+  }, [report, state.tabs.length, themeId, manifest, hotlistOpen, showBar, mdi])
 
   // Apply the MDI child-window geometry whenever the mode changes. In 'normal'
   // mode a dragged/resized window keeps its explicit box (mdiGeom); max / min /
