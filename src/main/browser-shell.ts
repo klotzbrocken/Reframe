@@ -137,6 +137,9 @@ export class BrowserShell {
   // or '' for the browser default. Set by the renderer on every theme switch and
   // pushed into every page preload with the display mode.
   private scrollbarStyle = ''
+  // Global "CRT screen effect" toggle (Settings). Pushed into every page preload
+  // with the display mode; the chrome renderer draws its own matching overlay.
+  private crtEnabled = false
 
   constructor(
     private win: BaseWindow,
@@ -845,20 +848,28 @@ export class BrowserShell {
     this.broadcastDisplay()
   }
 
+  /** Toggle the CRT screen effect for page content, and push it live. */
+  setCrt(on: boolean): void {
+    this.crtEnabled = !!on
+    this.broadcastDisplay()
+  }
+
   /** Effective mode for an origin: its override (depth/typo) over the global
-   *  default; dither + scrollbar are global (per active theme). */
+   *  default; dither + scrollbar + crt are global. */
   getPageDisplay(origin?: string): {
     depth: string
     dither: boolean
     typo: string
     scrollbar: string
+    crt: boolean
   } {
     const o = origin ? this.displayBySite[origin] : undefined
     return {
       depth: o?.depth ?? this.globalDisplay.depth,
       dither: this.globalDisplay.dither,
       typo: o?.typo ?? this.globalDisplay.typo,
-      scrollbar: this.scrollbarStyle
+      scrollbar: this.scrollbarStyle,
+      crt: this.crtEnabled
     }
   }
 

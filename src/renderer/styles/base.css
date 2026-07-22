@@ -1845,3 +1845,50 @@ body,
   max-height: 84%;
   object-fit: contain;
 }
+
+/* ===================================================================== *
+ * CRT screen effect (Settings toggle) — scanlines, RGB mask, vignette and
+ * a faint flicker over the chrome UI. The page WebContentsView draws its own
+ * matching overlay (page preload), so together the whole window reads as one
+ * CRT. Click-through, above everything.
+ * ===================================================================== */
+.ow-crt {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  pointer-events: none;
+}
+.ow-crt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.16) 50%),
+    linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.05),
+      rgba(0, 255, 0, 0.015),
+      rgba(0, 0, 255, 0.05)
+    );
+  background-size: 100% 3px, 4px 100%;
+  animation: ow-crt-flicker 0.12s steps(2) infinite;
+}
+.ow-crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(18, 16, 16, 0) 55%,
+    rgba(0, 0, 0, 0.16) 78%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+@keyframes ow-crt-flicker {
+  0% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 1;
+  }
+}
