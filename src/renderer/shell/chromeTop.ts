@@ -14,5 +14,11 @@ const active = new Set<string>()
 export function requestChromeTop(reason: string, on: boolean): void {
   if (on) active.add(reason)
   else active.delete(reason)
-  window.oldweb.setChromeOnTop(active.size > 0)
+  const floating = active.size > 0
+  window.oldweb.setChromeOnTop(floating)
+  // Signal to theme CSS that the chrome is floating above the page, so a theme
+  // that paints an opaque layer inside the content region (the AOL MDI "child
+  // window") can go transparent and let the page show through while a menu/popup
+  // is open — otherwise raising the chrome would blank the page behind it.
+  document.querySelector('.ow-root')?.toggleAttribute('data-chrome-top', floating)
 }
