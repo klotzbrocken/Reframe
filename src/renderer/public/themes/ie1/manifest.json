@@ -1,29 +1,30 @@
 {
   "id": "ie1",
   "name": "Internet Explorer 1.0",
-  "era": "1995 · Windows 95",
+  "era": "1995 \u00b7 Windows 95",
   "scrollbar": "w95",
   "toolbar": [
     "open",
     "home",
-    "|",
     "back",
     "forward",
-    "|",
     "stop",
     "refresh",
-    "|",
     "favorites",
     "favadd",
-    "|",
     "fontup",
     "fontdown",
-    "|",
     "cut",
     "copy",
     "paste"
   ],
-  "menus": ["File", "Edit", "View", "Favorites", "Help"],
+  "menus": [
+    "File",
+    "Edit",
+    "View",
+    "Favorites",
+    "Help"
+  ],
   "homeUrl": "https://www.microsoft.com",
   "oldWebDate": "19950816",
   "layout": {
@@ -31,7 +32,10 @@
     "showMenuBar": true,
     "showTabs": false
   },
-  "throbber": { "kind": "css", "label": "" },
+  "throbber": {
+    "kind": "css",
+    "label": ""
+  },
   "labels": {
     "address": "Address",
     "go": "Go",
