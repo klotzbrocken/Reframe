@@ -64,7 +64,7 @@
     }
   ],
   "throbber": {
-    "kind": "image",
+    "kind": "css",
     "label": "Netscape"
   },
   "labels": {
