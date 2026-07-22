@@ -2,6 +2,7 @@
   "id": "firefox",
   "name": "Firefox 1.0",
   "era": "2004 · cross-platform",
+  "scrollbar": "xp",
   "toolbar": ["back", "forward", "|", "refresh", "stop", "home"],
   "menus": ["File", "Edit", "View", "Go", "Bookmarks", "Tools", "Help"],
   "personalBar": [
