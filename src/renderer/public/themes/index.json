@@ -8,7 +8,7 @@
   { "id": "aol40mac", "name": "AOL Desktop 4.0 (Mac OS 9)", "era": "1998 · Mac OS 9" },
   { "id": "ie5", "name": "Internet Explorer 5", "era": "1999 · Windows 98" },
   { "id": "ie45mac", "name": "Internet Explorer 4.5 (Mac)", "era": "1999 · Mac OS 8.5" },
-  { "id": "ie45macmono", "name": "Internet Explorer 4.5 (Mac, monochrome)", "era": "1999 · Mac OS 8.5 · 1-bit" },
+  { "id": "ie45macmono", "name": "Internet Explorer 4.5 (Mac, 1bit)", "era": "1999 · Mac OS 8.5 · 1-bit" },
   { "id": "netscape", "name": "Netscape Communicator 4.7", "era": "1999 · Windows 9x" },
   { "id": "omniweb", "name": "OmniWeb 3.0", "era": "1999 · NeXTSTEP / Rhapsody" },
   { "id": "netscape4mac", "name": "Netscape Navigator 4.x (Mac)", "era": "2000 · Mac OS 9" },

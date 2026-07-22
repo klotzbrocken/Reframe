@@ -245,13 +245,23 @@ function scrollbarCss(style: string | undefined): string {
     )
   }
 
-  // Mac OS X 10.x Aqua: a WHITE track, a blue-gel capsule thumb, and BOTH arrows
-  // paired at the bottom (matching the reference chart). Its own button config.
+  // Mac OS X 10.0 "Cheetah" Aqua: a white rounded trough, a glossy blue-gel
+  // capsule thumb, both arrows paired at the bottom. The gel is a layered
+  // gradient (a rounded cross-section pill + a length-wise top sheen) around the
+  // authentic Aqua selection blue #2563ae, after the B00merang Cheetah theme.
   if (style === 'aqua10') {
-    const gelV = 'linear-gradient(to right,#1f6fe0 0,#4f9bf6 26%,#93d0ff 52%,#e6f4ff 68%,#7fbdf5 100%)'
-    const gelH = 'linear-gradient(to bottom,#1f6fe0 0,#4f9bf6 26%,#93d0ff 52%,#e6f4ff 68%,#7fbdf5 100%)'
+    // Cross-section pill (dark edges → bright specular highlight → dark edge).
+    const crossR =
+      'linear-gradient(to right,#164e94 0,#2f7fd6 14%,#7cb8f2 38%,#e2f1ff 52%,#66a8ec 74%,#164e94 100%)'
+    const crossB =
+      'linear-gradient(to bottom,#164e94 0,#2f7fd6 14%,#7cb8f2 38%,#e2f1ff 52%,#66a8ec 74%,#164e94 100%)'
+    // Length-wise glass sheen over the top half.
+    const sheenB =
+      'linear-gradient(to bottom,rgba(255,255,255,.5),rgba(255,255,255,0) 46%,rgba(255,255,255,.14) 82%)'
+    const sheenR =
+      'linear-gradient(to right,rgba(255,255,255,.5),rgba(255,255,255,0) 46%,rgba(255,255,255,.14) 82%)'
     const btnBox =
-      'background:#fbfbfb!important;box-shadow:inset 0 0 0 1px #d0d0d0!important;background-repeat:no-repeat!important;background-position:center!important'
+      'background:#fff!important;box-shadow:inset 0 0 0 1px #dadada!important;background-repeat:no-repeat!important;background-position:center!important'
     return (
       '::-webkit-scrollbar{width:16px!important;height:16px!important;background:#fff!important}' +
       '::-webkit-scrollbar-button:vertical:start:decrement,::-webkit-scrollbar-button:vertical:start:increment,' +
@@ -262,11 +272,13 @@ function scrollbarCss(style: string | undefined): string {
       '::-webkit-scrollbar-button:vertical:end:increment{background-image:' + triDn('#555') + '!important}' +
       '::-webkit-scrollbar-button:horizontal:end:decrement{background-image:' + triLf('#555') + '!important}' +
       '::-webkit-scrollbar-button:horizontal:end:increment{background-image:' + triRt('#555') + '!important}' +
-      '::-webkit-scrollbar-track{background:#fff!important;box-shadow:inset 1px 0 #d4d4d4,inset -1px 0 #d4d4d4!important}' +
+      // White rounded trough with a soft inner shadow (B00merang: base white,
+      // inset 2px -2px 3px black/.3).
+      '::-webkit-scrollbar-track{background:#fff!important;border-radius:8px!important;box-shadow:inset 1px 1px 2px rgba(0,0,0,.16),inset -1px -1px 1px rgba(0,0,0,.05)!important}' +
       '::-webkit-scrollbar-corner{background:#fff!important}' +
-      '::-webkit-scrollbar-thumb{border-radius:8px!important;border:1px solid #1a5fc4!important;min-height:28px!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.85)!important}' +
-      '::-webkit-scrollbar-thumb:vertical{background:' + gelV + '!important}' +
-      '::-webkit-scrollbar-thumb:horizontal{background:' + gelH + '!important}'
+      '::-webkit-scrollbar-thumb{border-radius:8px!important;border:1px solid #123f7e!important;min-height:30px!important}' +
+      '::-webkit-scrollbar-thumb:vertical{background-image:' + sheenB + ',' + crossR + '!important;background-repeat:no-repeat,no-repeat!important}' +
+      '::-webkit-scrollbar-thumb:horizontal{background-image:' + sheenR + ',' + crossB + '!important;background-repeat:no-repeat,no-repeat!important}'
     )
   }
 
