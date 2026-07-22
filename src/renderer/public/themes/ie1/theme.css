@@ -164,21 +164,23 @@ body {
   justify-content: center;
   align-items: center;
   min-width: 0;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
+  margin: 0 1px;
   padding: 0;
-  background: transparent;
-  border: 1px solid transparent;
-  box-shadow: none;
-  color: #000;
-}
-.ow-btn:hover:not(:disabled) {
+  /* Each icon sits in its own square, always-raised Win95 button (as in IE 1.0). */
+  background: var(--ie1-face);
+  border: 1px solid;
   border-color: #fff #000 #000 #fff;
   box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+  color: #000;
 }
 .ow-btn:active:not(:disabled) {
   border-color: #000 #fff #fff #000;
   box-shadow: inset 1px 1px 0 #808080;
+}
+.ow-btn:disabled {
+  border-color: #fff #000 #000 #fff;
 }
 .ow-btn__label {
   display: none;
@@ -267,19 +269,22 @@ body {
   width: 62px;
   height: 62px;
   z-index: 50;
-  /* one frame == well width (58px); flag sits at the top of the well */
-  background: var(--ie1-face) url('assets/flag_sprite.png') center top / 464px 51px no-repeat;
+  /* The flag (18 frames extracted from iexplore.exe) is scaled so one 62px cell
+     fills the whole well — no unfilled strip below it. Idle shows frame 1. */
+  background: url('assets/flag.png') left top / 62px 62px no-repeat;
   box-shadow: var(--w95-sunken);
 }
 .ow-toolbar .ow-throbber.is-active {
-  animation: ie1-flag 0.5s steps(8) infinite;
+  background-image: url('assets/flag_sprite.png');
+  background-size: auto 62px;
+  animation: ie1-flag 0.7s steps(18) infinite;
 }
 @keyframes ie1-flag {
   from {
     background-position-x: 0;
   }
   to {
-    background-position-x: -464px;
+    background-position-x: -1116px;
   }
 }
 
