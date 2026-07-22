@@ -54,6 +54,8 @@ export interface Settings {
   modemSampleUrl?: string
   /** Period UI sounds (clicks, chimes, error beeps). Default on. */
   uiSounds?: boolean
+  /** CRT screen effect (scanlines, RGB mask, vignette) over the whole app. Default off. */
+  crt?: boolean
 }
 
 // Mirrors SPEED_OPTS in App.tsx (the connection-speed control is surfaced here
@@ -120,6 +122,7 @@ export function SettingsDialog({
   const [closeAction, setCloseAction] = useState(settings.closeAction || 'quit')
   const [adblock, setAdblock] = useState(settings.adblock ?? false)
   const [uiSounds, setUiSounds] = useState(settings.uiSounds !== false)
+  const [crt, setCrt] = useState(settings.crt ?? false)
   const [colorDepth, setColorDepth] = useState(
     settings.colorDepth && settings.colorDepth !== 'auto' ? settings.colorDepth : 'off'
   )
@@ -261,6 +264,11 @@ export function SettingsDialog({
                 onChange={(e) => setUiSounds(e.target.checked)}
               />
               <span>Period UI sounds (clicks, chimes, errors)</span>
+            </label>
+
+            <label className="ow-field ow-field--check">
+              <input type="checkbox" checked={crt} onChange={(e) => setCrt(e.target.checked)} />
+              <span>CRT screen effect (scanlines &amp; glow)</span>
             </label>
 
             <div className="ow-field--sep ow-field--wide">Retro display (web pages)</div>
@@ -443,6 +451,8 @@ export function SettingsDialog({
                 adblock: adblock || undefined,
                 // Default-on: persist `false` only when the user turns it off.
                 uiSounds: uiSounds ? undefined : false,
+                // Off is the default — persist only when the user turns it on.
+                crt: crt || undefined,
                 // Off is the default — persist only an explicit reduced depth.
                 colorDepth: colorDepth === 'off' ? undefined : colorDepth,
                 // Default-on: persist `false` only when the page dither is off.

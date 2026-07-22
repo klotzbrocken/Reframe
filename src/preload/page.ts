@@ -374,11 +374,38 @@ function scrollbarCss(style: string | undefined): string {
   )
 }
 
+// --- CRT screen effect ------------------------------------------------------
+// A pure-CSS scanline + RGB-mask + vignette overlay, injected as fixed pseudo-
+// elements on <html>. No DOM nodes (insertCSS only adds rules), and NO filter on
+// html/body — a filter there would break the page's own position:fixed elements.
+// A faint flicker sells the phosphor. The chrome renderer draws a matching
+// overlay so the whole window reads as one CRT. Best-effort z-index like the
+// other page effects (a site's own max-z fixed element could still sit above).
+function crtCss(on: boolean | undefined): string {
+  if (!on) return ''
+  return (
+    'html::before{content:"";position:fixed;inset:0;z-index:2147483646;pointer-events:none;' +
+    'background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,.16) 50%),' +
+    'linear-gradient(90deg,rgba(255,0,0,.05),rgba(0,255,0,.015),rgba(0,0,255,.05));' +
+    'background-size:100% 3px,4px 100%;animation:reframe-crt-flicker .12s steps(2) infinite}' +
+    'html::after{content:"";position:fixed;inset:0;z-index:2147483647;pointer-events:none;' +
+    'background:radial-gradient(ellipse at center,rgba(18,16,16,0) 55%,rgba(0,0,0,.16) 78%,rgba(0,0,0,.4) 100%)}' +
+    '@keyframes reframe-crt-flicker{0%{opacity:.92}100%{opacity:1}}'
+  )
+}
+
 let filterKey: string | null = null
 let typoKey: string | null = null
 let scrollKey: string | null = null
+let crtKey: string | null = null
 function applyDisplay(
-  mode: { depth?: string; dither?: boolean; typo?: string; scrollbar?: string } | null
+  mode: {
+    depth?: string
+    dither?: boolean
+    typo?: string
+    scrollbar?: string
+    crt?: boolean
+  } | null
 ): void {
   const drop = (k: string | null): null => {
     try {
@@ -391,6 +418,7 @@ function applyDisplay(
   filterKey = drop(filterKey)
   typoKey = drop(typoKey)
   scrollKey = drop(scrollKey)
+  crtKey = drop(crtKey)
   const fcss = displayCss(mode)
   if (fcss) {
     try {
@@ -411,6 +439,14 @@ function applyDisplay(
   if (scss) {
     try {
       scrollKey = webFrame.insertCSS(scss)
+    } catch {
+      /* ignore */
+    }
+  }
+  const ccss = crtCss(mode?.crt)
+  if (ccss) {
+    try {
+      crtKey = webFrame.insertCSS(ccss)
     } catch {
       /* ignore */
     }

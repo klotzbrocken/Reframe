@@ -119,6 +119,8 @@ export interface OldwebAPI {
   /** Set the period scrollbar look injected into page content (the active theme's
    *  `scrollbar`: sys7 | sys7mono | aqua10 | xp; '' = browser default). */
   setScrollbar(style: string): Promise<void>
+  /** Toggle the CRT screen effect (scanlines/vignette) over page content. */
+  setCrt(on: boolean): Promise<void>
   /** Archive Timeline: capture COUNT for each of the 12 months of `year` for `url`
    *  (index 0 = Jan). Fetched per year from the Wayback calendar API. */
   waybackMonths(url: string, year: number): Promise<number[]>

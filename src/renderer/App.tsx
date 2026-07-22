@@ -563,6 +563,12 @@ export function App() {
   useEffect(() => {
     window.oldweb.setAdblock(settings.adblock ?? false)
   }, [settings.adblock])
+  // CRT screen effect: push the toggle to every page preload (which draws the
+  // scanline/vignette overlay over the web content). The chrome gets its own
+  // matching overlay below, so the whole window reads as one CRT.
+  useEffect(() => {
+    window.oldweb.setCrt(settings.crt ?? false)
+  }, [settings.crt])
   // Retro "display" effect on page content: colour-depth reduction + dither, plus
   // the Classic Web Typography level. Both default OFF — pages render normally
   // unless the user opts in via Settings. `era` resolves against the theme's era
@@ -2033,6 +2039,9 @@ export function App() {
       data-menu-size={settings.menuFontSize || 'normal'}
       data-label-size={settings.labelFontSize || 'normal'}
     >
+      {/* CRT scanline/vignette overlay for the chrome UI (the page view draws its
+          own matching overlay via the page preload). Click-through. */}
+      {settings.crt && <div className="ow-crt" aria-hidden />}
       <TitleBar
         title={titleText}
         maximized={state.maximized}

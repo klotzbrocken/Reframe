@@ -119,10 +119,12 @@ export function registerIpc(getShell: () => BrowserShell | null): void {
       depth: 'off',
       dither: true,
       typo: 'off',
-      scrollbar: ''
+      scrollbar: '',
+      crt: false
     }
   })
   handle('shell:setScrollbar', (_e, style) => s()?.setScrollbarStyle(asString(style)))
+  handle('shell:setCrt', (_e, on) => s()?.setCrt(asBool(on)))
   handle('wayback:months', (_e, url, year) => s()?.waybackMonths(asString(url), Number(year)) ?? [])
   handle('shell:print', (_e, id) => (validId(id) ? s()?.print(id) : undefined))
   handle('shell:savePage', (_e, id) => (validId(id) ? s()?.savePage(id) : undefined))
