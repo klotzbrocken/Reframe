@@ -1871,6 +1871,17 @@ body,
   z-index: 2147483646;
   pointer-events: none;
 }
+/* Interactive overlays open by floating the chrome above the page (see
+   chromeTop.ts), which would put the CRT overlay over them too. Keep menus, the
+   address-history list, dialogs/Settings and the flyout ABOVE the CRT so they
+   stay crisp — the toolbar/status bar behind them still get the CRT look. */
+.ow-menu__dropdown,
+.ow-address-list,
+.ow-dialog-backdrop,
+.ow-fab,
+.ow-fab__panel {
+  z-index: 2147483647;
+}
 .ow-crt::before {
   content: '';
   position: absolute;
