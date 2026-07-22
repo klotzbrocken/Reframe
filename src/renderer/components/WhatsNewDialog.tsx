@@ -1,26 +1,30 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.10.0'
+export const WHATS_NEW_VERSION = '1.12.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'You’ve Got Mail — the AOL Desktop 4.0 theme',
-    body: 'The star of this release: a pixel-faithful recreation of the 1998 AOL client wrapped around today’s web. The colourful two-row toolbar, the Keyword bar, the running-man throbber and the dial-in animation are all here — and every page floats inside a real MDI “child window” you can move, resize, minimise and maximise, just like the original. Icons that needed the real AOL service (Mail, People, Quotes…) are shown greyed out, as they’d be before you signed on.'
+    title: 'Browse like it’s 1994 — Netscape Navigator 1.1',
+    body: 'Reframe’s earliest era yet: the grey Motif chrome, the text-labelled Back / Forward / Home / Reload / Images / Open / Print / Find / Stop toolbar, the “Location:” bar and the Directory buttons. In place of the trademarked “N” logo it gets an original throbber — a dark starfield that streaks with shooting-star meteors while a page loads.'
   },
   {
-    title: 'Two flavours — Windows & Mac OS 9',
-    body: 'Pick “AOL Desktop 4.0” for the classic Windows look, or “AOL Desktop 4.0 (Mac OS 9)” for the Macintosh version — same AOL shell, but with the classic Platinum title bars (close box on the left) and the menus up in the real Mac menu bar.'
+    title: 'Switch on the CRT',
+    body: 'A new “CRT screen effect” in Settings lays scanlines, a faint RGB channel mask, a vignette and a subtle flicker over the whole window — chrome and web page alike — for that phosphor glow. Off by default; flip it on whenever you want the tube back.'
   },
   {
-    title: 'Channels that go somewhere',
-    body: 'Click the Channels icon for the iconic channel directory, or its little ▼ for a quick drop-down — News, Sports, Travel, Shopping and more, each linking to a fitting modern site. Don’t like a destination? Right-click any channel to edit its link; your choices are remembered.'
+    title: 'Period scrollbars, per theme',
+    body: 'The web view’s scrollbars now match each theme’s era instead of the modern overlay: System 7 and Mac OS 8 Platinum, Mac OS X Aqua’s blue gel, the Windows 95 raised-silver bar, Windows XP Luna, and a 1-bit black-and-white version — the chunky, always-visible bars old browsers really had.'
   },
   {
-    title: 'More windows, less clutter',
-    body: 'With a window minimised, typing a new address opens a fresh window — several can be open at once, each as its own title-bar. The navigation arrows light up only when they’re usable, and the address bar doubles as the Keyword box. Themes are now sorted by year, and every AOL screen has its own “About” page.'
+    title: 'Internet Explorer 1.0, done right',
+    body: 'The IE 1.0 theme gets its original toolbar icons and the waving-flag throbber that fills its well, square raised buttons grouped by spacing (no separator lines), and the classic groove between the menu bar and the toolbar.'
+  },
+  {
+    title: 'More ways to feel the era',
+    body: 'Period wait cursors while pages load, synthesised UI sounds (clicks, chimes, error beeps) with per-theme overrides, progressive loading feedback, and two new always-on connection tiers — DSL and cable — alongside the dial-up speeds.'
   }
 ]
 
