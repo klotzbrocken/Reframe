@@ -811,6 +811,17 @@ body,
 }
 
 /* ---- Windows XP Luna --------------------------------------------------- */
+/* XP Luna: the WHOLE window frame turns Luna-blue and continuous with the
+   caption — the theme paints a grey Win95 bevel on .ow-root, so override its
+   background + bevel here (keeping its padding, which the blue frame fills). */
+.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) {
+  background: #0b54d8 !important;
+  box-shadow:
+    inset 1px 1px 0 #2e84f2,
+    inset 2px 2px 0 #1e72e6,
+    inset -1px -1px 0 #0a246a,
+    inset -2px -2px 0 #0b54d8 !important;
+}
 .ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar {
   /* XP Luna Blue — the glossy active caption: bright top edge, deep blue body,
      a lighter sheen band near the bottom. cornerRadius 0 (no rounding). */
@@ -1682,7 +1693,9 @@ body,
 
 /* --- variant: slim inline (default) — sunken field, like .ow-zone --------- */
 .ow-modem--slim {
-  background: #c0c0c0;
+  /* Inherit the theme's face so it blends with the status bar (e.g. IE6 tan)
+     instead of a fixed grey. */
+  background: var(--ow-face, #c0c0c0);
   box-shadow: inset 1px 1px #808080, inset -1px -1px #fff;
 }
 .ow-modem__label {
