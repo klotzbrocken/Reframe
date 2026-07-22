@@ -193,18 +193,36 @@ const stipple = (c: string): string =>
 // A 2×2 checkerboard at 50% density (the Windows 95 track texture).
 const dither = (c: string): string =>
   svgBg("<g fill='" + c + "'><rect width='1' height='1'/><rect x='1' y='1' width='1' height='1'/></g>", 2, 2)
-/** Two stacked background layers (glyph over fill) for a thumb or button. */
-function layer(top: string, bottom: string): string {
+// The CRT scanline, baked onto scrollbar parts when the effect is on — a native
+// scrollbar paints above the page DOM, so the page's CRT overlay can't cover it.
+const CRT_SCAN = 'linear-gradient(rgba(0,0,0,0) 50%,rgba(0,0,0,.22) 50%)'
+/** Background declaration for N image layers, with the CRT scanline optionally
+ *  layered on top. `reps` matches `imgs`; layers get centred/auto sizing. */
+function scanN(crt: boolean | undefined, imgs: string[], reps: string[]): string {
+  if (crt) {
+    return (
+      'background-image:' + [CRT_SCAN, ...imgs].join(',') + '!important;' +
+      'background-repeat:' + ['repeat', ...reps].join(',') + '!important;' +
+      'background-position:' + ['0 0', ...imgs.map(() => 'center')].join(',') + '!important;' +
+      'background-size:' + ['100% 3px', ...imgs.map(() => 'auto')].join(',') + '!important'
+    )
+  }
   return (
-    'background-image:' +
-    top +
-    ',' +
-    bottom +
-    '!important;background-repeat:no-repeat,repeat!important;background-position:center,center!important'
+    'background-image:' + imgs.join(',') + '!important;' +
+    'background-repeat:' + reps.join(',') + '!important;background-position:center!important'
   )
 }
+/** Append the scanline over a solid-colour part (a `background:<color>` decl). */
+const scanSolid = (crt: boolean | undefined): string =>
+  crt
+    ? 'background-image:' + CRT_SCAN + '!important;background-repeat:repeat!important;background-position:0 0!important;background-size:100% 3px!important;'
+    : ''
+/** Two stacked background layers (glyph over fill) for a thumb or button. */
+function layer(top: string, bottom: string, crt?: boolean): string {
+  return scanN(crt, [top, bottom], ['no-repeat', 'repeat'])
+}
 
-function scrollbarCss(style: string | undefined): string {
+function scrollbarCss(style: string | undefined, crt?: boolean): string {
   if (!style) return ''
   // Force a classic bar and set up one arrow button at each end (hide the extra
   // double-button slots so we don't get paired arrows).
@@ -227,17 +245,17 @@ function scrollbarCss(style: string | undefined): string {
       sel +
       '{background:' +
       btnFace +
-      '!important;border:1px solid #000!important;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080!important;background-image:' +
-      glyph +
-      '!important;background-repeat:no-repeat!important;background-position:center!important}'
+      '!important;border:1px solid #000!important;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080!important;' +
+      scanN(crt, [glyph], ['no-repeat']) +
+      '}'
     return (
       base +
       '::-webkit-scrollbar{background:' + track + '!important}' +
-      '::-webkit-scrollbar-track{background:' + track + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
+      '::-webkit-scrollbar-track{background:' + track + '!important;' + scanSolid(crt) + 'box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
       '::-webkit-scrollbar-corner{background:' + track + '!important}' +
       '::-webkit-scrollbar-thumb{border:1px solid #000!important;min-height:20px!important}' +
-      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH('#6563cf'), thumbV) + ';border:1px solid #000!important}' +
-      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV('#6563cf'), thumbHb) + ';border:1px solid #000!important}' +
+      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH('#6563cf'), thumbV, crt) + ';border:1px solid #000!important}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV('#6563cf'), thumbHb, crt) + ';border:1px solid #000!important}' +
       btn('::-webkit-scrollbar-button:vertical:decrement', triUp('#000')) +
       btn('::-webkit-scrollbar-button:vertical:increment', triDn('#000')) +
       btn('::-webkit-scrollbar-button:horizontal:decrement', triLf('#000')) +
@@ -266,15 +284,15 @@ function scrollbarCss(style: string | undefined): string {
       '::-webkit-scrollbar-button:horizontal:start:decrement,::-webkit-scrollbar-button:horizontal:start:increment{display:none!important}' +
       '::-webkit-scrollbar-button:vertical:end:decrement,::-webkit-scrollbar-button:vertical:end:increment{display:block!important;height:15px!important;' + btnBox + '}' +
       '::-webkit-scrollbar-button:horizontal:end:decrement,::-webkit-scrollbar-button:horizontal:end:increment{display:block!important;width:15px!important;' + btnBox + '}' +
-      '::-webkit-scrollbar-button:vertical:end:decrement{background-image:' + triUp('#666') + '!important}' +
-      '::-webkit-scrollbar-button:vertical:end:increment{background-image:' + triDn('#666') + '!important}' +
-      '::-webkit-scrollbar-button:horizontal:end:decrement{background-image:' + triLf('#666') + '!important}' +
-      '::-webkit-scrollbar-button:horizontal:end:increment{background-image:' + triRt('#666') + '!important}' +
-      '::-webkit-scrollbar-track{background:#eef0f2!important;border-radius:8px!important;box-shadow:inset 1px 1px 2px rgba(0,0,0,.12),inset -1px -1px 1px rgba(0,0,0,.04)!important}' +
+      '::-webkit-scrollbar-button:vertical:end:decrement{' + scanN(crt, [triUp('#666')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-button:vertical:end:increment{' + scanN(crt, [triDn('#666')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-button:horizontal:end:decrement{' + scanN(crt, [triLf('#666')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-button:horizontal:end:increment{' + scanN(crt, [triRt('#666')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-track{background:#eef0f2!important;' + scanSolid(crt) + 'border-radius:8px!important;box-shadow:inset 1px 1px 2px rgba(0,0,0,.12),inset -1px -1px 1px rgba(0,0,0,.04)!important}' +
       '::-webkit-scrollbar-corner{background:#eef0f2!important}' +
       '::-webkit-scrollbar-thumb{border-radius:8px!important;border:1px solid #2c66aa!important;min-height:30px!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.7)!important}' +
-      '::-webkit-scrollbar-thumb:vertical{background-image:' + edgeR + ',' + bodyB + '!important;background-repeat:no-repeat,no-repeat!important}' +
-      '::-webkit-scrollbar-thumb:horizontal{background-image:' + edgeB + ',' + bodyR + '!important;background-repeat:no-repeat,no-repeat!important}'
+      '::-webkit-scrollbar-thumb:vertical{' + scanN(crt, [edgeR, bodyB], ['no-repeat', 'no-repeat']) + '}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + scanN(crt, [edgeB, bodyR], ['no-repeat', 'no-repeat']) + '}'
     )
   }
 
@@ -286,14 +304,14 @@ function scrollbarCss(style: string | undefined): string {
     const arrow = '#3f56a0'
     const grip = '#5872b8'
     const btn = (glyph: string, sel: string): string =>
-      sel + '{' + layer(glyph, grad) + ';border:1px solid ' + bd + '!important}'
+      sel + '{' + layer(glyph, grad, crt) + ';border:1px solid ' + bd + '!important}'
     return (
       base +
       '::-webkit-scrollbar{background:#efece4!important}' +
-      '::-webkit-scrollbar-track{background:' + trackGrad + '!important}::-webkit-scrollbar-corner{background:' + trackGrad + '!important}' +
+      '::-webkit-scrollbar-track{' + scanN(crt, [trackGrad], ['repeat']) + '}::-webkit-scrollbar-corner{background:' + trackGrad + '!important}' +
       '::-webkit-scrollbar-thumb{border:1px solid ' + bd + '!important;min-height:28px!important}' +
-      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(grip), grad) + '}' +
-      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(grip), grad) + '}' +
+      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(grip), grad, crt) + '}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(grip), grad, crt) + '}' +
       btn(triUp(arrow), '::-webkit-scrollbar-button:vertical:decrement') +
       btn(triDn(arrow), '::-webkit-scrollbar-button:vertical:increment') +
       btn(triLf(arrow), '::-webkit-scrollbar-button:horizontal:decrement') +
@@ -310,18 +328,13 @@ function scrollbarCss(style: string | undefined): string {
       'box-shadow:inset -1px -1px #000,inset 1px 1px #c0c0c0,inset -2px -2px #808080,inset 2px 2px #fff!important;'
     const box = 'background:' + silver + '!important;' + raise
     const btn = (sel: string, glyph: string): string =>
-      sel +
-      '{' +
-      box +
-      'background-image:' +
-      glyph +
-      '!important;background-repeat:no-repeat!important;background-position:center!important}'
+      sel + '{' + box + scanN(crt, [glyph], ['no-repeat']) + '}'
     return (
       base +
       '::-webkit-scrollbar{background:#fff!important}' +
-      '::-webkit-scrollbar-track{background:#fff!important;background-image:' + dither(silver) + '!important}' +
+      '::-webkit-scrollbar-track{background:#fff!important;' + scanN(crt, [dither(silver)], ['repeat']) + '}' +
       '::-webkit-scrollbar-corner{background:' + silver + '!important}' +
-      '::-webkit-scrollbar-thumb{' + box + 'min-height:20px!important}' +
+      '::-webkit-scrollbar-thumb{' + box + scanSolid(crt) + 'min-height:20px!important}' +
       btn('::-webkit-scrollbar-button:vertical:decrement', triUp('#000')) +
       btn('::-webkit-scrollbar-button:vertical:increment', triDn('#000')) +
       btn('::-webkit-scrollbar-button:horizontal:decrement', triLf('#000')) +
@@ -354,19 +367,18 @@ function scrollbarCss(style: string | undefined): string {
     ink +
     '!important;' +
     btnBevel +
-    'background-image:' +
-    glyph +
-    '!important;background-repeat:no-repeat!important;background-position:center!important}'
+    scanN(crt, [glyph], ['no-repeat']) +
+    '}'
   const thumb =
     'background:' + thumbFace + '!important;border:1px solid ' + ink + '!important;' + thumbBevel
   return (
     base +
     '::-webkit-scrollbar{background:' + trackBase + '!important}' +
-    '::-webkit-scrollbar-track{background:' + trackBase + '!important;background-image:' + trackFill + '!important;box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
+    '::-webkit-scrollbar-track{background:' + trackBase + '!important;' + scanN(crt, [trackFill], ['repeat']) + ';box-shadow:inset 1px 0 #000,inset -1px 0 #000!important}' +
     '::-webkit-scrollbar-corner{background:' + thumbFace + '!important}' +
     '::-webkit-scrollbar-thumb{' + thumb + 'min-height:24px!important}' +
-    '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(ridge), thumbFace) + ';' + thumbBevel + 'border:1px solid ' + ink + '!important}' +
-    '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(ridge), thumbFace) + ';' + thumbBevel + 'border:1px solid ' + ink + '!important}' +
+    '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(ridge), thumbFace, crt) + ';' + thumbBevel + 'border:1px solid ' + ink + '!important}' +
+    '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(ridge), thumbFace, crt) + ';' + thumbBevel + 'border:1px solid ' + ink + '!important}' +
     btn('::-webkit-scrollbar-button:vertical:decrement', triUp(ink)) +
     btn('::-webkit-scrollbar-button:vertical:increment', triDn(ink)) +
     btn('::-webkit-scrollbar-button:horizontal:decrement', triLf(ink)) +
@@ -475,7 +487,7 @@ function applyDisplay(
       /* ignore */
     }
   }
-  const scss = scrollbarCss(mode?.scrollbar)
+  const scss = scrollbarCss(mode?.scrollbar, mode?.crt)
   if (scss) {
     try {
       scrollKey = webFrame.insertCSS(scss)
