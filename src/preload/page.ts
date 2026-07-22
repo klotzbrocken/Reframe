@@ -375,23 +375,63 @@ function scrollbarCss(style: string | undefined): string {
 }
 
 // --- CRT screen effect ------------------------------------------------------
-// A pure-CSS scanline + RGB-mask + vignette overlay, injected as fixed pseudo-
-// elements on <html>. No DOM nodes (insertCSS only adds rules), and NO filter on
-// html/body — a filter there would break the page's own position:fixed elements.
-// A faint flicker sells the phosphor. The chrome renderer draws a matching
-// overlay so the whole window reads as one CRT. Best-effort z-index like the
-// other page effects (a site's own max-z fixed element could still sit above).
-function crtCss(on: boolean | undefined): string {
-  if (!on) return ''
-  return (
-    'html::before{content:"";position:fixed;inset:0;z-index:2147483646;pointer-events:none;' +
-    'background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,.16) 50%),' +
-    'linear-gradient(90deg,rgba(255,0,0,.05),rgba(0,255,0,.015),rgba(0,0,255,.05));' +
-    'background-size:100% 3px,4px 100%;animation:reframe-crt-flicker .12s steps(2) infinite}' +
-    'html::after{content:"";position:fixed;inset:0;z-index:2147483647;pointer-events:none;' +
-    'background:radial-gradient(ellipse at center,rgba(18,16,16,0) 55%,rgba(0,0,0,.16) 78%,rgba(0,0,0,.4) 100%)}' +
-    '@keyframes reframe-crt-flicker{0%{opacity:.92}100%{opacity:1}}'
-  )
+// The per-page overlay must sit above ALL page content. A fixed pseudo-element
+// on <html> loses to pages that establish their own stacking contexts, so we
+// instead mount a real element into the browser TOP LAYER via the Popover API —
+// it paints above everything without a `filter` (a filter on html would break
+// the page's own position:fixed). pointer-events:none keeps the page clickable.
+// The scanline / RGB-mask / vignette live on ::before/::after of that element
+// (which also render in the top layer). The chrome renderer draws a matching
+// overlay so the whole window reads as one CRT.
+const CRT_ID = '__reframe_crt'
+const CRT_CSS =
+  '#' +
+  CRT_ID +
+  '{position:fixed!important;inset:0!important;margin:0!important;border:0!important;padding:0!important;' +
+  'width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;' +
+  'background:transparent!important;pointer-events:none!important;overflow:hidden!important;' +
+  'z-index:2147483647!important;outline:0!important}' +
+  '#' +
+  CRT_ID +
+  '::backdrop{background:transparent!important}' +
+  '#' +
+  CRT_ID +
+  '::before{content:"";position:absolute;inset:0;pointer-events:none;' +
+  'background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,.16) 50%),' +
+  'linear-gradient(90deg,rgba(255,0,0,.05),rgba(0,255,0,.015),rgba(0,0,255,.05));' +
+  'background-size:100% 3px,4px 100%;animation:reframe-crt-flicker .12s steps(2) infinite}' +
+  '#' +
+  CRT_ID +
+  '::after{content:"";position:absolute;inset:0;pointer-events:none;' +
+  'background:radial-gradient(ellipse at center,rgba(18,16,16,0) 55%,rgba(0,0,0,.16) 78%,rgba(0,0,0,.4) 100%)}' +
+  '@keyframes reframe-crt-flicker{0%{opacity:.92}100%{opacity:1}}'
+
+let crtEl: HTMLDivElement | null = null
+function applyCrt(on: boolean | undefined): void {
+  if (on) {
+    if (crtEl) return
+    try {
+      const el = document.createElement('div')
+      el.id = CRT_ID
+      el.setAttribute('popover', 'manual')
+      el.setAttribute('aria-hidden', 'true')
+      ;(document.body || document.documentElement).appendChild(el)
+      // Moves the element into the top layer, above every page stacking context.
+      ;(el as unknown as { showPopover?: () => void }).showPopover?.()
+      crtEl = el
+    } catch {
+      /* Popover unsupported / not connectable yet — the z-index fallback in
+         CRT_CSS still helps on simple pages */
+    }
+  } else if (crtEl) {
+    try {
+      ;(crtEl as unknown as { hidePopover?: () => void }).hidePopover?.()
+    } catch {
+      /* ignore */
+    }
+    crtEl.remove()
+    crtEl = null
+  }
 }
 
 let filterKey: string | null = null
@@ -443,14 +483,14 @@ function applyDisplay(
       /* ignore */
     }
   }
-  const ccss = crtCss(mode?.crt)
-  if (ccss) {
+  if (mode?.crt) {
     try {
-      crtKey = webFrame.insertCSS(ccss)
+      crtKey = webFrame.insertCSS(CRT_CSS)
     } catch {
       /* ignore */
     }
   }
+  applyCrt(mode?.crt)
 }
 
 // Read the mode for THIS origin synchronously at document-start (before first
