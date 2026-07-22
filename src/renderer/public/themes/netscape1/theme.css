@@ -126,48 +126,43 @@ body {
  * Toolbar — ten raised bevel buttons (40×23 glyph + label), 8px groups.
  * ===================================================================== */
 .ow-toolbar {
-  min-height: 48px;
-  padding: 4px;
-  gap: 2px;
-  align-items: flex-start;
+  min-height: 60px;
+  padding: 3px;
+  gap: 3px;
+  align-items: center;
   background: #c0c0c0;
   border-top: 1px solid #ffffff;
   border-bottom: 1px solid #808080;
 }
+/* Netscape 1.x / Motif toolbar buttons are FLAT grey squares (~52px), a subtle
+   bevel appearing only on hover, pressed on click. */
 .ow-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-width: 0;
-  padding: 3px 5px 2px;
+  justify-content: center;
+  gap: 3px;
+  min-width: 52px;
+  height: 52px;
+  padding: 3px;
   margin: 0;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 0;
   background: #c0c0c0;
   color: #000000;
   cursor: default;
-  box-shadow:
-    inset -1px -1px #0a0a0a,
-    inset 1px 1px #ffffff,
-    inset -2px -2px #808080,
-    inset 2px 2px #dfdfdf;
+  box-shadow: none;
+}
+.ow-btn:hover:not(:disabled) {
+  border-color: #ffffff #808080 #808080 #ffffff;
+  box-shadow: inset -1px -1px #808080, inset 1px 1px #dfdfdf;
 }
 .ow-btn:active:not(:disabled) {
-  padding: 4px 4px 1px 6px;
-  box-shadow:
-    inset 1px 1px #0a0a0a,
-    inset -1px -1px #ffffff,
-    inset 2px 2px #808080,
-    inset -2px -2px #dfdfdf;
+  border-color: #808080 #ffffff #ffffff #808080;
+  box-shadow: inset 1px 1px #808080;
 }
 .ow-btn:disabled {
   color: #808080;
-  box-shadow:
-    inset -1px -1px #0a0a0a,
-    inset 1px 1px #ffffff,
-    inset -2px -2px #808080,
-    inset 2px 2px #dfdfdf;
 }
 .ow-btn__icon {
   width: 40px;
