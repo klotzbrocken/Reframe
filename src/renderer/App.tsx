@@ -2177,7 +2177,7 @@ export function App() {
               <ModemStatus
                 active={modemOn}
                 phase={modemPhase}
-                speed={settings.connectionSpeed ?? 'full'}
+                speed={modemSpeed}
                 onToggle={handleModemToggle}
               />
             ) : undefined
