@@ -217,11 +217,15 @@ export class BrowserShell {
     if (!tab) return
     const [w, h] = this.win.getContentSize()
     const { top, right, bottom, left } = this.insets
+    // When maximized, keep the view 1px inside the right/bottom window edge: a
+    // WebContentsView flush with the screen edge can't receive clicks in that
+    // final column on macOS, which made the page scrollbar dead at the edge.
+    const edge = this.win.isMaximized() ? 1 : 0
     tab.view.setBounds({
       x: Math.round(left),
       y: Math.round(top),
-      width: Math.max(0, Math.round(w - left - right)),
-      height: Math.max(0, Math.round(h - top - bottom))
+      width: Math.max(0, Math.round(w - left - right - edge)),
+      height: Math.max(0, Math.round(h - top - bottom - edge))
     })
   }
 
