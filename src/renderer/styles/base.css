@@ -1211,7 +1211,7 @@ body,
   left: 50%;
   transform: translateX(-50%);
   bottom: 30px;
-  width: 328px;
+  width: 344px;
   display: flex;
   flex-direction: column;
   /* NOTE: no overflow:hidden — the theme dropdown must escape the panel. */
@@ -1570,6 +1570,10 @@ body,
   font-weight: 700;
   color: #23272e;
   white-space: nowrap;
+  /* Truncate rather than overflow the row for any long theme name. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .ow-fab__ddera {
   font-size: 10px;
