@@ -468,6 +468,13 @@ body {
   box-shadow: var(--w98-raised);
   padding: 3px;
 }
+/* While a menu/popup floats the chrome above the page, the opaque MDI window
+   would otherwise blank the page behind it — go transparent so the page shows
+   through for the duration (the title bar + menu still draw on top). */
+.ow-root[data-chrome-top] .ow-content__chrome {
+  background: transparent !important;
+  box-shadow: none !important;
+}
 /* Its title bar — IDENTICAL to the outer window's Win98 caption (same navy
    gradient, Tahoma text and 3D min/max/close buttons with SVG glyphs), just with
    the AOL globe + the live page title. Draggable to move; double-click = maximise. */
