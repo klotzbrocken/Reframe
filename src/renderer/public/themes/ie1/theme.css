@@ -244,15 +244,13 @@ body {
   opacity: 0.4;
 }
 
-/* raised vertical separator between toolbar groups (Win95) */
+/* Toolbar group spacing — IE 1.0 groups its icons with a GAP, no drawn line. */
 .ow-toolbar-sep {
   flex: 0 0 auto;
-  align-self: center;
-  width: 2px;
+  width: 10px;
   height: 22px;
-  margin: 0 4px;
-  border-left: 1px solid #808080;
-  border-right: 1px solid #fff;
+  border: 0;
+  background: transparent;
 }
 
 /* --- throbber: the waving Windows flag in a tall sunken well on the right.
