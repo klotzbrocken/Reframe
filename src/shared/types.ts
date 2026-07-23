@@ -121,6 +121,9 @@ export interface OldwebAPI {
   setScrollbar(style: string): Promise<void>
   /** Toggle the CRT screen effect (scanlines/vignette) over page content. */
   setCrt(on: boolean): Promise<void>
+  /** Toggle the translucent Aero-glass window backdrop (macOS vibrancy / Windows
+   *  acrylic) — used by the "Windows Vista" title-bar style. */
+  setGlass(on: boolean): Promise<void>
   /** Archive Timeline: capture COUNT for each of the 12 months of `year` for `url`
    *  (index 0 = Jan). Fetched per year from the Wayback calendar API. */
   waybackMonths(url: string, year: number): Promise<number[]>

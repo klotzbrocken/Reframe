@@ -569,6 +569,11 @@ export function App() {
   useEffect(() => {
     window.oldweb.setCrt(settings.crt ?? false)
   }, [settings.crt])
+  // Aero glass: turn the translucent window backdrop on only for the Vista
+  // title-bar style (macOS vibrancy / Windows acrylic); off restores opaque.
+  useEffect(() => {
+    window.oldweb.setGlass(settings.menuStyle === 'vista')
+  }, [settings.menuStyle])
   // Retro "display" effect on page content: colour-depth reduction + dither, plus
   // the Classic Web Typography level. Both default OFF — pages render normally
   // unless the user opts in via Settings. `era` resolves against the theme's era
