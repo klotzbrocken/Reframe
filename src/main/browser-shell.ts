@@ -858,6 +858,32 @@ export class BrowserShell {
     this.broadcastDisplay()
   }
 
+  /** Toggle the translucent Aero-glass window backdrop (for the Vista title-bar
+   *  style). macOS gets real vibrancy, Windows 11 acrylic; elsewhere the window
+   *  stays opaque and the CSS provides a static faux-glass look. The transparent
+   *  chrome view over the opaque page view means only the title-bar + border
+   *  bands turn to glass — the page content stays opaque. */
+  setGlass(on: boolean): void {
+    const win = this.win as unknown as {
+      setVibrancy?: (t: string | null) => void
+      setBackgroundMaterial?: (t: string) => void
+      setBackgroundColor: (c: string) => void
+    }
+    try {
+      if (on) {
+        win.setBackgroundColor('#00000000')
+        if (process.platform === 'darwin') win.setVibrancy?.('under-window')
+        else if (process.platform === 'win32') win.setBackgroundMaterial?.('acrylic')
+      } else {
+        if (process.platform === 'darwin') win.setVibrancy?.(null)
+        else if (process.platform === 'win32') win.setBackgroundMaterial?.('none')
+        win.setBackgroundColor('#c0c0c0')
+      }
+    } catch {
+      /* window gone / API unsupported on this platform — ignore */
+    }
+  }
+
   /** Effective mode for an origin: its override (depth/typo) over the global
    *  default; dither + scrollbar + crt are global. */
   getPageDisplay(origin?: string): {

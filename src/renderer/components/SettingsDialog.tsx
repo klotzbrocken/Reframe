@@ -20,7 +20,7 @@ export interface Settings {
   /** Show the period boot splash when switching themes (default true). */
   themeSplash?: boolean
   /** Menu bar visual style across all themes. */
-  menuStyle?: 'win98' | 'luna'
+  menuStyle?: 'win98' | 'luna' | 'vista'
   /** Size scale for the top menus (File/Edit/…) and their dropdowns. */
   menuFontSize?: FontSize
   /** Size scale for toolbar buttons (icon + caption), bookmarks and tabs. */
@@ -221,9 +221,13 @@ export function SettingsDialog({
 
           <label className="ow-field">
             <span>Title bar style (window controls)</span>
-            <select value={menuStyle} onChange={(e) => setMenuStyle(e.target.value as 'win98' | 'luna')}>
+            <select
+              value={menuStyle}
+              onChange={(e) => setMenuStyle(e.target.value as 'win98' | 'luna' | 'vista')}
+            >
               <option value="win98">Windows 95 / 98 (navy, square buttons)</option>
               <option value="luna">Windows XP Luna (blue, rounded buttons)</option>
+              <option value="vista">Windows Vista (Aero glass)</option>
             </select>
           </label>
 
@@ -444,7 +448,7 @@ export function SettingsDialog({
                 defaultTheme: theme,
                 searchEngine: engine,
                 themeSplash: splash,
-                menuStyle: menuStyle as 'win98' | 'luna',
+                menuStyle: menuStyle as 'win98' | 'luna' | 'vista',
                 menuFontSize: menuFontSize as FontSize,
                 labelFontSize: labelFontSize as FontSize,
                 closeAction: closeAction as 'quit' | 'minimize',

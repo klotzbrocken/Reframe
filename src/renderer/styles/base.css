@@ -893,6 +893,118 @@ body,
   background-color: #c23e22 !important;
 }
 
+/* ---- vista: Windows Vista / 7 "Aero" glass -------------------------------- *
+ * A translucent silvery glass caption + window frame. The blur behind it comes
+ * from the OS window material (macOS vibrancy / Windows acrylic), toggled from
+ * the renderer when this style is picked (window:setGlass); the CSS below is the
+ * semi-transparent tint, diagonal highlight, glossy buttons + red close, and the
+ * rounded glass frame — reproduced as original CSS. Same 10-theme exclusion
+ * chain as win98/luna (the Mac-chrome themes keep their own caption). */
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) {
+  /* Glass frame: a translucent inner border + rounded top corners (the outer
+     drop shadow is the OS window shadow). Base already forces the root
+     background transparent, so the border band reveals the window material. */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 4px rgba(200, 216, 232, 0.22) !important;
+  border-radius: 7px 7px 4px 4px !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar {
+  position: relative !important;
+  height: 30px !important;
+  padding: 0 5px 0 8px !important;
+  align-items: flex-start !important;
+  border-radius: 5px 5px 0 0 !important;
+  overflow: hidden !important;
+  /* diagonal highlight streak over a semi-transparent silvery glass */
+  background:
+    linear-gradient(
+      115deg,
+      transparent 34%,
+      rgba(255, 255, 255, 0.34) 44%,
+      transparent 49%,
+      transparent 66%,
+      rgba(255, 255, 255, 0.22) 74%,
+      transparent 80%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(236, 244, 251, 0.4) 46%,
+      rgba(210, 224, 238, 0.5) 54%,
+      rgba(224, 233, 244, 0.55) 100%
+    ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(120, 140, 165, 0.35) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
+  backdrop-filter: blur(16px) saturate(1.3) !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar__icon {
+  align-self: center !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar__text {
+  align-self: center !important;
+  color: #0b0b0b !important;
+  font-weight: 400 !important;
+  font-family: 'Segoe UI', 'Frutiger', Tahoma, 'Segoe', sans-serif !important;
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 6px rgba(255, 255, 255, 0.75),
+    0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+/* Aero caption buttons: translucent glass min/max, a red gloss close; the group
+   hangs from the top edge with rounded outer bottom corners. */
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn {
+  width: 29px !important;
+  min-width: 29px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  border: 1px solid rgba(120, 140, 165, 0.6) !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(228, 238, 248, 0.55) 48%,
+      rgba(198, 214, 230, 0.6) 52%,
+      rgba(224, 234, 246, 0.62) 100%
+    ) !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn:hover {
+  filter: brightness(1.08) !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='minimize'] {
+  border-radius: 0 0 0 4px !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8'%3E%3Crect x='1' y='6' width='8' height='1.6' fill='%232a2a2a'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(228, 238, 248, 0.55) 48%, rgba(198, 214, 230, 0.6) 52%, rgba(224, 234, 246, 0.62) 100%) !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='maximize'] {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9'%3E%3Crect x='1' y='1' width='8' height='7' fill='none' stroke='%232a2a2a'/%3E%3Crect x='1' y='1' width='8' height='2' fill='%232a2a2a'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(228, 238, 248, 0.55) 48%, rgba(198, 214, 230, 0.6) 52%, rgba(224, 234, 246, 0.62) 100%) !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='restore'] {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='10'%3E%3Crect x='3' y='0' width='7' height='6' fill='none' stroke='%232a2a2a'/%3E%3Crect x='0' y='3' width='7' height='6' fill='%23eef4fb' stroke='%232a2a2a'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(228, 238, 248, 0.55) 48%, rgba(198, 214, 230, 0.6) 52%, rgba(224, 234, 246, 0.62) 100%) !important;
+}
+.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='close'] {
+  width: 46px !important;
+  min-width: 46px !important;
+  border-color: rgba(150, 40, 25, 0.75) !important;
+  border-radius: 0 0 4px 0 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='9'%3E%3Cpath d='M1 1 L10 8 M10 1 L1 8' stroke='%23fff' stroke-width='1.6'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(246, 128, 102, 0.97) 0%, rgba(226, 74, 48, 0.97) 48%, rgba(198, 44, 24, 0.98) 52%, rgba(234, 100, 74, 0.98) 100%) !important;
+}
+
 /* Tour focus rings (the redesigned flyout's own styles live at the end of
  * this file, in the "Floating controls — redesign" block). */
 .ow-tour__next:focus-visible,
