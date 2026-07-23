@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { TabState } from '../../shared/types'
 
 interface Props {
@@ -7,11 +8,26 @@ interface Props {
   onActivate: (id: number) => void
   onClose: (id: number) => void
   onNew: () => void
+  /** Optional slot rendered before the tabs (IE7: the Favorites star cluster). */
+  left?: ReactNode
+  /** Optional slot rendered after the new-tab button, pushed to the far right
+   *  (IE7: the Home / Feeds / Print / Page / Tools / Help command bar). */
+  right?: ReactNode
 }
 
-export function TabStrip({ tabs, activeId, newTabLabel, onActivate, onClose, onNew }: Props) {
+export function TabStrip({
+  tabs,
+  activeId,
+  newTabLabel,
+  onActivate,
+  onClose,
+  onNew,
+  left,
+  right
+}: Props) {
   return (
     <div className="ow-tabstrip">
+      {left && <div className="ow-tabstrip__left">{left}</div>}
       {tabs.map((t) => (
         <div
           key={t.id}
@@ -39,6 +55,7 @@ export function TabStrip({ tabs, activeId, newTabLabel, onActivate, onClose, onN
       <button className="ow-tab-new" onClick={onNew} title={newTabLabel}>
         +
       </button>
+      {right && <div className="ow-tabstrip__right">{right}</div>}
     </div>
   )
 }

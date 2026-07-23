@@ -15,6 +15,7 @@ import { HotListPanel, type HotListEntry } from './components/HotListPanel'
 import { Clock } from './components/Clock'
 import { requestChromeTop } from './shell/chromeTop'
 import { SettingsDialog, type Settings } from './components/SettingsDialog'
+import { Ie7CommandBar } from './components/Ie7CommandBar'
 import { StatusBar } from './components/StatusBar'
 import { ModemStatus, type ModemPhase } from './components/ModemStatus'
 import { playDialup, dialupTimings, type DialupHandle, type ModemSpeed } from './shell/modem-sound'
@@ -1706,6 +1707,57 @@ export function App() {
     void window.oldweb.setNativeMenu(nativeMenus ? { menus: JSON.parse(nativeMenuJson) } : null)
   }, [nativeMenus, nativeMenuJson])
 
+  // IE7 tab-row extras: a Favorites cluster (star + add) at the left and a command
+  // bar (Home / Feeds / Print / Page / Tools / Help) at the right. Only built when
+  // the manifest opts in (layout.commandBar); every other theme passes undefined.
+  const commandBarEl = layout.commandBar ? (
+    <Ie7CommandBar
+      onHome={() => navAction.home?.onClick?.()}
+      onFeeds={() => {
+        let host = ''
+        try {
+          host = new URL(activeUrl).hostname
+        } catch {
+          /* no valid URL — fall back to a bare feed search */
+        }
+        gatedNavigate(
+          'https://www.google.com/search?q=' + encodeURIComponent((host + ' rss feed').trim())
+        )
+      }}
+      onPrint={() => navAction.print?.onClick?.()}
+      onNewWindow={() => actions.newTab()}
+      onSaveAs={() => activeTab && window.oldweb.savePage(activeTab.id)}
+      onZoom={(dir) => activeTab && window.oldweb.zoomStep(activeTab.id, dir)}
+      onReload={() => navAction.refresh?.onClick?.()}
+      onOptions={() => setDialogOpen(true)}
+      onHelp={() => {
+        if (activeTab) void window.oldweb.openAbout(activeTab.id, themeId)
+      }}
+    />
+  ) : undefined
+  const favClusterEl = layout.commandBar ? (
+    <>
+      <button
+        type="button"
+        className="ow-favbtn"
+        data-action="favorites"
+        title="Favorites Center"
+        onClick={navAction.favorites?.onClick}
+      >
+        <span className="ow-favbtn__icon" aria-hidden />
+      </button>
+      <button
+        type="button"
+        className="ow-favbtn"
+        data-action="addfav"
+        title="Add to Favorites"
+        onClick={navAction.favorites?.onClick}
+      >
+        <span className="ow-favbtn__icon" aria-hidden />
+      </button>
+    </>
+  ) : undefined
+
   const tabStrip = (
     <TabStrip
       tabs={state.tabs}
@@ -1720,6 +1772,8 @@ export function App() {
         playUi('open')
         actions.newTab()
       }}
+      left={favClusterEl}
+      right={commandBarEl}
     />
   )
 
