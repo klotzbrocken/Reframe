@@ -1,0 +1,48 @@
+{
+  "id": "ie7",
+  "name": "Internet Explorer 7.0",
+  "era": "2006 · Windows Vista",
+  "scrollbar": "vista",
+  "toolbar": ["back", "forward", "refresh", "stop"],
+  "menus": [],
+  "homeUrl": "https://www.myretromac.app",
+  "oldWebDate": "20061101",
+  "layout": {
+    "tabsPosition": "top",
+    "showStatusBar": true,
+    "showMenuBar": false,
+    "showTabs": true,
+    "unifiedToolbar": true,
+    "showFavicon": true,
+    "commandBar": true
+  },
+  "throbber": {
+    "kind": "css",
+    "label": "Working"
+  },
+  "labels": {
+    "address": "",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "search": "Search",
+    "favorites": "Favorites",
+    "print": "Print",
+    "newTab": "New Tab"
+  },
+  "sounds": {},
+  "vars": {
+    "--ow-face": "#eaf1fa",
+    "--ow-face-light": "#ffffff",
+    "--ow-face-dark": "#a8c0dd",
+    "--ow-face-darker": "#7f9db9",
+    "--ow-field": "#ffffff",
+    "--ow-text": "#000000",
+    "--ow-highlight": "#3399ff",
+    "--ow-titlebar": "#4a76b8",
+    "--ow-font": "'Segoe UI', Tahoma, 'Frutiger', Verdana, sans-serif"
+  }
+}

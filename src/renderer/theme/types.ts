@@ -75,7 +75,7 @@ export interface ThemeManifest {
   /** Period scrollbar look injected into page content (the web view's own
    *  scrollbars, styled via ::-webkit-scrollbar in the page preload). Omitted =
    *  the browser default. One of the shared OS looks in page.ts. */
-  scrollbar?: 'sys7' | 'sys7mono' | 'sys8' | 'aqua10' | 'xp' | 'w95'
+  scrollbar?: 'sys7' | 'sys7mono' | 'sys8' | 'aqua10' | 'xp' | 'w95' | 'vista'
   /** The exact toolbar button row for this theme, in order. */
   toolbar?: ToolbarItem[]
   /** The exact menu-bar labels for this theme, in order. */
@@ -123,6 +123,10 @@ export interface ThemeManifest {
      *  in-window menu bar (Camino had no in-window menus). macOS only; other
      *  platforms fall back to the in-window menu bar. */
     nativeMenus?: boolean
+    /** IE7: render a command bar (Home / Feeds / Print / Page / Tools / Help) at
+     *  the right of the tab strip, and a Favorites cluster (star + add) at its
+     *  left — the Internet Explorer 7 tab-row layout. Only wired when true. */
+    commandBar?: boolean
   }
   throbber?: {
     /** 'css' = animated purely in theme.css; 'image' = animated background. */

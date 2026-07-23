@@ -492,14 +492,17 @@ function createWindow(): void {
     minWidth: 480,
     minHeight: 360,
     title: 'Reframe',
-    // Opaque grey by default (win98/luna and every non-glass theme). The window
-    // is constructed transparent so the "Windows Vista" (Aero) style can toggle a
-    // translucent/vibrant backdrop at runtime (setGlass) — macOS only reveals
-    // vibrancy on a window that was CREATED transparent; a runtime bg change on an
-    // opaque window doesn't turn it see-through. Non-glass themes keep the opaque
-    // backgroundColor, so they are unaffected.
+    // Constructed fully transparent so the "Windows Vista" (Aero) glass style can
+    // let the desktop show through the translucent title-bar CSS. A window's
+    // see-through capability is fixed at creation on macOS, so it must be born
+    // transparent (a runtime toggle can't turn an opaque-born window see-through).
+    // The window is born clear (#00000000); setGlass() then FILLS it opaque grey
+    // (#c0c0c0) for win98/luna and every non-glass theme, and CLEARS it again for
+    // Vista — so only the Vista title bar is transparent and all other themes keep
+    // a solid backing. The chrome view over it is transparent, the page view is
+    // opaque, so only the title-bar band + borders reveal the desktop.
     transparent: true,
-    backgroundColor: '#c0c0c0',
+    backgroundColor: '#00000000',
     // Frameless: no macOS traffic lights. The active theme draws its own
     // period-accurate title bar + window controls (Win98 for the IE5 theme).
     frame: false,

@@ -319,6 +319,38 @@ function scrollbarCss(style: string | undefined, crt?: boolean): string {
     )
   }
 
+  // Windows Vista / 7 "Aero" (2007): a pale glossy blue-white gel thumb with soft
+  // rounded ends and a faint grip, in a near-white bluish track; light glass arrow
+  // buttons with slim blue-grey chevrons. Lighter, rounder and glossier than XP
+  // Luna. Colours tuned to the Aero scrollbar (matoseb chart + the Figma set).
+  if (style === 'vista') {
+    // Cross-section gel: bright glass edge → pale azure body. Vertical thumb reads
+    // left→right, horizontal thumb top→bottom; buttons use the top-lit vertical gel.
+    const gelV = 'linear-gradient(to right,#fbfdff 0,#e6f0fb 28%,#d3e2f7 52%,#c3d6f1 74%,#dcebfb 100%)'
+    const gelH = 'linear-gradient(to bottom,#fbfdff 0,#e6f0fb 28%,#d3e2f7 52%,#c3d6f1 74%,#dcebfb 100%)'
+    const trackV = 'linear-gradient(to right,#edf3fa,#fbfdff 50%,#edf3fa)'
+    const trackH = 'linear-gradient(to bottom,#edf3fa,#fbfdff 50%,#edf3fa)'
+    const bd = '#9fbbdf'
+    const arrow = '#54708f'
+    const grip = '#a2b6d4'
+    const btn = (glyph: string, sel: string): string =>
+      sel + '{' + layer(glyph, gelH, crt) + ';border:1px solid ' + bd + '!important}'
+    return (
+      base +
+      '::-webkit-scrollbar{background:#f2f6fb!important}' +
+      '::-webkit-scrollbar-track{' + scanN(crt, [trackV], ['repeat']) + '}' +
+      '::-webkit-scrollbar-track:horizontal{' + scanN(crt, [trackH], ['repeat']) + '}' +
+      '::-webkit-scrollbar-corner{background:#edf3fa!important}' +
+      '::-webkit-scrollbar-thumb{border:1px solid ' + bd + '!important;border-radius:3px!important;min-height:28px!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)!important}' +
+      '::-webkit-scrollbar-thumb:vertical{' + layer(gripH(grip), gelV, crt) + '}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + layer(gripV(grip), gelH, crt) + '}' +
+      btn(triUp(arrow), '::-webkit-scrollbar-button:vertical:decrement') +
+      btn(triDn(arrow), '::-webkit-scrollbar-button:vertical:increment') +
+      btn(triLf(arrow), '::-webkit-scrollbar-button:horizontal:decrement') +
+      btn(triRt(arrow), '::-webkit-scrollbar-button:horizontal:increment')
+    )
+  }
+
   // Windows 95/98/2000: a silver 50%-dithered track over white, a plain raised
   // silver thumb + arrow buttons with the canonical two-tone 3D bevel.
   if (style === 'w95') {

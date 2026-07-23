@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About Internet Explorer 7.0</title>
+<style>
+:root{--a:#1c6fd6;--a2:#0b3f9c;--ink:#1b1e26}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.65 -apple-system,'Segoe UI',Tahoma,Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,#c3d8f2,#e9f0f8 380px)}
+.in{max-width:740px;margin:0 auto;padding:0 24px}
+
+/* ---- authentic "About Internet Explorer" dialog reproduction ---- */
+.wrap{padding:46px 0 10px}
+.dlg{max-width:520px;margin:0 auto;background:#f4f4f4;border:1px solid #7a9bc4;border-radius:6px 6px 4px 4px;box-shadow:0 12px 34px rgba(10,30,70,.35);overflow:hidden;font-size:13px;line-height:1.4}
+.dlg__bar{display:flex;align-items:center;gap:8px;height:30px;padding:0 6px 0 10px;color:#fff;font-weight:700;font-size:12px;background:linear-gradient(180deg,#3f8ae6,#1f5fc0 46%,#1a55b4 54%,#2f74d4)}
+.dlg__bar .x{margin-left:auto;width:34px;height:20px;border-radius:3px;background:linear-gradient(180deg,#f79b86,#d24a30 52%,#b93018);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.dlg__body{padding:20px 22px 16px;background:#f4f4f4}
+.brand{display:flex;align-items:center;gap:16px}
+.brand img{width:64px;height:64px;image-rendering:auto}
+.brand .word{font-size:13px;color:#333}
+.brand .big{font-size:30px;line-height:1;font-weight:400;color:#1b1e26;letter-spacing:-.5px}
+.brand .big b{color:#1c6fd6;font-weight:700}
+.brand .big sup{color:#d98a1f;font-weight:700;font-size:26px}
+.meta{margin:16px 2px 0;font-size:12px;color:#333}
+.meta div{margin:2px 0}
+.legal{margin:14px 2px 0;padding:8px 10px;height:74px;overflow:auto;background:#fff;border:1px solid #a7b6c8;font-size:11px;color:#444}
+.by{display:flex;align-items:center;gap:10px;margin:14px 2px 4px;font-size:12px}
+.by .flag{width:26px;height:22px;flex:0 0 auto;border-radius:2px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;transform:perspective(40px) rotateY(-8deg)}
+.by .flag i{display:block}
+.by .flag i:nth-child(1){background:#e64b3c}.by .flag i:nth-child(2){background:#5bbf50}
+.by .flag i:nth-child(3){background:#3f8ae6}.by .flag i:nth-child(4){background:#f6b731}
+.btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.btns button{min-width:118px;height:26px;font:12px 'Segoe UI',Tahoma,sans-serif;background:linear-gradient(180deg,#fdfefe,#dfe7f0);border:1px solid #7a90ab;border-radius:3px}
+.btns button.primary{border-color:#3f6aa8;box-shadow:0 0 0 1px #bcd2ef inset}
+
+/* ---- Reframe history section ---- */
+h2{margin:34px 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--a);border-bottom:2px solid var(--a);padding-bottom:6px}
+p{margin:0 0 14px}
+.lead{font-size:19px;color:#31415a;margin:26px 0 0}
+ul{list-style:none;padding:0;margin:0}
+li{position:relative;padding:11px 0 11px 28px;border-bottom:1px solid #dbe3ee}
+li::before{content:'✦';position:absolute;left:2px;top:11px;color:var(--a)}
+li b{color:var(--ink)}
+footer{font-size:12px;color:#7c8598;border-top:1px solid #dbe3ee;margin-top:36px;padding:16px 0 40px}
+code{background:#e6ecf5;padding:1px 5px;border-radius:3px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="dlg">
+  <div class="dlg__bar"><span>About Internet Explorer</span><span class="x">✕</span></div>
+  <div class="dlg__body">
+    <div class="brand">
+      <img src="/themes/ie7/assets/elogo.png" alt="Internet Explorer" />
+      <div>
+        <div class="word">Windows®</div>
+        <div class="big">Internet <b>Explorer</b> <sup>7</sup></div>
+      </div>
+    </div>
+    <div class="meta">
+      <div>Version: 7.0.5346.5</div>
+      <div>Cipher Strength: 128-bit</div>
+      <div>Product ID: 55375-640-2839067-23520</div>
+      <div>Update Versions: Beta 2</div>
+    </div>
+    <div class="legal">Warning: This computer program is protected by copyright law and international treaties. Unauthorized reproduction or distribution of this program, or any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.</div>
+    <div class="by"><span class="flag"><i></i><i></i><i></i><i></i></span><span>©2006 Microsoft Corporation</span></div>
+    <div class="btns"><button class="primary">OK</button><button>System Info…</button></div>
+  </div>
+</div></div>
+
+<main class="in">
+  <p class="lead">The comeback — tabs, a search box and RSS, five years after Microsoft declared the browser war won.</p>
+
+  <h2>A short history</h2>
+  <p>Internet Explorer 7 arrived in <b>October 2006</b>, the first major IE release since IE6 in 2001. It shipped with <b>Windows Vista</b> and as a free update for Windows XP, wearing the light &ldquo;Aero-lite&rdquo; chrome this theme recreates — the round glass <b>Back/Forward pearls</b>, a full-width address bar, a dedicated Live-Search box and, at last, <b>tabbed browsing</b>.</p>
+  <p>It was as much a security project as a feature release: a new anti-phishing filter, a locked-down &ldquo;Protected Mode&rdquo; on Vista, and the removal of many legacy behaviours. After years of stagnation, IE7 was Microsoft answering Firefox — which had reached the tabs, extensions and standards support IE had ignored.</p>
+
+  <h2>Lesser-known &amp; curious</h2>
+  <ul>
+    <li><b>The menu bar vanished.</b> IE7 was the first Explorer to hide File/Edit/View by default, moving everything into the <b>Command Bar</b> on the right of the tab row — recreated here with the original Home, Feeds, Print, Page and Tools glyphs.</li>
+    <li><b>RSS grew up.</b> The orange <b>Feeds</b> button and the shared &ldquo;Common Feed List&rdquo; IE7 introduced became the little orange icon that appeared in half the web&rsquo;s address bars for the next decade.</li>
+    <li><b>Quick Tabs &amp; the search box.</b> A thumbnail overview of every open tab, and a separate search field wired to a provider of your choice — MSN Search by default, soon renamed Live Search.</li>
+    <li><b>This build is Beta 2</b> (7.0.5346.5), the version in the reference screenshots — you can still read &ldquo;Update Versions: Beta 2&rdquo; in the About box above.</li>
+    <li><b>The pearls are CSS.</b> The blue and green glass navigation buttons are redrawn here as pure gradients; the command-bar and favorites icons are the genuine extracted resources.</li>
+  </ul>
+
+  <footer>Viewed in <b>Reframe</b> — a love letter to the browsers we grew up with. History is for fun; all trademarks belong to their respective owners.</footer>
+</main>
+</body>
+</html>

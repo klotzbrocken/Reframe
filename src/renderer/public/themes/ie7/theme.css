@@ -1,0 +1,771 @@
+/*
+ * Internet Explorer 7.0 (2006) — the Windows Vista / XP "Aero-lite" chrome,
+ * recreated from the IE7 Beta 2 German reference screenshots + the extracted
+ * ieframe/iexplore resource icons (the round Back/Forward glass buttons are
+ * redrawn in CSS; the command-bar + favorites glyphs are the originals).
+ *
+ * The defining IE7 layout, over the shared chrome DOM:
+ *   Row 1 (unified toolbar): round glass Back/Forward · full-width address field
+ *          · Refresh · Stop · Live-Search box.  No menu bar.
+ *   Row 2 (tab strip): Favorites star + Add at the left · the tabs · the command
+ *          bar (Home / Feeds / Print / Page / Tools / Help) at the right.
+ * The title bar is shared with the other Windows themes (base.css draws the
+ * Win98 / Luna / Vista-glass caption per the user's menu-style setting); only the
+ * "e" document icon and caption text are ours.
+ */
+
+body {
+  font-family: var(--ow-font);
+  font-size: 11px;
+  color: var(--ow-text);
+  background: #eaf1fa;
+}
+
+/* Light Aero window panel. Under the Vista menu-style the base.css glass frame
+   overrides this bevel; under Win98/Luna this soft two-tone frame shows. */
+.ow-root {
+  box-sizing: border-box;
+  background: #e8f0f9;
+  padding: 4px 4px 6px;
+  border: 0;
+  box-shadow:
+    inset -1px -1px #5f7fa8,
+    inset 1px 1px #ffffff,
+    inset -2px -2px #b3c8de,
+    inset 2px 2px #dcebf9;
+}
+
+/* ---- Title bar (base.css owns the bar; we set the "e" icon + caption) ------ */
+.ow-titlebar__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 0;
+  background: url('assets/elogo32.png') center / contain no-repeat;
+  box-shadow: none;
+}
+.ow-titlebar__text {
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+/* ===================================================================== *
+ * Row 1 — unified toolbar: round Back/Forward, full-width address field,
+ * Refresh, Stop, and the Live-Search box. Flex `order` places the toolbar
+ * buttons (which render before the address field in the DOM) correctly.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 34px;
+  padding: 2px 6px;
+  gap: 3px;
+  align-items: center;
+  background: linear-gradient(180deg, #f7fafe 0%, #e4eef9 52%, #d7e6f6 100%);
+  border-bottom: 1px solid #9fb9d8;
+}
+.ow-toolbar--unified {
+  display: flex;
+}
+.ow-toolbar--unified .ow-btn[data-action='back'] {
+  order: 1;
+}
+.ow-toolbar--unified .ow-btn[data-action='forward'] {
+  order: 2;
+}
+.ow-toolbar--unified .ow-addressbar {
+  order: 3;
+  flex: 1;
+}
+.ow-toolbar--unified .ow-btn[data-action='refresh'] {
+  order: 4;
+}
+.ow-toolbar--unified .ow-btn[data-action='stop'] {
+  order: 5;
+}
+.ow-toolbar--unified .ow-searchbox {
+  order: 6;
+}
+/* Hide the unified-mode extras IE7 doesn't use. */
+.ow-toolbar .ow-throbber,
+.ow-toolbar-dot,
+.ow-toolbar__spacer {
+  display: none !important;
+}
+
+/* Generic toolbar button reset (Refresh / Stop). */
+.ow-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 0;
+  padding: 0 2px;
+  margin: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #000000;
+  cursor: default;
+}
+.ow-btn__label {
+  display: none;
+}
+.ow-btn:disabled {
+  opacity: 0.4;
+}
+
+/* Refresh / Stop — small flat glyph buttons at the address field's right edge,
+   with a faint Aero hover highlight. */
+.ow-btn[data-action='refresh'] .ow-btn__icon,
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  width: 22px;
+  height: 22px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+}
+.ow-btn[data-action='refresh'] .ow-btn__icon {
+  background-image: url('assets/refresh.png');
+}
+.ow-btn[data-action='stop'] .ow-btn__icon {
+  background-image: url('assets/stop.png');
+}
+.ow-btn[data-action='refresh']:hover:not(:disabled),
+.ow-btn[data-action='stop']:hover:not(:disabled) {
+  background: linear-gradient(180deg, #fbfdff, #dcebfb);
+  box-shadow: inset 0 0 0 1px #a9c6e8;
+}
+.ow-btn:active:not(:disabled) .ow-btn__icon {
+  transform: translate(1px, 1px);
+}
+
+/* Round glass Back + Forward — the authentic IE7 "navigation pearls" from the
+   original ieframe artwork (a 57×116 sprite: two columns Back|Forward × four
+   rows normal / hover / pressed / disabled). We paint it on the button itself
+   and hide the inner icon. */
+.ow-toolbar--unified .ow-btn[data-action='back'],
+.ow-toolbar--unified .ow-btn[data-action='forward'] {
+  position: relative;
+  width: 28px;
+  height: 29px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-image: url('assets/nav.png');
+  background-size: 57px 116px;
+  background-repeat: no-repeat;
+}
+.ow-toolbar--unified .ow-btn[data-action='back'] {
+  background-position: 0 0;
+}
+.ow-toolbar--unified .ow-btn[data-action='forward'] {
+  background-position: -29px 0;
+}
+.ow-btn[data-action='back']:hover:not(:disabled) {
+  background-position: 0 -29px;
+}
+.ow-btn[data-action='forward']:hover:not(:disabled) {
+  background-position: -29px -29px;
+}
+.ow-btn[data-action='back']:active:not(:disabled) {
+  background-position: 0 -58px;
+}
+.ow-btn[data-action='forward']:active:not(:disabled) {
+  background-position: -29px -58px;
+}
+.ow-btn[data-action='back']:disabled {
+  background-position: 0 -87px;
+  opacity: 1;
+}
+.ow-btn[data-action='forward']:disabled {
+  background-position: -29px -87px;
+  opacity: 1;
+}
+/* the sprite carries its own glyph — hide the NavButton's icon element */
+.ow-toolbar--unified .ow-btn[data-action='back'] .ow-btn__icon,
+.ow-toolbar--unified .ow-btn[data-action='forward'] .ow-btn__icon {
+  display: none;
+}
+/* recent-pages dropdown caret to the right of the Forward pearl */
+.ow-toolbar--unified .ow-btn[data-action='forward']::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #5a708c;
+  transform: translateY(-2px);
+}
+
+/* ===================================================================== *
+ * Address field — a white pill with the page favicon, the URL, and a
+ * history dropdown caret. (Go is via Enter; Refresh/Stop sit to its right.)
+ * ===================================================================== */
+.ow-addressbar {
+  height: 24px;
+  padding: 0 2px;
+  gap: 4px;
+  align-items: center;
+  background: transparent;
+  border: 0;
+}
+.ow-address-label {
+  display: none;
+}
+.ow-address-combo {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 22px;
+  background: #ffffff;
+  border: 1px solid #7c9bc0;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.12);
+  padding: 0 2px 0 4px;
+}
+/* The empty favicon <span> is only a drag handle — hide it. The chrome sets the
+   live page favicon as the INPUT's background-image (inline). */
+.ow-address-favicon {
+  display: none;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  height: 18px;
+  font-size: 12px;
+  font-family: var(--ow-font);
+  color: #000000;
+  /* Page favicon pinned as a 16px icon at the left (the chrome's inline
+     background-image overrides this url when the page has one); the IE "e" is
+     the placeholder when it doesn't. Constrained size + no-repeat so it never
+     tiles across the field. */
+  background: url('assets/elogo32.png') 3px center / 16px 16px no-repeat;
+  padding: 0 2px 0 24px;
+}
+/* Selected URL/search text uses the IE7 blue, not the OS accent (which the
+   address field would otherwise show when it auto-selects on focus). */
+.ow-address-input::selection,
+.ow-searchbox__input::selection {
+  background: #3399ff;
+  color: #ffffff;
+}
+.ow-address-dropdown {
+  position: relative;
+  flex: 0 0 auto;
+  width: 17px;
+  align-self: stretch;
+  border: 0;
+  border-left: 1px solid #cdddee;
+  background: linear-gradient(180deg, #fbfdff, #dcebfb);
+}
+.ow-address-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #40587a;
+  transform: translate(-50%, -2px);
+}
+.ow-address-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 1px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #7c9bc0;
+  font-size: 11px;
+}
+.ow-address-item {
+  padding: 3px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.ow-address-item:hover {
+  background: #3399ff;
+  color: #ffffff;
+}
+/* IE7 submits with Enter (or the Go arrow appears while typing); hide the pill. */
+.ow-go {
+  display: none;
+}
+.ow-loc-links,
+.ow-loc-bookmarks,
+.ow-loc-proxy,
+.ow-loc-related {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Live-Search box — white pill, engine monogram + caret at the left, a
+ * blue magnifier at the right. (Enter runs the search.)
+ * ===================================================================== */
+.ow-searchbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 170px;
+  height: 22px;
+  padding: 0 24px 0 2px;
+  background: #ffffff;
+  border: 1px solid #7c9bc0;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.12);
+}
+.ow-searchbox__engine {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 0;
+  background: transparent;
+  padding: 0 2px;
+  cursor: default;
+}
+.ow-searchbox__monogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.ow-searchbox__caret {
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #40587a;
+}
+.ow-searchbox__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  height: 18px;
+  font-size: 12px;
+  font-family: var(--ow-font);
+  color: #000000;
+}
+/* blue magnifier button at the right edge */
+.ow-searchbox::after {
+  content: '';
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 22px;
+  border-left: 1px solid #cdddee;
+  border-radius: 0 2px 2px 0;
+  background:
+    url('assets/search.png') center / 15px no-repeat,
+    linear-gradient(180deg, #eaf4ff, #cfe3fa);
+}
+.ow-searchbox__menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 50;
+  min-width: 170px;
+  margin: 2px 0 0;
+  padding: 2px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #7c9bc0;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 11px;
+}
+.ow-searchbox__option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  cursor: default;
+}
+.ow-searchbox__option:hover,
+.ow-searchbox__option.is-active {
+  background: #3399ff;
+  color: #ffffff;
+}
+
+/* ===================================================================== *
+ * Row 2 — the tab strip: Favorites cluster (left) · tabs · command bar (right).
+ * ===================================================================== */
+.ow-tabstrip {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 27px;
+  padding: 3px 6px 0;
+  background: linear-gradient(180deg, #dce8f6 0%, #c9dbf0 100%);
+  border-bottom: 1px solid #8fb0d6;
+  /* base.css sets overflow-x:auto, which forces overflow-y to auto and would clip
+     the Page/Tools command-bar dropdowns at the tab-row height. Let them spill. */
+  overflow: visible;
+}
+.ow-tabstrip__left {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  align-self: center;
+  margin-right: 4px;
+  padding-right: 5px;
+  border-right: 1px solid #a9c2e0;
+}
+.ow-tabstrip__right {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+  align-self: center;
+  padding-left: 5px;
+}
+
+/* Favorites Center (star) + Add-to-Favorites (star+). */
+.ow-favbtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 21px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  cursor: default;
+}
+.ow-favbtn:hover {
+  border-color: #a9c6e8;
+  background: linear-gradient(180deg, #fbfdff, #dcebfb);
+}
+.ow-favbtn:active {
+  background: linear-gradient(180deg, #d3e6fb, #eaf4ff);
+}
+.ow-favbtn__icon {
+  width: 18px;
+  height: 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.ow-favbtn[data-action='favorites'] .ow-favbtn__icon {
+  background-image: url('assets/star.png');
+}
+.ow-favbtn[data-action='addfav'] .ow-favbtn__icon {
+  background-image: url('assets/addfav.png');
+  background-size: 14px;
+}
+
+/* Tabs — rounded-top Aero tabs; active is white and lifts, inactive is a
+   translucent blue with a hover brighten. */
+.ow-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  max-width: 190px;
+  min-width: 96px;
+  padding: 0 6px 0 8px;
+  background: linear-gradient(180deg, #eaf2fc, #cbdef4);
+  border: 1px solid #9db9d8;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  color: #1a3355;
+  cursor: default;
+}
+.ow-tab:hover {
+  background: linear-gradient(180deg, #f6faff, #d9e8fa);
+}
+.ow-tab.is-active {
+  height: 24px;
+  background: #ffffff;
+  border-color: #7fa4cf;
+  color: #000000;
+  font-weight: 400;
+}
+.ow-tab__favicon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+.ow-tab__spinner {
+  display: none;
+}
+.ow-tab__spinner.is-active {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: url('assets/elogo32.png') center / 14px no-repeat;
+  animation: ie7-spin 0.9s linear infinite;
+}
+@keyframes ie7-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.ow-tab__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+.ow-tab__close {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #5a708c;
+  font-size: 13px;
+  line-height: 1;
+  cursor: default;
+  visibility: hidden;
+}
+.ow-tab:hover .ow-tab__close,
+.ow-tab.is-active .ow-tab__close {
+  visibility: visible;
+}
+.ow-tab__close:hover {
+  background: #e8615a;
+  color: #ffffff;
+}
+/* New-tab stub — the small blank tab to the right of the last tab. */
+.ow-tab-new {
+  width: 26px;
+  height: 20px;
+  margin-left: 2px;
+  align-self: flex-end;
+  border: 1px solid #9db9d8;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #e4eef9, #cddef2);
+  color: #3a5578;
+  font-size: 13px;
+  line-height: 16px;
+  cursor: default;
+}
+.ow-tab-new:hover {
+  background: linear-gradient(180deg, #f4f9ff, #dceafa);
+}
+
+/* Command bar — Home / Feeds / Print / Page / Tools / Help. */
+.ow-cmdbar {
+  display: flex;
+  align-items: center;
+}
+.ow-cmd-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.ow-cmdbtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #16324f;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: default;
+}
+.ow-cmdbtn:hover,
+.ow-cmdbtn.is-open {
+  border-color: #a9c6e8;
+  background: linear-gradient(180deg, #fbfdff, #d9e9fb);
+}
+.ow-cmdbtn:active,
+.ow-cmdbtn.is-open {
+  background: linear-gradient(180deg, #cfe2fa, #eaf4ff);
+}
+/* Page / Tools dropdown menu. */
+.ow-cmd-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 60;
+  min-width: 150px;
+  margin: 2px 0 0;
+  padding: 2px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #7c9bc0;
+  box-shadow: 2px 3px 6px rgba(10, 30, 70, 0.28);
+  font-size: 11px;
+  color: #16324f;
+}
+.ow-cmd-item {
+  padding: 4px 14px;
+  border-radius: 2px;
+  white-space: nowrap;
+  cursor: default;
+}
+.ow-cmd-item:hover {
+  background: #3399ff;
+  color: #ffffff;
+}
+.ow-cmdbtn__icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.ow-cmdbtn[data-action='home'] .ow-cmdbtn__icon {
+  background-image: url('assets/home.png');
+}
+.ow-cmdbtn[data-action='feeds'] .ow-cmdbtn__icon {
+  background-image: url('assets/feeds.png');
+}
+.ow-cmdbtn[data-action='print'] .ow-cmdbtn__icon {
+  background-image: url('assets/print.png');
+}
+.ow-cmdbtn[data-action='page'] .ow-cmdbtn__icon {
+  background-image: url('assets/page.png');
+}
+.ow-cmdbtn[data-action='tools'] .ow-cmdbtn__icon {
+  background-image: url('assets/tools.png');
+}
+.ow-cmdbtn[data-action='help'] .ow-cmdbtn__icon {
+  background-image: url('assets/mail.png');
+  background-image: none;
+}
+/* Help is a blue "?" pearl (no original glyph copied). */
+.ow-cmdbtn[data-action='help'] .ow-cmdbtn__icon {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 34%, #d9ecff 0%, #4f8fd6 55%, #2f5f9c 100%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  position: relative;
+}
+.ow-cmdbtn[data-action='help'] .ow-cmdbtn__icon::after {
+  content: '?';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+/* Only Home shows a text label; Print/Page/Tools show label + a dropdown caret;
+   Feeds and Help are icon-only. */
+.ow-cmdbtn__label {
+  font-size: 11px;
+}
+.ow-cmdbtn[data-action='feeds'] .ow-cmdbtn__label,
+.ow-cmdbtn[data-action='help'] .ow-cmdbtn__label {
+  display: none;
+}
+.ow-cmdbtn[data-action='home']::after,
+.ow-cmdbtn[data-action='print']::after,
+.ow-cmdbtn[data-action='page']::after,
+.ow-cmdbtn[data-action='tools']::after {
+  content: '';
+  margin-left: 1px;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #4b6485;
+}
+
+/* ===================================================================== *
+ * Status bar — light Aero, sunken cells, segmented progress, zone dot.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 22px;
+  padding: 1px 0;
+  gap: 0;
+  align-items: stretch;
+  font-size: 11px;
+  color: #223a55;
+  background: linear-gradient(180deg, #e9f1fb, #d5e3f3);
+  border-top: 1px solid #9fb9d8;
+}
+.ow-status-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ow-progress {
+  width: 140px;
+  flex: 0 0 auto;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  height: 14px;
+  padding: 1px;
+  margin: 0 6px;
+  background: #ffffff;
+  border: 1px solid #9db9d8;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ow-progress__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #4aa3f0 0,
+    #4aa3f0 8px,
+    #d8e8fb 8px,
+    #d8e8fb 11px
+  );
+}
+.ow-progress.is-active .ow-progress__bar {
+  width: 60%;
+  animation: ie7-progress 1.2s linear infinite;
+}
+@keyframes ie7-progress {
+  0% {
+    width: 8%;
+  }
+  100% {
+    width: 96%;
+  }
+}
+.ow-zone {
+  width: 110px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  color: #223a55;
+  border-left: 1px solid #b7cbe3;
+}
+.ow-zone::before {
+  content: '';
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #bcd6ff 0%, #4f8be0 55%, #24589e 100%);
+}
+.ow-zone__lock {
+  display: none;
+}

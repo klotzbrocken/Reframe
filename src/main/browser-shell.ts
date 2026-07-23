@@ -244,6 +244,11 @@ export class BrowserShell {
         preload: join(__dirname, '../preload/page.cjs')
       }
     })
+    // Opaque page backing: the main window is born transparent (for the Vista
+    // Aero glass title bar), so a blank/loading tab with no painted content would
+    // otherwise show the see-through window straight to the desktop. A white
+    // backing keeps every tab's content area solid, like a real browser page.
+    view.setBackgroundColor('#ffffff')
     const tab: Tab = { id, view, favicon: null }
     this.tabs.set(id, tab)
     this.order.push(id)
@@ -256,10 +261,13 @@ export class BrowserShell {
     this.emit({ type: 'tab-created', tab: this.stateOf(tab) })
     this.activateTab(id)
 
+    // Always commit a document — a real URL, or about:blank for a blank new tab.
+    // Without this the view stays empty, and on the born-transparent window (Vista
+    // glass) an empty view has nothing to paint, so the content area shows straight
+    // through to the desktop. about:blank commits a white page over the opaque
+    // white backing set above, keeping the new tab solid.
     const target = normalizeInput(url)
-    if (target) {
-      view.webContents.loadURL(target).catch(() => {})
-    }
+    view.webContents.loadURL(target || 'about:blank').catch(() => {})
     return id
   }
 
@@ -858,26 +866,26 @@ export class BrowserShell {
     this.broadcastDisplay()
   }
 
-  /** Toggle the translucent Aero-glass window backdrop (for the Vista title-bar
-   *  style). macOS gets real vibrancy, Windows 11 acrylic; elsewhere the window
-   *  stays opaque and the CSS provides a static faux-glass look. The transparent
-   *  chrome view over the opaque page view means only the title-bar + border
-   *  bands turn to glass — the page content stays opaque. */
+  /** Toggle the see-through window backdrop for the Vista (Aero) title-bar style.
+   *  The window is born transparent; here we simply set its backing OPAQUE for
+   *  every non-glass theme (so win98/luna etc. keep a solid grey window) and CLEAR
+   *  it for Vista, letting the desktop show through the translucent title-bar CSS.
+   *  The transparent chrome view over the opaque page view means only the title-bar
+   *  + border bands become see-through — the page content stays opaque. Windows 11
+   *  additionally gets DWM acrylic for a real frosted blur. */
   setGlass(on: boolean): void {
     const win = this.win as unknown as {
-      setVibrancy?: (t: string | null) => void
       setBackgroundMaterial?: (t: string) => void
       setBackgroundColor: (c: string) => void
     }
     try {
-      if (on) {
-        win.setBackgroundColor('#00000000')
-        if (process.platform === 'darwin') win.setVibrancy?.('under-window')
-        else if (process.platform === 'win32') win.setBackgroundMaterial?.('acrylic')
-      } else {
-        if (process.platform === 'darwin') win.setVibrancy?.(null)
-        else if (process.platform === 'win32') win.setBackgroundMaterial?.('none')
-        win.setBackgroundColor('#c0c0c0')
+      // Born-transparent window: alpha in the backgroundColor is honoured, so
+      // '#00000000' = clear (desktop shows through translucent CSS), '#c0c0c0' =
+      // solid grey backing. This is the whole effect on macOS / Linux.
+      win.setBackgroundColor(on ? '#00000000' : '#c0c0c0')
+      if (process.platform === 'win32') {
+        // Windows 11: add DWM acrylic behind the clear backing for a frosted blur.
+        win.setBackgroundMaterial?.(on ? 'acrylic' : 'none')
       }
     } catch {
       /* window gone / API unsupported on this platform — ignore */
