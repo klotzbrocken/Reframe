@@ -91,6 +91,16 @@ export function TourOverlay({ steps, onDone }: { steps: TourStep[]; onDone: () =
   if (!step) return null
 
   const last = i === steps.length - 1
+  // Escape always ends the tour. Belt and braces: the card's own Skip button is
+  // the normal way out, but the tour covers the whole window and force-opens the
+  // flyout, so there must be a way out that does not depend on hitting a target.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') onDone()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onDone])
   const next = (): void => (last ? onDone() : setI((n) => n + 1))
 
   // Lay the arrow + label to the left of the target if there's room, else right.

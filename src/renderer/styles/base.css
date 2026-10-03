@@ -2030,7 +2030,7 @@ body,
 .ow-crt {
   position: fixed;
   inset: 0;
-  z-index: 2147483646;
+  z-index: 2147483645;
   pointer-events: none;
 }
 /* Interactive overlays open by floating the chrome above the page (see
@@ -2042,6 +2042,14 @@ body,
 .ow-dialog-backdrop,
 .ow-fab,
 .ow-fab__panel {
+  z-index: 2147483646;
+}
+/* The coachmark tour goes above even those: it force-opens the flyout to point
+   at it, so anything that outranks the tour card buries its own Skip/Next
+   buttons — and since the forced-open flyout cannot be closed either, that
+   locks the app on first run with no way out. The tour is click-through except
+   for its card, so the feature it highlights stays usable underneath. */
+.ow-tour {
   z-index: 2147483647;
 }
 .ow-crt::before {
