@@ -24,7 +24,17 @@ NOTARYTOOL_PROFILE=Retromac GH_TOKEN=$(gh auth token) npm run release
   `NOTARYTOOL_PROFILE` is unset the hook skips notarization (plain signed build).
 - One-time credential setup:
   `xcrun notarytool store-credentials "Retromac" --apple-id <id> --team-id FTJLR8JRNS`
+- Builds **both** `arm64` and `x64` (the arches are in `build.mac.target`), so
+  Apple Silicon and Intel each get their own dmg + zip. Notarization therefore
+  runs twice, once per arch.
 - Uploads `dmg`, `zip`, `latest-mac.yml` (+ blockmaps) to the `vX.Y.Z` release.
+
+> **Build the two arches in ONE invocation.** `latest-mac.yml` is rewritten from
+> scratch by every electron-builder run, listing only what that run produced —
+> so building arm64 and x64 separately leaves a manifest naming just the second
+> one, and every user on the other arch is handed the wrong build by the
+> auto-updater. `npm run release` does the right thing; a manual
+> `electron-builder --mac --x64` on its own does not.
 
 ## Windows (built on CI)
 
