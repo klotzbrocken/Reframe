@@ -376,6 +376,7 @@ export function FloatingMenu({
                     type="button"
                     role="tab"
                     aria-selected={themeTab === plat}
+                    data-plat={plat}
                     className={'ow-fab__ddtab' + (themeTab === plat ? ' is-active' : '')}
                     onMouseDown={(e) => {
                       e.preventDefault()
@@ -383,6 +384,7 @@ export function FloatingMenu({
                       setThemeOpen(false)
                     }}
                   >
+                    <span className="ow-fab__ddtabicon" aria-hidden />
                     {plat === 'win' ? 'Windows' : 'Mac & misc'}
                   </button>
                 ))}
