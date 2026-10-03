@@ -90,6 +90,9 @@ npm run build    # production build into out/
 npm run package  # build a macOS .app via electron-builder
 ```
 
+Electron is pinned to the 43 line on purpose — 44 broke looping Web Audio. See
+[`docs/electron-version.md`](docs/electron-version.md) before raising it.
+
 ## Add a theme
 
 No code changes required — drop a folder in `src/renderer/public/themes/<id>/`:

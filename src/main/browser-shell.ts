@@ -9,6 +9,7 @@ import {
   nativeImage,
   shell as electronShell
 } from 'electron'
+import * as electronModule from 'electron'
 import { join } from 'path'
 import { writeFile } from 'fs/promises'
 import { pathToFileURL } from 'url'
@@ -579,9 +580,30 @@ export class BrowserShell {
     }
   }
 
-  /** Copy a base64 PNG data URL to the system clipboard. */
-  copyShareImage(dataUrl: string): void {
-    clipboard.writeImage(nativeImage.createFromDataURL(dataUrl))
+  /** Copy a base64 PNG data URL to the system clipboard.
+   *
+   *  Electron 44 replaced the synchronous `clipboard.writeImage` with the
+   *  W3C-modelled async `clipboard.write([ClipboardItem])`. Both are handled
+   *  here so the app runs on either runtime — note that `ClipboardItem` must be
+   *  read off the module NAMESPACE: as a named ESM import it is a hard
+   *  SyntaxError on a runtime that doesn't export it, and the main process
+   *  would not even boot. */
+  async copyShareImage(dataUrl: string): Promise<void> {
+    const img = nativeImage.createFromDataURL(dataUrl)
+    const cb = clipboard as unknown as {
+      writeImage?: (image: unknown) => void
+      write?: (items: unknown[]) => Promise<void>
+    }
+    if (typeof cb.writeImage === 'function') {
+      cb.writeImage(img) // Electron ≤ 43
+      return
+    }
+    const Item = (electronModule as unknown as { ClipboardItem?: new (d: unknown) => unknown })
+      .ClipboardItem
+    if (!Item || !cb.write) return
+    // toPNG() hands back a Node Buffer; Blob wants a plain ArrayBuffer view.
+    const png = new Uint8Array(img.toPNG())
+    await cb.write([new Item({ 'image/png': new Blob([png], { type: 'image/png' }) })])
   }
 
   /**
@@ -780,6 +802,27 @@ export class BrowserShell {
 
   private wire(tab: Tab): void {
     const wc = tab.view.webContents
+
+    // F12 opens DevTools on the page. No menu entry — a browser needs a way to
+    // look at a page, but the retro chrome has nowhere honest to put it. The CDP
+    // debugger (modem throttling, the chrome shim) and DevTools cannot both be
+    // attached, so the debugger is detached first; it re-attaches on the next
+    // speed change or new tab.
+    wc.on('before-input-event', (e, input) => {
+      if (input.type !== 'keyDown' || input.key !== 'F12') return
+      e.preventDefault()
+      if (wc.isDevToolsOpened()) {
+        wc.closeDevTools()
+        return
+      }
+      try {
+        if (wc.debugger.isAttached()) wc.debugger.detach()
+      } catch {
+        /* already detached */
+      }
+      tab.dbgAttached = false
+      wc.openDevTools({ mode: 'detach' })
+    })
 
     wc.on('did-start-loading', () => {
       tab.favicon = null // clear stale favicon while the next page loads
