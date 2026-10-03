@@ -1,26 +1,34 @@
 // Bump WHATS_NEW_VERSION whenever the notes below change — App.tsx shows this
 // dialog automatically once per version (tracked in localStorage), and it's also
 // reachable any time from the Reframe ▸ What's New menu.
-export const WHATS_NEW_VERSION = '1.13.0'
+export const WHATS_NEW_VERSION = '1.14.0'
 
 const KOFI = 'https://ko-fi.com/N4N11K1NC'
 
 const NOTES: { title: string; body: string }[] = [
   {
-    title: 'Internet Explorer 7 — the 2006 comeback',
-    body: 'The browser that finally brought tabs to Explorer. Round glass Back / Forward “pearls”, a full-width address bar with the live site favicon, a dedicated Live-Search box, and the command bar on the tab row — Home, Feeds, Print, and working Page and Tools menus. Original toolbar icons throughout, plus a faithful “About Internet Explorer 7” box.'
+    title: 'Internet Explorer 5.1 — the first Aqua browser',
+    body: 'Mac OS X in 2000, when Aqua was brand new: a pinstriped window under the 10.0 title bar, a row of big labelled toolbar buttons, the teal “Address :” band with its ›go button, the @‑bulleted Favorites bar, and the blue “e” spinning away while a page loads.'
   },
   {
-    title: 'Windows Vista Aero glass',
-    body: 'A new title-bar style in Settings ▸ Title bar: a translucent, blurred glass caption with the Aero bevel, glossy caption buttons and the red close. Switch it on for any Windows theme to frame the window in 2007-era glass.'
+    title: 'NetPositive — BeOS R5',
+    body: 'The browser from the operating system that almost was. BeOS had no title bar at all: a yellow tab sits on the window’s top edge, only as wide as the page title needs, with the close box at one end and the zoom widget at the other. Under it, one flat row holds the globe, the address field and six icons.'
   },
   {
-    title: 'A Vista scrollbar to match',
-    body: 'The web view’s period scrollbars gain a Windows Vista / 7 “Aero” look — a pale, glossy blue-white gel thumb with slim chevron arrows — lighter and rounder than the XP Luna bar.'
+    title: 'Aqua, rebuilt from the pixels',
+    body: 'The Mac OS X 10.0 traffic lights are measured row by row off the original — black at the top of the rim, a white gloss across the top third, the colour deep beneath it and glowing back up from the foot. Safari 1.0, Netscape 7.02 and the new Internet Explorer 5.1 now share them, and the Aqua scrollbars got the same treatment: the right gel, the concave track, and an arrow at each end.'
+  },
+  {
+    title: 'Then and now',
+    body: 'While you are time‑travelling, a small button beside the modem opens a comparison: the archived page and today’s, in one frame, with a handle you drag across to wipe between them. The archived side is always labelled with the year it actually comes from.'
+  },
+  {
+    title: 'A shorter theme list',
+    body: 'The theme picker splits into Windows and Mac & misc, so the list stays half as long as the catalogue grows — with a small icon on each tab to tell them apart at a glance.'
   },
   {
     title: 'Fixes & polish',
-    body: 'Tighter Vista glass (a touch less transparent, a stronger frame bevel), a solid backing so new tabs never flash through to the desktop, and a range of theme touch-ups.'
+    body: 'Closing the window on macOS and clicking the dock icon brings it back, instead of leaving the app running invisibly. The first‑run tour no longer hides behind the flyout, and Escape ends it. The flyout button is no longer clipped by themes with a short status bar. Looping sound on retro pages stays clean. And F12 opens the developer tools on the page.'
   }
 ]
 
