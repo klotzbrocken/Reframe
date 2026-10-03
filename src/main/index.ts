@@ -485,7 +485,14 @@ function buildAppMenu(): void {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }
 
-function createWindow(): void {
+/**
+ * Build the app window. `waitForSplash` is true ONLY for the very first launch,
+ * where the startup splash shows alone and `finishStartup()` reveals the window
+ * afterwards. Every later call (the dock icon on macOS, after the window was
+ * closed) must show the window itself: `finishStartup()` is one-shot and would
+ * return early, leaving a window that nothing can ever reveal.
+ */
+function createWindow(waitForSplash = false): void {
   const win = new BaseWindow({
     width: 1100,
     height: 760,
@@ -551,9 +558,20 @@ function createWindow(): void {
     if (activeShell.tabCount() === 0) activeShell.createTab(HOME_URL)
   })
 
+  // BaseWindow does NOT release its child WebContentsViews, and the module-level
+  // `shell` / `mainWindow` references would keep them alive even if it did — so
+  // on macOS, where the app survives its last window, every close would leave a
+  // full set of page processes running (timers, audio, network and all).
   win.on('closed', () => {
-    /* window gone; views are released with it */
+    activeShell.dispose()
+    if (shell === activeShell) shell = null
+    if (mainWindow === win) mainWindow = null
   })
+
+  if (!waitForSplash) {
+    win.show()
+    win.focus()
+  }
 }
 
 // Remote pages default to DENY for sensitive capabilities. Electron grants
@@ -613,12 +631,20 @@ app.whenReady().then(() => {
   ipcMain.on('splash:done', () => finishStartup())
   ipcMain.on('splash:theme', (_e, themeId: string) => showThemeSplash(themeId))
   registerIpc(() => shell)
-  createWindow()
+  createWindow(true)
   showStartupSplash()
   // Fallback: never leave the app hidden if the splash window dies early.
   setTimeout(finishStartup, 10000)
+  // Dock icon / Cmd-Tab. Guarding on getAllWindows() would be wrong: splash
+  // windows are BrowserWindows and count, so a live theme splash at close time
+  // would suppress the rebuild entirely. Track the app window itself, and show
+  // it when it merely got hidden (showThemeSplash hides it for a few seconds).
   app.on('activate', () => {
-    if (BaseWindow.getAllWindows().length === 0) createWindow()
+    if (!mainWindow || mainWindow.isDestroyed()) createWindow()
+    else {
+      mainWindow.show()
+      mainWindow.focus()
+    }
   })
 })
 

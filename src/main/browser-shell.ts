@@ -272,6 +272,29 @@ export class BrowserShell {
     return id
   }
 
+  /** The window is closing: close every page's WebContents plus the chrome
+   *  view's. BaseWindow does not release child WebContentsViews on its own, and
+   *  the `tabs` map here (plus the module-level `shell` reference in index.ts)
+   *  would pin them regardless. No events are emitted — the chrome that would
+   *  receive them is going away in the same breath. */
+  dispose(): void {
+    for (const tab of this.tabs.values()) {
+      try {
+        tab.view.webContents.close()
+      } catch {
+        /* already gone */
+      }
+    }
+    this.tabs.clear()
+    this.order = []
+    this.activeId = null
+    try {
+      this.chromeView.webContents.close()
+    } catch {
+      /* already gone */
+    }
+  }
+
   closeTab(id: number): void {
     const tab = this.tabs.get(id)
     if (!tab) return
