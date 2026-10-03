@@ -268,31 +268,46 @@ function scrollbarCss(style: string | undefined, crt?: boolean): string {
   // top-lit sheen over a bright azure body, edges rounded off. Both arrows paired
   // at the bottom. Blue tuned to the fig's Aqua controls (bright, not navy).
   if (style === 'aqua10') {
-    // Length-wise body: bright gloss at the top third, azure below.
-    const bodyB = 'linear-gradient(to bottom,#c8e4fb 0,#77b0ec 40%,#3f86d2 54%,#63a3e6 100%)'
-    const bodyR = 'linear-gradient(to right,#c8e4fb 0,#77b0ec 40%,#3f86d2 54%,#63a3e6 100%)'
-    // Cross-section edge shading to round the capsule.
-    const edgeR =
-      'linear-gradient(to right,rgba(0,24,70,.28),rgba(0,24,70,0) 26%,rgba(0,24,70,0) 74%,rgba(0,24,70,.28))'
-    const edgeB =
-      'linear-gradient(to bottom,rgba(0,24,70,.28),rgba(0,24,70,0) 26%,rgba(0,24,70,0) 74%,rgba(0,24,70,.28))'
+    // Measured off 10.x screenshots rather than guessed.
+    //
+    // The TUBE is not flat grey: across its width it runs from a dark hairline
+    // at the near edge to near-white about four fifths over, then eases back —
+    // which is what makes it read as concave.
+    const tube =
+      (d: string): string =>
+        'linear-gradient(to ' + d + ',#b8b8b9 0,#c0c0c1 6%,#d3d4d3 22%,#e4e4e5 44%,#f5f6f6 64%,#fcfbfb 80%,#f3f4f5 92%,#efefef 100%)'
+    // The capsule is SMOOTH — measured along its length the blue channel varies
+    // by 3 steps out of 255 with no periodicity, so the ridges it seems to have
+    // at a glance are not there. Do not add a ribbing layer.
+    //
+    // The GEL, straight off a cross-section of the real capsule (23 samples at
+    // 2x, normalised): a navy rim, a light band, the characteristic darker WAIST
+    // at two fifths, then a steady climb to the gloss at four fifths and a grey
+    // rim on the far side. Aqua lights these capsules from the far edge, not the
+    // near one. Stops are the measured values — not eyeballed approximations.
+    const gel =
+      (d: string): string =>
+        'linear-gradient(to ' + d + ',#1438ad 0,#1539ac 5%,#7fa4d9 9%,#9fbee5 14%,#9bbbe6 23%,#94b6e6 32%,#6092dc 41%,#73a3e9 50%,#83b3f8 55%,#97c6fb 64%,#a5d8fb 73%,#b1e3fb 82%,#a8d9fb 91%,#5c5c5b 96%,#5c5c5c 100%)'
+    // Arrows sit one at EACH end, on the same near-white as the tube — no boxes.
     const btnBox =
-      'background:#eef0f2!important;box-shadow:inset 0 0 0 1px #d6d8da!important;background-repeat:no-repeat!important;background-position:center!important'
+      'background:#fafafa!important;background-repeat:no-repeat!important;background-position:center!important'
     return (
-      '::-webkit-scrollbar{width:16px!important;height:16px!important;background:#eef0f2!important}' +
-      '::-webkit-scrollbar-button:vertical:start:decrement,::-webkit-scrollbar-button:vertical:start:increment,' +
-      '::-webkit-scrollbar-button:horizontal:start:decrement,::-webkit-scrollbar-button:horizontal:start:increment{display:none!important}' +
-      '::-webkit-scrollbar-button:vertical:end:decrement,::-webkit-scrollbar-button:vertical:end:increment{display:block!important;height:15px!important;' + btnBox + '}' +
-      '::-webkit-scrollbar-button:horizontal:end:decrement,::-webkit-scrollbar-button:horizontal:end:increment{display:block!important;width:15px!important;' + btnBox + '}' +
-      '::-webkit-scrollbar-button:vertical:end:decrement{' + scanN(crt, [triUp('#666')], ['no-repeat']) + '}' +
-      '::-webkit-scrollbar-button:vertical:end:increment{' + scanN(crt, [triDn('#666')], ['no-repeat']) + '}' +
-      '::-webkit-scrollbar-button:horizontal:end:decrement{' + scanN(crt, [triLf('#666')], ['no-repeat']) + '}' +
-      '::-webkit-scrollbar-button:horizontal:end:increment{' + scanN(crt, [triRt('#666')], ['no-repeat']) + '}' +
-      '::-webkit-scrollbar-track{background:#eef0f2!important;' + scanSolid(crt) + 'border-radius:8px!important;box-shadow:inset 1px 1px 2px rgba(0,0,0,.12),inset -1px -1px 1px rgba(0,0,0,.04)!important}' +
-      '::-webkit-scrollbar-corner{background:#eef0f2!important}' +
-      '::-webkit-scrollbar-thumb{border-radius:8px!important;border:1px solid #2c66aa!important;min-height:30px!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.7)!important}' +
-      '::-webkit-scrollbar-thumb:vertical{' + scanN(crt, [edgeR, bodyB], ['no-repeat', 'no-repeat']) + '}' +
-      '::-webkit-scrollbar-thumb:horizontal{' + scanN(crt, [edgeB, bodyR], ['no-repeat', 'no-repeat']) + '}'
+      '::-webkit-scrollbar{width:16px!important;height:16px!important;background:#fafafa!important}' +
+      // single arrow per end: hide the other half of each double-button pair
+      '::-webkit-scrollbar-button:start:increment,::-webkit-scrollbar-button:end:decrement{display:none!important}' +
+      '::-webkit-scrollbar-button:vertical:start:decrement,::-webkit-scrollbar-button:vertical:end:increment{display:block!important;height:15px!important;' + btnBox + '}' +
+      '::-webkit-scrollbar-button:horizontal:start:decrement,::-webkit-scrollbar-button:horizontal:end:increment{display:block!important;width:15px!important;' + btnBox + '}' +
+      '::-webkit-scrollbar-button:vertical:start:decrement{' + scanN(crt, [triUp('#555')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-button:vertical:end:increment{' + scanN(crt, [triDn('#555')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-button:horizontal:start:decrement{' + scanN(crt, [triLf('#555')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-button:horizontal:end:increment{' + scanN(crt, [triRt('#555')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-track{border-radius:8px!important;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10)!important}' +
+      '::-webkit-scrollbar-track:vertical{' + scanN(crt, [tube('right')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-track:horizontal{' + scanN(crt, [tube('bottom')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-corner{background:#fafafa!important}' +
+      '::-webkit-scrollbar-thumb{border-radius:8px!important;min-height:30px!important;box-shadow:inset 0 0 0 1px rgba(21,56,172,.55)!important}' +
+      '::-webkit-scrollbar-thumb:vertical{' + scanN(crt, [gel('right')], ['no-repeat']) + '}' +
+      '::-webkit-scrollbar-thumb:horizontal{' + scanN(crt, [gel('bottom')], ['no-repeat']) + '}'
     )
   }
 

@@ -210,7 +210,19 @@ body {
 .ow-toolbar .ow-btn[data-action='mail'] { background-image: url('assets/tb-mail.png'); }
 .ow-toolbar .ow-btn[data-action='mail']:hover:not(:disabled) { background-image: url('assets/tb-mail-hover.png'); }
 
-/* The blue "e" at the far right: it spins about its Y axis while loading. */
+/* The mark at the far right: the handoff's still frame when idle, the supplied
+   animation while loading — the same arrangement the IE 4.5 theme uses.
+   
+   It used to be a CSS rotateY of the still frame, which could never be right:
+   turning a flat image shows a MIRRORED face at half a turn, where the real
+   animation shows the back. The animation also carries its own timing (57
+   frames at 170ms, ~3.2s per revolution), which happens to match the 3.0s
+   measured off a recording of the real thing — so there is nothing left for
+   CSS to do here.
+   
+   The asset is 84x82 drawn at 42x41, i.e. 2x for sharpness on a retina
+   display, and it is smooth artwork rather than a pixel bitmap — so no
+   `image-rendering: pixelated` on this one, unlike the toolbar buttons. */
 .ow-toolbar .ow-throbber {
   flex: 0 0 42px;
   width: 42px;
@@ -218,22 +230,12 @@ body {
   margin: 0 11px 0 auto;
   align-self: center;
   background: url('assets/e-logo.png') center / 42px 41px no-repeat;
-  image-rendering: pixelated;
-  perspective: 200px;
 }
 .ow-toolbar .ow-throbber.is-active {
-  animation: ie5x-spin 1.1s linear infinite;
+  background-image: url('assets/e-anim.gif');
 }
 .ow-toolbar .ow-throbber__dot {
   display: none;
-}
-@keyframes ie5x-spin {
-  from {
-    transform: rotateY(0deg);
-  }
-  to {
-    transform: rotateY(360deg);
-  }
 }
 
 /* ===================================================================== *
