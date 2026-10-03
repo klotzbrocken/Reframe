@@ -2117,3 +2117,174 @@ body,
     opacity: 1;
   }
 }
+
+/* ========================================================================= *
+ * "Then and now" — the archived page and the live one wiped against each
+ * other with a draggable divider.
+ *
+ * Both halves are STILL IMAGES, captured at the content area's own size (see
+ * CompareSlider.tsx for why a live split is not possible). They are laid over
+ * .ow-content, which is exactly where the page view sits, so the comparison
+ * lands on the same frame the page occupied. Like the flyout, this is a neutral
+ * Reframe control rather than period chrome — the only themed piece is the
+ * status-bar button that opens it.
+ * ========================================================================= */
+.ow-compare {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  background: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ow-compare__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: top left;
+}
+/* The archived layer sits ON TOP and is clipped from the right, so the live
+   page shows through behind it. Clipping never rescales either shot. */
+.ow-compare__then {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 50% 0 0);
+}
+.ow-compare__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  margin-left: -1.5px;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  cursor: ew-resize;
+  touch-action: none;
+}
+.ow-compare__handle:focus-visible {
+  outline: 2px solid #3a90e8;
+  outline-offset: 2px;
+}
+.ow-compare__handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath fill='%23333' d='M7.4 4.5 3.2 9l4.2 4.5zM10.6 4.5 14.8 9l-4.2 4.5z'/%3E%3C/svg%3E")
+    center / 18px 18px no-repeat;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 2px 7px rgba(0, 0, 0, 0.35);
+}
+.ow-compare__tag {
+  position: absolute;
+  bottom: 12px;
+  padding: 3px 9px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font: 700 11px/1.4 -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.ow-compare__tag--then {
+  left: 12px;
+}
+.ow-compare__tag--now {
+  right: 12px;
+}
+.ow-compare__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font: 14px/1 -apple-system, 'Segoe UI', Tahoma, sans-serif;
+  cursor: pointer;
+}
+.ow-compare__close:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+.ow-compare__msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  background: #f3f4f7;
+  font: 12px/1.5 -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+  color: #23272e;
+}
+.ow-compare__msg p {
+  margin: 0;
+  max-width: 34em;
+}
+.ow-compare__btn {
+  padding: 5px 12px;
+  border: 1px solid #9aaec9;
+  border-radius: 6px;
+  background: #fff;
+  font: 700 11px/1 inherit;
+  color: #173a72;
+  cursor: pointer;
+}
+.ow-compare__btn:hover {
+  background: #eef2f8;
+}
+.ow-compare__spin {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #c6cbd4;
+  border-top-color: #3a90e8;
+  border-radius: 50%;
+  animation: ow-compare-spin 0.8s linear infinite;
+}
+@keyframes ow-compare-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The entry point: a small before/after glyph in the status bar, beside the
+   modem widget. Theme-neutral but overridable, the same contract .ow-modem
+   has — themes may restyle it like they restyle .ow-zone. */
+.ow-cmpbtn {
+  width: 18px;
+  height: 14px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Crect x='1.2' y='2.6' width='11.6' height='8.8' rx='1' fill='none' stroke='%23444' stroke-width='1.3'/%3E%3Cpath d='M7 2.6v8.8' stroke='%23444' stroke-width='1.3'/%3E%3Cpath d='M2 3.4h4.2v7.2H2z' fill='%23444' opacity='.45'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  cursor: pointer;
+  opacity: 0.75;
+}
+.ow-cmpbtn:hover:not(:disabled) {
+  opacity: 1;
+}
+.ow-cmpbtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}

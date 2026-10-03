@@ -55,6 +55,27 @@ const CHROME_SHIM = `(() => { try {
       npnNegotiatedProtocol: 'h2', wasAlternateProtocolAvailable: false, connectionInfo: 'h2' }; };
 } catch (e) {} })();`
 
+/** Timestamp out of a Wayback URL — `/web/20010917011416if_/http://…`. */
+const WB_TS_RE = /\/web\/(\d{4,14})(?:[a-z]{2}_)?\//i
+
+/**
+ * The capture a tab is already displaying, rebuilt banner-free (`if_`), but
+ * only when it is within a year of the one being asked for — otherwise the
+ * request (e.g. "compare with 2015 instead") would be silently ignored in
+ * favour of whatever happens to be on screen.
+ */
+function snapshotFromUrl(
+  current: string,
+  originalUrl: string,
+  year: number
+): { url: string; year: string } | null {
+  const ts = current.match(WB_TS_RE)?.[1]
+  if (!ts) return null
+  const snapYear = ts.slice(0, 4)
+  if (Math.abs(Number(snapYear) - year) > 1) return null
+  return { url: `https://web.archive.org/web/${ts}if_/${originalUrl}`, year: snapYear }
+}
+
 /** Cache of Archive-Timeline month lookups, keyed "url|year" (10 min TTL). */
 const timelineCache = new Map<string, { at: number; months: number[] }>()
 /** Hard cap on cached timeline entries — oldest is evicted when full so the map
@@ -453,10 +474,16 @@ export class BrowserShell {
           : (await wc.capturePage()).toPNG()
 
       if (!opts.originalUrl) return { error: 'No page URL' }
-      // Resolve a REAL snapshot via the availability API — loading a bare
-      // /web/{date}/ URL silently redirects to the nearest snapshot (often a
-      // modern year), which would look like "today".
-      const snap = await this.findSnapshot(opts.originalUrl, opts.year, opts.month)
+      // If the tab is ALREADY showing a capture, THAT capture is the one to
+      // compare against: it provably exists, and it is the page the user is
+      // actually looking at. Only ask the availability API when there is no
+      // capture in hand — it answers with an empty archived_snapshots for
+      // plenty of URLs that demonstrably have captures (http://www.amazon.com/
+      // among them), which would claim "no snapshot" about a page visibly on
+      // screen.
+      const snap =
+        (onWayback ? snapshotFromUrl(wc.getURL(), opts.originalUrl, opts.year) : null) ??
+        (await this.findSnapshot(opts.originalUrl, opts.year, opts.month))
       if (!snap) {
         return { error: 'No archive snapshot found for this page.' }
       }

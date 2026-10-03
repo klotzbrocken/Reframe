@@ -5,8 +5,10 @@ import { NavButton } from './components/NavButton'
 import { FloatingMenu } from './components/FloatingMenu'
 import { TourOverlay, TOUR_STEPS, TOUR_VERSION } from './components/TourOverlay'
 import { ShareDialog } from './components/ShareDialog'
+import { CompareSlider } from './components/CompareSlider'
 import { SecurityInfoDialog } from './components/SecurityInfoDialog'
 import { composeShare } from './shell/shareCompose'
+import { fetchThenAndNow } from './shell/thenAndNow'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
 import { Panel, type PanelEntry } from './components/Panel'
 import { PersonalBar, type PersonalBarItem } from './components/PersonalBar'
@@ -1068,6 +1070,54 @@ export function App() {
     requestChromeTop('share', shareOpen)
     return () => requestChromeTop('share', false)
   }, [shareOpen])
+  // "Then and now": the archived page and the live one wiped against each other.
+  // Same two captures the share image uses (fetchThenAndNow), shown instead of
+  // composed.
+  const [compareOpen, setCompareOpen] = useState(false)
+  const [compareBusy, setCompareBusy] = useState(false)
+  const [compareErr, setCompareErr] = useState<string | null>(null)
+  const [compareSuggest, setCompareSuggest] = useState<number | null>(null)
+  const [compareShot, setCompareShot] = useState<{
+    today: string
+    then: string
+    year: string
+  } | null>(null)
+  // Float the chrome above the page view, or the page covers the overlay.
+  useEffect(() => {
+    requestChromeTop('compare', compareOpen)
+    return () => requestChromeTop('compare', false)
+  }, [compareOpen])
+  const runCompare = async (year: number): Promise<void> => {
+    if (!activeTab) return
+    setCompareOpen(true)
+    setCompareBusy(true)
+    setCompareErr(null)
+    setCompareSuggest(null)
+    setCompareShot(null)
+    const shot = await fetchThenAndNow(
+      activeTab.id,
+      year,
+      Number(waybackDate.slice(4, 6)) || undefined,
+      unwrapWayback(activeTab.url)
+    )
+    if (shot.kind === 'suggest') setCompareSuggest(shot.year)
+    else if (shot.kind === 'error') setCompareErr(shot.message)
+    else setCompareShot({ today: shot.today, then: shot.then, year: shot.year })
+    setCompareBusy(false)
+  }
+  const compareOverlay = compareOpen ? (
+    <CompareSlider
+      busy={compareBusy}
+      error={compareErr}
+      suggestYear={compareSuggest}
+      onUseSuggest={() => compareSuggest && void runCompare(compareSuggest)}
+      today={compareShot?.today ?? null}
+      then={compareShot?.then ?? null}
+      year={compareShot?.year ?? ''}
+      onClose={() => setCompareOpen(false)}
+    />
+  ) : null
+
   const runShare = async (year: number): Promise<void> => {
     if (!activeTab) return
     setShareReqYear(year)
@@ -1076,28 +1126,27 @@ export function App() {
     setShareError(null)
     setShareImg(null)
     setShareSuggest(null)
-    const res = await window.oldweb.shareSources(activeTab.id, {
-      source: 'wayback',
+    const shot = await fetchThenAndNow(
+      activeTab.id,
       year,
       // Share targets the same month the Time Machine is set to.
-      month: Number(waybackDate.slice(4, 6)) || undefined,
-      originalUrl: unwrapWayback(activeTab.url)
-    })
+      Number(waybackDate.slice(4, 6)) || undefined,
+      unwrapWayback(activeTab.url)
+    )
     // No snapshot at the chosen year — ask the user to confirm the closest one.
-    if (res.suggestYear) {
-      setShareSuggest(Number(res.suggestYear))
+    if (shot.kind === 'suggest') {
+      setShareSuggest(shot.year)
       setShareBusy(false)
       return
     }
-    if (res.error || !res.today || !res.year) {
-      setShareError(res.error ?? 'Share failed')
+    if (shot.kind === 'error') {
+      setShareError(shot.message)
       setShareBusy(false)
       return
     }
-    const labelYear = res.snapYear ?? String(year)
-    setShareLabelYear(labelYear)
+    setShareLabelYear(shot.year)
     try {
-      setShareImg(await composeShare(res.today, res.year, labelYear))
+      setShareImg(await composeShare(shot.today, shot.then, shot.year))
     } catch {
       setShareError('Could not compose the image')
     }
@@ -2206,6 +2255,7 @@ export function App() {
             {pageScrim}
             {mdiStubs}
             {modemOverlay}
+            {compareOverlay}
           </div>
         </div>
       ) : (
@@ -2214,6 +2264,7 @@ export function App() {
           {pageScrim}
           {mdiStubs}
           {modemOverlay}
+          {compareOverlay}
         </div>
       )}
 
@@ -2227,13 +2278,29 @@ export function App() {
           text={state.statusText || loadMsg}
           loading={loading}
           right={
-            modemOn ? (
-              <ModemStatus
-                active={modemOn}
-                phase={modemPhase}
-                speed={modemSpeed}
-                onToggle={handleModemToggle}
-              />
+            oldWeb || modemOn ? (
+              <>
+                {/* Only while time-travelling — there is nothing to compare on
+                    the live web. Sits ahead of the modem in the same slot. */}
+                {oldWeb && (
+                  <button
+                    type="button"
+                    className="ow-cmpbtn"
+                    title={`Compare ${waybackDate.slice(0, 4)} with today`}
+                    aria-label="Compare then and now"
+                    disabled={compareBusy}
+                    onClick={() => void runCompare(Number(waybackDate.slice(0, 4)))}
+                  />
+                )}
+                {modemOn && (
+                  <ModemStatus
+                    active={modemOn}
+                    phase={modemPhase}
+                    speed={modemSpeed}
+                    onToggle={handleModemToggle}
+                  />
+                )}
+              </>
             ) : undefined
           }
         />
