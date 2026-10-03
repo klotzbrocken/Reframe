@@ -3,14 +3,43 @@
   "name": "Netscape 7.02 (Mac)",
   "era": "2003 · Mac OS X · Aqua",
   "scrollbar": "aqua10",
-  "toolbar": ["back", "forward", "refresh", "stop", "print"],
-  "menus": ["File", "Edit", "View", "Go", "Bookmarks", "Tools", "Help"],
+  "toolbar": [
+    "back",
+    "forward",
+    "refresh",
+    "stop",
+    "print"
+  ],
+  "menus": [
+    "File",
+    "Edit",
+    "View",
+    "Go",
+    "Bookmarks",
+    "Tools",
+    "Help"
+  ],
   "personalBar": [
-    { "label": "Home", "url": "https://www.mozilla.org" },
-    { "label": "My Netscape", "url": "https://www.netscape.com" },
-    { "label": "Net2Phone", "url": "https://www.net2phone.com" },
-    { "label": "Search Netscape", "url": "https://search.netscape.com" },
-    { "label": "Shop@Netscape", "url": "https://www.netscape.com" }
+    {
+      "label": "Home",
+      "url": "https://www.mozilla.org"
+    },
+    {
+      "label": "My Netscape",
+      "url": "https://www.netscape.com"
+    },
+    {
+      "label": "Net2Phone",
+      "url": "https://www.net2phone.com"
+    },
+    {
+      "label": "Search Netscape",
+      "url": "https://search.netscape.com"
+    },
+    {
+      "label": "Shop@Netscape",
+      "url": "https://www.netscape.com"
+    }
   ],
   "homeUrl": "https://www.mozilla.org",
   "oldWebDate": "20030201",
@@ -22,7 +51,10 @@
     "unifiedToolbar": true,
     "nativeMenus": true
   },
-  "throbber": { "kind": "image", "label": "Netscape" },
+  "throbber": {
+    "kind": "image",
+    "label": "Netscape"
+  },
   "labels": {
     "address": "Location:",
     "go": "Go",
@@ -38,7 +70,7 @@
     "--ie4-platinum": "#e2e6ea",
     "--ie4-light": "#eef1f4",
     "--ie4-dark": "#5a6673",
-    "--ns7-toolbar": "#c7d0d9",
+    "--ns7-toolbar": "#c0c9d3",
     "--ns7-toolbar-hi": "#dfe6ed",
     "--ns7-urlbar": "#edf5f7",
     "--ns7-content-border": "#494f5d",

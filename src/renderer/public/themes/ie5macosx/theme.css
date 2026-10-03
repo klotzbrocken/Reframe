@@ -1,0 +1,416 @@
+@import url('../_shared/aqua-gem.css');
+
+/* =====================================================================
+ * Internet Explorer 5.1 — Mac OS X Developer Preview 4 (Microsoft, 2000)
+ *
+ * The first Aqua browser: a pinstriped window under a 10.0 title bar, a row of
+ * big labelled toolbar buttons, the teal "Address :" band with its ›go button,
+ * a pinstriped Favorites bar of @-bulleted links, and the spinning blue "e".
+ *
+ * The toolbar buttons, the "e" and the @ bullet are the handoff's original
+ * 1:1 bitmaps (image-rendering: pixelated, never rescaled). Everything else —
+ * pinstripes, the teal band, the frame — is CSS, so the window stays resizable
+ * instead of being one fixed 860×671 screenshot.
+ *
+ * The traffic lights come from _shared/aqua-gem.css; base.css leaves this
+ * theme's caption alone (see MAC_THEMES / data-own-chrome in App.tsx).
+ * ===================================================================== */
+
+body {
+  font-family: var(--ie5x-font);
+  font-size: 11px;
+  color: #000;
+  -webkit-font-smoothing: none;
+}
+
+/* The Aqua pinstripe: a 4-row cycle, used by every bar that isn't the teal
+   address band. */
+.ow-root,
+.ow-toolbar,
+.ow-personalbar,
+.ow-statusbar,
+.ow-menubar {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0 1px,
+      #eeeeee 1px 2px,
+      #e6e6e6 2px 3px,
+      #eeeeee 3px 4px
+    )
+    0 0 / auto auto;
+}
+
+.ow-root {
+  border: 1px solid #7a7a7a;
+}
+
+/* ===================================================================== *
+ * Title bar — the Mac OS X 10.0 caption: 21 pinstripe rows between a light
+ * top edge and a dark underline, the title centred in Lucida Grande 13.
+ * ===================================================================== */
+.ow-titlebar {
+  position: relative;
+  height: 24px;
+  padding: 0 10px;
+  background: url('assets/title-bg.png') repeat-x;
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__text {
+  position: absolute;
+  inset: 0 0 1px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 13px;
+  color: #000;
+  pointer-events: none;
+}
+/* the @ badge the original puts ahead of the page title */
+.ow-titlebar__text::before {
+  content: '';
+  width: 17px;
+  height: 17px;
+  background: url('assets/title-at.png') center / 17px 17px no-repeat;
+  image-rendering: pixelated;
+}
+
+/* ===================================================================== *
+ * Menu bar — only shown off macOS (there the real menu bar takes over).
+ * ===================================================================== */
+.ow-menubar {
+  height: 20px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--ie5x-line-soft);
+}
+.ow-menu__label {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--ie5x-teal-dark);
+  color: #fff;
+}
+.ow-menu__dropdown {
+  background: #fff;
+  border: 1px solid #8c8c8c;
+  border-radius: 4px;
+  padding: 3px;
+  font-size: 12px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--ie5x-teal-dark);
+  color: #fff;
+}
+.ow-menu__item.is-disabled {
+  color: #9a9a9a;
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid #d0d0d0;
+  margin: 3px 4px;
+}
+
+/* ===================================================================== *
+ * Toolbar — 56×40 bitmap cells, label baked into the artwork.
+ *   base  tb-<name>.png        · dimmed (and the resting state of Home/Mail)
+ *   on    tb-<name>-on.png     · enabled
+ *   hover tb-<name>-hover.png  · lit icon + teal label, only while enabled
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 0;
+  height: 40px;
+  gap: 0;
+  align-items: stretch;
+  padding: 0 0 0 25px;
+  background-image:
+    url('assets/toolbar-bg.png'),
+    repeating-linear-gradient(
+      to bottom,
+      #ffffff 0 1px,
+      #eeeeee 1px 2px,
+      #e6e6e6 2px 3px,
+      #eeeeee 3px 4px
+    );
+  background-repeat: repeat-x, repeat;
+}
+.ow-toolbar .ow-btn {
+  flex: 0 0 56px;
+  width: 56px;
+  min-width: 56px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: center / 56px 40px no-repeat;
+  image-rendering: pixelated;
+  font-size: 0;
+}
+.ow-toolbar .ow-btn:disabled {
+  opacity: 1;
+}
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  filter: brightness(0.8);
+}
+.ow-toolbar .ow-btn__icon,
+.ow-toolbar .ow-btn__label {
+  display: none;
+}
+
+/* the dotted rule between Home and AutoFill */
+.ow-toolbar .ow-toolbar-sep {
+  flex: 0 0 13px;
+  width: 13px;
+  align-self: center;
+  height: 26px;
+  margin: 0;
+  border: 0;
+  background: repeating-linear-gradient(
+      to bottom,
+      #9a9a9a 0 1px,
+      transparent 1px 3px
+    )
+    center / 1px 100% no-repeat;
+}
+
+/* Back / Forward / Stop / Refresh / Print / AutoFill: dim → on → hover. */
+.ow-toolbar .ow-btn[data-action='back'] { background-image: url('assets/tb-back-on.png'); }
+.ow-toolbar .ow-btn[data-action='back']:disabled { background-image: url('assets/tb-back.png'); }
+.ow-toolbar .ow-btn[data-action='back']:hover:not(:disabled) { background-image: url('assets/tb-back-hover.png'); }
+
+.ow-toolbar .ow-btn[data-action='forward'] { background-image: url('assets/tb-forward-on.png'); }
+.ow-toolbar .ow-btn[data-action='forward']:disabled { background-image: url('assets/tb-forward.png'); }
+.ow-toolbar .ow-btn[data-action='forward']:hover:not(:disabled) { background-image: url('assets/tb-forward-hover.png'); }
+
+.ow-toolbar .ow-btn[data-action='stop'] { background-image: url('assets/tb-stop-on.png'); }
+.ow-toolbar .ow-btn[data-action='stop']:disabled { background-image: url('assets/tb-stop.png'); }
+.ow-toolbar .ow-btn[data-action='stop']:hover:not(:disabled) { background-image: url('assets/tb-stop-hover.png'); }
+
+.ow-toolbar .ow-btn[data-action='refresh'] { background-image: url('assets/tb-refresh-on.png'); }
+.ow-toolbar .ow-btn[data-action='refresh']:disabled { background-image: url('assets/tb-refresh.png'); }
+.ow-toolbar .ow-btn[data-action='refresh']:hover:not(:disabled) { background-image: url('assets/tb-refresh-hover.png'); }
+
+.ow-toolbar .ow-btn[data-action='print'] { background-image: url('assets/tb-print-on.png'); }
+.ow-toolbar .ow-btn[data-action='print']:disabled { background-image: url('assets/tb-print.png'); }
+.ow-toolbar .ow-btn[data-action='print']:hover:not(:disabled) { background-image: url('assets/tb-print-hover.png'); }
+
+.ow-toolbar .ow-btn[data-action='find'] { background-image: url('assets/tb-autofill-on.png'); }
+.ow-toolbar .ow-btn[data-action='find']:disabled { background-image: url('assets/tb-autofill.png'); }
+.ow-toolbar .ow-btn[data-action='find']:hover:not(:disabled) { background-image: url('assets/tb-autofill-hover.png'); }
+
+/* Home and Mail are always live, so their base bitmap is the lit one. */
+.ow-toolbar .ow-btn[data-action='home'] { background-image: url('assets/tb-home.png'); }
+.ow-toolbar .ow-btn[data-action='home']:hover:not(:disabled) { background-image: url('assets/tb-home-hover.png'); }
+
+.ow-toolbar .ow-btn[data-action='mail'] { background-image: url('assets/tb-mail.png'); }
+.ow-toolbar .ow-btn[data-action='mail']:hover:not(:disabled) { background-image: url('assets/tb-mail-hover.png'); }
+
+/* The blue "e" at the far right: it spins about its Y axis while loading. */
+.ow-toolbar .ow-throbber {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 41px;
+  margin: 0 11px 0 auto;
+  align-self: center;
+  background: url('assets/e-logo.png') center / 42px 41px no-repeat;
+  image-rendering: pixelated;
+  perspective: 200px;
+}
+.ow-toolbar .ow-throbber.is-active {
+  animation: ie5x-spin 1.1s linear infinite;
+}
+.ow-toolbar .ow-throbber__dot {
+  display: none;
+}
+@keyframes ie5x-spin {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+/* ===================================================================== *
+ * Address bar — the teal band: white "Address :", a sunken white field with
+ * the @ badge, and the ›go button at its right.
+ * ===================================================================== */
+.ow-addressbar {
+  height: 26px;
+  gap: 6px;
+  align-items: center;
+  padding: 0 0 0 14px;
+  background: linear-gradient(
+    to bottom,
+    #15474d 0%,
+    #2c868f 22%,
+    #3ebaca 40%,
+    #3db8c6 55%,
+    #2c838d 78%,
+    #144248 96%,
+    #010b0c 100%
+  );
+}
+.ow-address-label {
+  font: 11px var(--ie5x-font);
+  color: #fff;
+  white-space: nowrap;
+}
+.ow-address-combo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 18px;
+  background: #fff;
+  border: 1px solid #0d3338;
+  border-radius: 0;
+  box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+.ow-address-favicon {
+  display: block;
+  width: 15px;
+  height: 15px;
+  margin: 0 1px 0 2px;
+  flex: 0 0 auto;
+  background: url('assets/title-at.png') center / 15px 15px no-repeat;
+  image-rendering: pixelated;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent !important;
+  font: 11px var(--ie5x-font);
+  color: #000;
+  padding: 0 2px;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+.ow-address-dropdown {
+  display: none;
+}
+.ow-go {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 14px 0 8px;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  font: 13px var(--ie5x-font);
+  color: #fff;
+}
+.ow-go::before {
+  content: '❯';
+  font-size: 9px;
+}
+.ow-go:active {
+  background: rgba(0, 0, 0, 0.18);
+}
+.ow-go__icon {
+  display: none;
+}
+.ow-addressbar .ow-loc-links,
+.ow-addressbar .ow-loc-related,
+.ow-addressbar .ow-loc-bookmarks,
+.ow-addressbar .ow-loc-proxy {
+  display: none;
+}
+.ow-address-list {
+  border: 1px solid #8c8c8c;
+  background: #fff;
+  font: 11px var(--ie5x-font);
+}
+.ow-address-item:hover {
+  background: var(--ie5x-teal-dark);
+  color: #fff;
+}
+
+/* ===================================================================== *
+ * Favorites bar — Geneva links, each behind a small @ bullet.
+ * ===================================================================== */
+.ow-personalbar {
+  height: 19px;
+  gap: 0;
+  align-items: center;
+  padding: 0 0 0 26px;
+  border-bottom: 1px solid var(--ie5x-line-soft);
+}
+.ow-pbar-btn {
+  height: 17px;
+  gap: 3px;
+  padding: 0 7px 0 3px;
+  font: 10px var(--ie5x-panel-font);
+  color: #000;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+}
+.ow-pbar-btn:active {
+  background: rgba(0, 0, 0, 0.12);
+}
+.ow-pbar-btn__icon {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  background: url('assets/title-at.png') center / 13px 13px no-repeat;
+  image-rendering: pixelated;
+}
+
+/* ===================================================================== *
+ * Status bar — pinstriped foot of the window.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 20px;
+  gap: 6px;
+  align-items: center;
+  padding: 0 8px;
+  border-top: 1px solid var(--ie5x-line-soft);
+  font: 10px var(--ie5x-panel-font);
+  color: #000;
+}
+.ow-status-text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ow-statusbar .ow-progress {
+  display: none;
+}
+.ow-statusbar .ow-progress.is-active {
+  display: block;
+  width: 120px;
+  height: 10px;
+  flex: 0 0 auto;
+  border: 1px solid var(--ie5x-line);
+  border-radius: 5px;
+  background: #fff;
+  overflow: hidden;
+}
+.ow-statusbar .ow-progress__bar {
+  height: 100%;
+  background: linear-gradient(to bottom, #6fd2e0, #2b93a4);
+}
+.ow-statusbar .ow-zone {
+  flex: 0 0 auto;
+  gap: 4px;
+  align-items: center;
+  color: #4a4a4a;
+}
+
+/* ===================================================================== *
+ * Content — white page area inside a hairline frame.
+ * ===================================================================== */
+.ow-content {
+  background: #fff;
+  border-top: 1px solid var(--ie5x-line);
+}

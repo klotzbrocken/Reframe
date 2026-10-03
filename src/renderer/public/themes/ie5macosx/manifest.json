@@ -1,0 +1,39 @@
+{
+  "id": "ie5macosx",
+  "name": "Internet Explorer 5.1 (Mac OS X)",
+  "era": "2000 · Mac OS X DP4 · Aqua",
+  "scrollbar": "aqua10",
+  "toolbar": ["back", "forward", "stop", "refresh", "home", "|", "find", "print", "mail"],
+  "menus": ["File", "Edit", "View", "Go", "Favorites", "Help"],
+  "personalBar": [{ "label": "Live Home Page", "url": "https://www.apple.com" }],
+  "homeUrl": "https://www.apple.com",
+  "oldWebDate": "20001001",
+  "layout": {
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": false,
+    "nativeMenus": true
+  },
+  "throbber": { "kind": "image", "label": "Internet Explorer" },
+  "labels": {
+    "address": "Address :",
+    "go": "go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Refresh",
+    "home": "Home",
+    "find": "AutoFill",
+    "print": "Print",
+    "mail": "Mail"
+  },
+  "vars": {
+    "--ie5x-teal": "#076270",
+    "--ie5x-teal-dark": "#097b8c",
+    "--ie5x-face": "#efefef",
+    "--ie5x-line": "#8c8c8c",
+    "--ie5x-line-soft": "#adadad",
+    "--ie5x-font": "'Lucida Grande', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+    "--ie5x-panel-font": "'Geneva', 'Lucida Grande', Helvetica, Arial, sans-serif"
+  }
+}

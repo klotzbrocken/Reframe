@@ -1,8 +1,11 @@
+@import url('../_shared/aqua-gem.css');
+
 /*
  * Safari 1.0 (2003) — Aqua "brushed metal" look. Original CSS recreation of the
  * era's window style: pinstriped metal bars, left-side traffic-light controls,
  * a centered window title, capsule toolbar buttons, a rounded location field
- * and a bookmarks bar. No vendor artwork is bundled.
+ * and a bookmarks bar. The traffic lights are the shared Mac OS X 10.0 gems
+ * from _shared/aqua-gem.css. No vendor artwork is bundled.
  */
 
 body {
@@ -56,35 +59,6 @@ body {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
   pointer-events: none;
 }
-.ow-titlebar__controls {
-  order: -1;
-  gap: 8px;
-  align-items: center;
-}
-.ow-winbtn {
-  width: 12px;
-  height: 12px;
-  min-width: 12px;
-  padding: 0;
-  border: 0.5px solid rgba(0, 0, 0, 0.35);
-  border-radius: 50%;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
-}
-.ow-winbtn[data-control='close'] {
-  order: 0;
-  margin: 0;
-  background: radial-gradient(circle at 50% 35%, #ff857e, #ed4b43);
-}
-.ow-winbtn[data-control='minimize'] {
-  order: 1;
-  background: radial-gradient(circle at 50% 35%, #ffd066, #f5b21e);
-}
-.ow-winbtn[data-control='maximize'],
-.ow-winbtn[data-control='restore'] {
-  order: 2;
-  background: radial-gradient(circle at 50% 35%, #6ee07e, #1fb538);
-}
-
 /* --- slim menu bar (kept for theme access) ------------------------------- */
 .ow-menubar {
   height: 18px;

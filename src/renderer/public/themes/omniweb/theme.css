@@ -8,8 +8,8 @@
  *
  * The TITLE BAR (and matching platinum menu bar) is intentionally the same as
  * Internet Explorer 4.01 for Macintosh — the Mac OS 9 Platinum bar — per request.
- * That block is copied from the ie4mac theme; base.css excludes data-theme
- * 'omniweb' from the Windows title-bar chrome (like ie4mac / camino).
+ * That block is copied from the ie4mac theme; base.css leaves it alone
+ * because the theme is tagged [data-own-chrome] (like ie4mac / camino).
  * ===================================================================== */
 
 /* ===================================================================== *

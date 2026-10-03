@@ -1,0 +1,115 @@
+/* =====================================================================
+ * Mac OS X 10.0 "Cheetah" Aqua traffic lights — shared by every Aqua theme
+ * (@import this file at the top of a theme.css).
+ *
+ * Measured row by row off 10.0.4's own pixels (the gems in the IE5/DP4 window
+ * frame), which is also what RetroMac's Cheetah chrome draws in AppKit. Down
+ * the middle of the 13 px close gem:
+ *
+ *   row  0   #262626   the rim — ONE pixel, near-black at the top
+ *   rows 1-3 the gloss, bright immediately under the rim and fading into
+ *            the hue (#d6cccc · #f3e6e6 · #da9e9c over the red)
+ *   row  4   #c35449   the body at its deepest
+ *   rows 5-11 lightening steadily downward …
+ *   row 11   #fdb4a7   … to the glow just above the bottom rim
+ *   row 12   #cd6f5f   the rim again, lit by the glow
+ *
+ * So the body is a straight vertical ramp (deep under the gloss → glow at the
+ * foot), the gloss a wide ellipse hung off the top edge, and the rim only ever
+ * shows as the 1 px ring around both. 22 px apart = 13 + a 9 px gap.
+ *
+ * A theme picks nothing here — it just imports. To restyle one gem, override
+ * its --gem-* custom properties.
+ * ===================================================================== */
+
+.ow-titlebar__controls {
+  order: -1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.ow-winbtn {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  /* the rim: black on top, the hue's dark down the sides, light at the bottom */
+  background: linear-gradient(
+    180deg,
+    #262626 0%,
+    var(--gem-rim) 18%,
+    var(--gem-rim) 68%,
+    var(--gem-mid) 100%
+  );
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.ow-winbtn:focus,
+.ow-winbtn:focus-visible {
+  outline: none;
+}
+
+/* the body: deep everywhere except where the glow swells up from under the
+   foot of the gem — so the sides stay dark at mid height (#b83434 against the
+   centre's #e47264) exactly as the original does */
+.ow-winbtn::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 72% 95% at 50% 100%,
+    var(--gem-glow) 0%,
+    var(--gem-mid) 38%,
+    var(--gem-deep) 78%,
+    var(--gem-deep) 100%
+  );
+}
+
+/* the gloss: rows 1-3, nearly the full width and gone again by row 4 — it has
+   to reach the rim at the sides, or a dark cap shows above it */
+.ow-winbtn::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 85% 30% at 50% 7%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.46) 52%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.ow-winbtn:active::before {
+  filter: brightness(0.75);
+}
+
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  --gem-rim: #7d1105;
+  --gem-deep: #c5493b;
+  --gem-mid: #eb8877;
+  --gem-glow: #ffc9bd;
+}
+.ow-winbtn[data-control='minimize'] {
+  order: 1;
+  --gem-rim: #b03d03;
+  --gem-deep: #e8a12e;
+  --gem-mid: #fac95f;
+  --gem-glow: #fffda3;
+}
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 2;
+  --gem-rim: #2f6a0c;
+  --gem-deep: #6fb03c;
+  --gem-mid: #9dd364;
+  --gem-glow: #dffbab;
+}

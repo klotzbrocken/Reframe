@@ -1,0 +1,54 @@
+{
+  "id": "netpositive",
+  "name": "NetPositive 2.2 (BeOS)",
+  "era": "2000 · BeOS R5",
+  "toolbar": [
+    "back",
+    "forward",
+    "stop",
+    "refresh",
+    "home",
+    "save"
+  ],
+  "menus": [
+    "File",
+    "Edit",
+    "Go",
+    "Bookmarks",
+    "View"
+  ],
+  "homeUrl": "https://www.haiku-os.org",
+  "oldWebDate": "20000601",
+  "layout": {
+    "showMenuBar": true,
+    "showStatusBar": true,
+    "showTabs": false,
+    "unifiedToolbar": true,
+    "clearBacking": true
+  },
+  "throbber": {
+    "kind": "css",
+    "label": "NetPositive"
+  },
+  "labels": {
+    "address": "",
+    "go": "Go",
+    "back": "Back",
+    "forward": "Forward",
+    "stop": "Stop",
+    "reload": "Reload",
+    "home": "Home",
+    "save": "Save"
+  },
+  "vars": {
+    "--np-face": "#d8d8d8",
+    "--np-menu": "#e8e8e8",
+    "--np-yellow": "#ffcb00",
+    "--np-yellow-lit": "#ffff33",
+    "--np-yellow-dark": "#986600",
+    "--np-line": "#989898",
+    "--np-mid": "#888888",
+    "--np-dark": "#606060",
+    "--np-font": "'Swis721 BT', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+  }
+}

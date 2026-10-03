@@ -1,0 +1,394 @@
+/* =====================================================================
+ * NetPositive 2.2 — BeOS R5.0.1 Personal Edition (Be Inc., 2000)
+ *
+ * BeOS never had a title BAR: it had a yellow TAB sitting on the left of the
+ * window's top edge, with a close box at one end and the zoom widget at the
+ * other. Under it: a #e8e8e8 menu bar, then one flat #d8d8d8 row holding the
+ * globe, the address field and six 28×24 icon buttons — no button chrome at
+ * all, the icons sit straight on the face.
+ *
+ * The toolbar bitmaps and the globe are the handoff's originals at 1:1
+ * (image-rendering: pixelated). The tab, the bevels and the hairlines are CSS,
+ * so the window stays resizable. base.css leaves the caption alone because the
+ * theme is tagged [data-own-chrome] (see ownChrome() in theme/types.ts).
+ * ===================================================================== */
+
+body {
+  font-family: var(--np-font);
+  font-size: 11px;
+  color: #000;
+  -webkit-font-smoothing: none;
+}
+
+/* No frame on the root: the title-bar row is OUTSIDE the window (only the tab
+   sits on its top edge), so the window's own border starts at the menu bar and
+   is carried by each bar below instead. The window is told to leave its backing
+   clear — see layout.clearBacking in manifest.json — so the desktop shows
+   beside the tab rather than a stretch of grey reading as a title bar. */
+.ow-root {
+  background: transparent;
+}
+.ow-menubar,
+.ow-toolbar,
+.ow-content,
+.ow-statusbar {
+  border-left: 1px solid var(--np-dark);
+  border-right: 1px solid var(--np-dark);
+}
+.ow-statusbar {
+  border-bottom: 1px solid var(--np-dark);
+}
+
+/* ===================================================================== *
+ * The yellow tab. BeOS had no title BAR: a tab sits on the window's top edge,
+ * only as wide as it needs to be, and beside it there is simply nothing.
+ *
+ * So the row itself is transparent with just the window's top edge under it,
+ * and the tab is built from the three controls laid out in a line: the close
+ * box, the title, the zoom widget. `display: contents` on the controls wrapper
+ * drops them into the title bar's own flex row, so `order` can put the close
+ * box ahead of the title and the three cells sit flush as one tab that grows
+ * and shrinks with the page title.
+ * ===================================================================== */
+.ow-titlebar {
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  align-items: stretch;
+  justify-content: flex-start;
+  /* the window's top edge, running out from under the tab */
+  border-bottom: 1px solid var(--np-dark);
+}
+.ow-titlebar__icon {
+  display: none;
+}
+.ow-titlebar__controls {
+  display: contents;
+}
+
+/* the three tab cells: same yellow, lit top edge, brown foot */
+.ow-titlebar__text,
+.ow-winbtn[data-control='close'],
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  background: var(--np-yellow);
+  box-shadow:
+    inset 0 1px 0 var(--np-yellow-lit),
+    inset 0 -1px 0 var(--np-yellow-dark);
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.ow-titlebar__text {
+  order: 1;
+  /* shrink-to-fit: the tab is exactly as wide as the title needs, never the
+     full window width (base.css lets it grow — this takes that back) */
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  max-width: 45%;
+  padding: 0 16px 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.ow-winbtn {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.ow-winbtn:focus,
+.ow-winbtn:focus-visible {
+  outline: none;
+}
+/* BeOS windows have no minimise widget. */
+.ow-winbtn[data-control='minimize'] {
+  display: none;
+}
+
+/* the close box: a small bevelled square at the head of the tab */
+.ow-winbtn[data-control='close'] {
+  order: 0;
+  width: 21px;
+  box-shadow:
+    inset 1px 0 0 var(--np-yellow-lit),
+    inset 0 1px 0 var(--np-yellow-lit),
+    inset 0 -1px 0 var(--np-yellow-dark);
+}
+.ow-winbtn[data-control='close']::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  background: var(--np-yellow);
+  border: 1px solid;
+  border-color: var(--np-yellow-lit) var(--np-yellow-dark) var(--np-yellow-dark)
+    var(--np-yellow-lit);
+}
+.ow-winbtn[data-control='close']:active::before {
+  border-color: var(--np-yellow-dark) var(--np-yellow-lit) var(--np-yellow-lit)
+    var(--np-yellow-dark);
+}
+
+/* the zoom widget: a small square with a larger one behind its top-right */
+.ow-winbtn[data-control='maximize'],
+.ow-winbtn[data-control='restore'] {
+  order: 2;
+  width: 24px;
+  box-shadow:
+    inset -1px 0 0 var(--np-yellow-dark),
+    inset 0 1px 0 var(--np-yellow-lit),
+    inset 0 -1px 0 var(--np-yellow-dark);
+}
+.ow-winbtn[data-control='maximize']::before,
+.ow-winbtn[data-control='restore']::before,
+.ow-winbtn[data-control='maximize']::after,
+.ow-winbtn[data-control='restore']::after {
+  content: '';
+  position: absolute;
+  background: var(--np-yellow);
+  border: 1px solid;
+  border-color: var(--np-yellow-lit) var(--np-yellow-dark) var(--np-yellow-dark)
+    var(--np-yellow-lit);
+}
+.ow-winbtn[data-control='maximize']::before,
+.ow-winbtn[data-control='restore']::before {
+  left: 9px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+}
+.ow-winbtn[data-control='maximize']::after,
+.ow-winbtn[data-control='restore']::after {
+  left: 5px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+}
+
+/* ===================================================================== *
+ * Menu bar — the lighter #e8e8e8 band, hard 1 px bevels, grey selection.
+ * ===================================================================== */
+.ow-menubar {
+  height: 18px;
+  padding: 0 4px;
+  background: var(--np-menu);
+  border-bottom: 1px solid var(--np-mid);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.ow-menu__label {
+  padding: 1px 7px;
+  font-size: 11px;
+}
+.ow-menu.is-open .ow-menu__label,
+.ow-menu__label:hover {
+  background: var(--np-line);
+  color: #000;
+}
+.ow-menu__dropdown {
+  background: var(--np-menu);
+  border: 1px solid;
+  border-color: #fff var(--np-dark) var(--np-dark) #fff;
+  border-radius: 0;
+  padding: 2px 0;
+  font: 11px var(--np-font);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+.ow-menu__item {
+  padding: 1px 16px 1px 10px;
+}
+.ow-menu__item:hover:not(.is-disabled) {
+  background: var(--np-line);
+  color: #000;
+}
+.ow-menu__item.is-disabled {
+  color: var(--np-line);
+}
+.ow-menu__sep {
+  height: 0;
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid #fff;
+  margin: 2px 0;
+}
+
+/* ===================================================================== *
+ * Toolbar — one flat row. NetPositive puts the globe + address field on the
+ * LEFT and the six icons on the RIGHT, so the address bar is re-ordered
+ * ahead of the buttons instead of after them.
+ * ===================================================================== */
+.ow-toolbar {
+  min-height: 0;
+  height: 32px;
+  gap: 0;
+  align-items: center;
+  padding: 0 6px 0 5px;
+  background: var(--np-face);
+  border-bottom: 1px solid var(--np-mid);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.ow-toolbar .ow-btn {
+  flex: 0 0 28px;
+  width: 28px;
+  min-width: 28px;
+  height: 24px;
+  margin-left: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: center / 28px 24px no-repeat;
+  image-rendering: pixelated;
+  font-size: 0;
+}
+.ow-toolbar .ow-btn:disabled {
+  opacity: 1;
+}
+.ow-toolbar .ow-btn:active:not(:disabled) {
+  filter: brightness(0.85);
+}
+.ow-toolbar .ow-btn__icon,
+.ow-toolbar .ow-btn__label {
+  display: none;
+}
+/* Back / Forward / Stop are drawn grey until there is something to do. */
+.ow-toolbar .ow-btn[data-action='back'] { background-image: url('assets/btn-back-on.png'); }
+.ow-toolbar .ow-btn[data-action='back']:disabled { background-image: url('assets/btn-back.png'); }
+.ow-toolbar .ow-btn[data-action='forward'] { background-image: url('assets/btn-forward-on.png'); }
+.ow-toolbar .ow-btn[data-action='forward']:disabled { background-image: url('assets/btn-forward.png'); }
+.ow-toolbar .ow-btn[data-action='stop'] { background-image: url('assets/btn-stop-on.png'); }
+.ow-toolbar .ow-btn[data-action='stop']:disabled { background-image: url('assets/btn-stop.png'); }
+.ow-toolbar .ow-btn[data-action='refresh'] { background-image: url('assets/btn-reload.png'); }
+.ow-toolbar .ow-btn[data-action='home'] { background-image: url('assets/btn-home.png'); }
+.ow-toolbar .ow-btn[data-action='save'] { background-image: url('assets/btn-save.png'); }
+
+/* no throbber in NetPositive — the globe beside the address field is static */
+.ow-toolbar .ow-throbber,
+.ow-toolbar .ow-toolbar-dot,
+.ow-toolbar .ow-searchbox,
+.ow-toolbar .ow-bmtoggle {
+  display: none;
+}
+
+/* ===================================================================== *
+ * Address field — ahead of the buttons, globe at its left, sunken field.
+ * ===================================================================== */
+.ow-toolbar .ow-addressbar {
+  order: -1;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 24px;
+  gap: 6px;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+.ow-address-label {
+  display: none;
+}
+.ow-addressbar::before {
+  content: '';
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  background: url('assets/globe.png') center / 20px 20px no-repeat;
+  image-rendering: pixelated;
+}
+.ow-address-combo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 17px;
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--np-mid) #fff #fff var(--np-mid);
+  border-radius: 0;
+}
+.ow-address-favicon,
+.ow-address-dropdown,
+.ow-addressbar .ow-go,
+.ow-addressbar .ow-loc-links,
+.ow-addressbar .ow-loc-related,
+.ow-addressbar .ow-loc-bookmarks,
+.ow-addressbar .ow-loc-proxy {
+  display: none;
+}
+.ow-address-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent !important;
+  font: 11px var(--np-font);
+  color: #000;
+  padding: 0 3px;
+}
+.ow-address-input:focus {
+  outline: none;
+}
+.ow-address-list {
+  border: 1px solid;
+  border-color: #fff var(--np-dark) var(--np-dark) #fff;
+  background: var(--np-menu);
+  font: 11px var(--np-font);
+}
+.ow-address-item:hover {
+  background: var(--np-line);
+}
+
+/* ===================================================================== *
+ * Status bar — a thin sunken strip along the bottom.
+ * ===================================================================== */
+.ow-statusbar {
+  height: 18px;
+  gap: 6px;
+  align-items: center;
+  padding: 0 6px;
+  background: var(--np-face);
+  border-top: 1px solid var(--np-mid);
+  box-shadow: inset 0 1px 0 #fff;
+  font: 10px var(--np-font);
+  color: #000;
+}
+.ow-status-text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ow-statusbar .ow-progress {
+  display: none;
+}
+.ow-statusbar .ow-progress.is-active {
+  display: block;
+  width: 120px;
+  height: 10px;
+  flex: 0 0 auto;
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--np-mid) #fff #fff var(--np-mid);
+  overflow: hidden;
+}
+.ow-statusbar .ow-progress__bar {
+  height: 100%;
+  background: #4040c0;
+}
+.ow-statusbar .ow-zone {
+  flex: 0 0 auto;
+  gap: 4px;
+  align-items: center;
+  color: var(--np-dark);
+}
+
+.ow-content {
+  background: #fff;
+  border-top: 1px solid var(--np-mid);
+}

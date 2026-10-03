@@ -70,9 +70,19 @@
     "era": "2000 \u00b7 Mac OS 9"
   },
   {
+    "id": "ie5macosx",
+    "name": "Internet Explorer 5.1 (Mac)",
+    "era": "2000 \u00b7 Mac OS X DP4 \u00b7 Aqua"
+  },
+  {
     "id": "netscape6",
     "name": "Netscape Communicator 6.0",
     "era": "2000 \u00b7 Windows"
+  },
+  {
+    "id": "netpositive",
+    "name": "NetPositive 2.2 (BeOS)",
+    "era": "2000 \u00b7 BeOS R5"
   },
   {
     "id": "opera",

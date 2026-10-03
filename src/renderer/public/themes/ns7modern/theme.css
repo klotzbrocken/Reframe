@@ -1,3 +1,5 @@
+@import url('../_shared/aqua-gem.css');
+
 /* =====================================================================
  * Netscape 7.02 for Macintosh — "Modern" skin (Netscape/AOL, 2003)
  *
@@ -8,8 +10,8 @@
  * PNGs, cut data-driven from the shipped `-moz-image-region` rules.
  *
  * The TITLE BAR + window frame are the shared Mac OS 9 Platinum chrome used
- * by the other Mac themes; base.css excludes data-theme 'ns7modern' from the
- * Windows title bar.
+ * by the other Mac themes; base.css leaves it alone because the theme is
+ * tagged [data-own-chrome] (see ownChrome() in theme/types.ts).
  * ===================================================================== */
 
 /* ===================================================================== *
@@ -21,16 +23,16 @@
 }
 
 /* ===================================================================== *
- * Title bar — Aqua pinstripe with left-side traffic-light controls.
+ * Title bar — flat chrome grey with left-side traffic-light controls.
  * ===================================================================== */
 .ow-titlebar {
   position: relative;
   height: 22px;
   padding: 0 10px;
-  background:
-    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 0 1px, transparent 1px 2px),
-    linear-gradient(to bottom, #fbfbfb 0%, #e2e2e2 48%, #cfcfcf 100%);
-  border-bottom: 1px solid #8f8f8f;
+  /* the same flat chrome grey as the toolbar face and the status bar — no
+     pinstripe, so the whole window reads as one piece */
+  background: var(--ns7-toolbar);
+  border-bottom: 1px solid var(--ns7-edge);
 }
 .ow-titlebar__icon {
   display: none;
@@ -43,50 +45,14 @@
   justify-content: center;
   font-size: 13px;
   font-weight: 600;
-  color: #2b2b2b;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: var(--ns7-status-text);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   pointer-events: none;
 }
-/* Traffic lights sit at the LEFT of the title bar. */
+/* Traffic lights sit at the LEFT of the title bar — the Mac OS X 10.0 gems
+   from _shared/aqua-gem.css (imported at the top of this file). */
 .ow-titlebar__controls {
-  order: -1;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  -webkit-app-region: drag;
-  app-region: drag;
-}
-.ow-winbtn {
-  width: 12px;
-  height: 12px;
-  min-width: 12px;
-  padding: 0;
-  border: 0.5px solid rgba(0, 0, 0, 0.32);
-  border-radius: 50%;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
-  position: relative;
-}
-.ow-winbtn:focus,
-.ow-winbtn:focus-visible {
-  outline: none;
-}
-.ow-winbtn:active {
-  filter: brightness(0.9);
-}
-.ow-winbtn[data-control='close'] {
-  order: 0;
-  margin: 0;
-  background: radial-gradient(circle at 50% 35%, #ff857e, #ed4b43);
-}
-.ow-winbtn[data-control='minimize'] {
-  order: 1;
-  background: radial-gradient(circle at 50% 35%, #ffd066, #f5b21e);
-}
-.ow-winbtn[data-control='maximize'],
-.ow-winbtn[data-control='restore'] {
-  order: 2;
-  background: radial-gradient(circle at 50% 35%, #6ee07e, #1fb538);
 }
 
 /* ===================================================================== *
@@ -127,7 +93,7 @@
 }
 .ow-menu__sep {
   height: 0;
-  border-top: 1px solid #c7d0d9;
+  border-top: 1px solid var(--ns7-toolbar);
   margin: 3px 4px;
 }
 
@@ -399,7 +365,7 @@
   align-items: center;
   padding: 0 8px;
   background: var(--ns7-toolbar);
-  border-top: 1px solid #c7d0d9;
+  border-top: 1px solid var(--ns7-toolbar);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
   font: 12px var(--ns7-font);
   color: var(--ns7-status-text);
