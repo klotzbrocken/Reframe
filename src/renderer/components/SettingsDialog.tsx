@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { DEFAULT_ENGINE_ID, SEARCH_ENGINES } from '../shell/engines'
+import { MAC_THEMES } from '../theme/types'
 
 // Injected at build time from package.json (see electron.vite.config.ts).
 declare const __APP_VERSION__: string
@@ -211,10 +212,18 @@ export function SettingsDialog({
           <label className="ow-field">
             <span>Default theme at start</span>
             <select value={theme} onChange={(e) => setTheme(e.target.value)}>
-              {themes.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
+              {/* Split by lineage so the list reads as two short groups
+                  instead of one run of two dozen names. */}
+              {(['win', 'mac'] as const).map((plat) => (
+                <optgroup key={plat} label={plat === 'win' ? 'Windows' : 'Mac & misc'}>
+                  {themes
+                    .filter((t) => MAC_THEMES.has(t.id) === (plat === 'mac'))
+                    .map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                </optgroup>
               ))}
             </select>
           </label>

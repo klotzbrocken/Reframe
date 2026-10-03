@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react'
 import { requestChromeTop } from '../shell/chromeTop'
 import { WAYBACK_MIN_YEAR as MIN_YEAR, WAYBACK_MAX_YEAR as MAX_YEAR } from '../shell/wayback'
 import type { WaybackTimeline } from '../../shared/types'
+import { MAC_THEMES } from '../theme/types'
 
 interface ThemeItem {
   id: string
@@ -112,6 +113,14 @@ export function FloatingMenu({
 }: Props) {
   const [open, setOpen] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
+  // Windows / Mac tab in the theme list — opens on the tab the active theme
+  // is in, so the list is half as long and already shows the relevant half.
+  const [themeTab, setThemeTab] = useState<'win' | 'mac'>(
+    MAC_THEMES.has(themeId) ? 'mac' : 'win'
+  )
+  useEffect(() => {
+    setThemeTab(MAC_THEMES.has(themeId) ? 'mac' : 'win')
+  }, [themeId])
   const [year, setYear] = useState(oldWeb ? waybackYear || 2001 : TODAY_STOP)
   const [month, setMonth] = useState(waybackMonth || 6)
   const ref = useRef<HTMLDivElement>(null)
@@ -354,9 +363,31 @@ export function FloatingMenu({
 
           <div className="ow-fab__div" />
 
-          {/* ---- Theme (dropdown) ---- */}
+          {/* ---- Theme (platform tabs + dropdown) ---- */}
           <div className="ow-fab__section" data-tour="theme">
-            <div className="ow-fab__title">Theme</div>
+            <div className="ow-fab__titlerow">
+              <div className="ow-fab__title">Theme</div>
+              {/* The tabs sit ABOVE the dropdown and decide what it contains,
+                  so neither the trigger nor the list grows with the catalogue. */}
+              <div className="ow-fab__ddtabs" role="tablist">
+                {(['win', 'mac'] as const).map((plat) => (
+                  <button
+                    key={plat}
+                    type="button"
+                    role="tab"
+                    aria-selected={themeTab === plat}
+                    className={'ow-fab__ddtab' + (themeTab === plat ? ' is-active' : '')}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      setThemeTab(plat)
+                      setThemeOpen(false)
+                    }}
+                  >
+                    {plat === 'win' ? 'Windows' : 'Mac & misc'}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="ow-fab__dd">
               <button
                 type="button"
@@ -376,29 +407,28 @@ export function FloatingMenu({
               </button>
               {themeOpen && (
                 <div className="ow-fab__ddlist" role="listbox">
-                  {themes.map((t) => {
-                    const active = t.id === themeId
-                    return (
-                      <button
-                        key={t.id}
-                        type="button"
-                        role="option"
-                        aria-selected={active}
-                        className={'ow-fab__ddrow' + (active ? ' is-active' : '')}
-                        onMouseDown={(e) => {
-                          e.preventDefault()
-                          onTheme(t.id)
-                          setThemeOpen(false)
-                        }}
-                      >
-                        <span className="ow-fab__ddname">{t.name}</span>
-                        {t.era && <span className="ow-fab__ddera">{t.era}</span>}
-                        <span className="ow-fab__ddcheck" aria-hidden>
-                          {active ? '✓' : ''}
-                        </span>
-                      </button>
-                    )
-                  })}
+                  {themes
+                    .filter((t) => MAC_THEMES.has(t.id) === (themeTab === 'mac'))
+                    .map((t) => {
+                      const active = t.id === themeId
+                      return (
+                        <button
+                          key={t.id}
+                          type="button"
+                          role="option"
+                          aria-selected={active}
+                          className={'ow-fab__ddrow' + (active ? ' is-active' : '')}
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            onTheme(t.id)
+                            setThemeOpen(false)
+                          }}
+                        >
+                          <span className="ow-fab__ddname">{t.name}</span>
+                          {t.era && <span className="ow-fab__ddera">{t.era}</span>}
+                        </button>
+                      )
+                    })}
                 </div>
               )}
             </div>

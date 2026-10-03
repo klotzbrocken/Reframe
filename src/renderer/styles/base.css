@@ -760,25 +760,27 @@ body,
 /* ======================================================================== *
  * Title-bar style switch (the bar with the min/max/close buttons).
  * Internet Explorer's title bar is the shared template for all Windows
- * themes (Opera, Firefox, Netscape, K-Meleon); Safari keeps its own Aqua bar.
+ * themes (Opera, Firefox, Netscape, K-Meleon). Themes that paint their own
+ * caption — every Mac/Aqua theme plus Mosaic — are tagged [data-own-chrome]
+ * on .ow-root (see ownChrome() in theme/types.ts) and are skipped below.
  *   win98 — classic Windows 95/98: solid navy gradient + square 3D buttons
  *   luna  — Windows XP Luna: glossy blue gradient + rounded buttons, red close
  * ======================================================================== */
 
 /* ---- Windows 95/98 (IE template) -------------------------------------- */
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-titlebar {
   background: linear-gradient(90deg, #000080 0%, #1084d0 100%) !important;
   height: 22px !important;
   padding: 2px 3px 2px 4px !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar__text {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: none !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-winbtn {
   width: 16px !important;
   height: 14px !important;
   min-width: 16px !important;
@@ -789,22 +791,22 @@ body,
   border-color: #fff #808080 #808080 #fff !important;
   border-radius: 0 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn:active {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-winbtn:active {
   border-color: #808080 #fff #fff #808080 !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-winbtn[data-control='minimize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M0 0h6v2H0z'/%3E%3C/svg%3E") !important;
   background-position: bottom 3px left 4px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-winbtn[data-control='maximize'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-winbtn[data-control='restore'] {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M2 0h6v2H2zM7 2h1v4H7zM2 2h1v1H2zM6 5h1v1H6zM0 3h6v2H0zM5 5h1v4H5zM0 5h1v4H0zM1 8h4v1H1z'/%3E%3C/svg%3E") !important;
   background-position: top 2px left 3px !important;
 }
-.ow-root[data-menu-style='win98']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='win98']:not([data-own-chrome]) .ow-winbtn[data-control='close'] {
   margin-left: 2px !important;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23000'/%3E%3C/svg%3E") !important;
   background-position: top 3px left 4px !important;
@@ -814,7 +816,7 @@ body,
 /* XP Luna: the WHOLE window frame turns Luna-blue and continuous with the
    caption — the theme paints a grey Win95 bevel on .ow-root, so override its
    background + bevel here (keeping its padding, which the blue frame fills). */
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) {
   background: #0b54d8 !important;
   box-shadow:
     inset 1px 1px 0 #2e84f2,
@@ -822,7 +824,7 @@ body,
     inset -1px -1px 0 #0a246a,
     inset -2px -2px 0 #0b54d8 !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-titlebar {
   /* XP Luna Blue — the glossy active caption: bright top edge, deep blue body,
      a lighter sheen band near the bottom. cornerRadius 0 (no rounding). */
   background: linear-gradient(
@@ -844,13 +846,13 @@ body,
     inset 0 -1px 0 #0a246a !important;
   border-top: 1px solid #0c3b94 !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar__text {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-titlebar__text {
   color: #fff !important;
   font-weight: 700 !important;
   font-family: Tahoma, 'Segoe UI', sans-serif !important;
   text-shadow: 1px 1px 2px rgba(0, 0, 40, 0.6) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-winbtn {
   width: 22px !important;
   height: 21px !important;
   min-width: 22px !important;
@@ -863,25 +865,25 @@ body,
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn:active {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-winbtn:active {
   background-color: #173f9c !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-winbtn[data-control='minimize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='3' y='8' width='6' height='2' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-winbtn[data-control='maximize'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='2' y='2' width='8' height='8' fill='none' stroke='%23fff' stroke-width='1.4'/%3E%3Crect x='2' y='2' width='8' height='2.6' fill='%23fff'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-winbtn[data-control='restore'] {
   background-image:
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='4' y='2' width='6' height='6' fill='none' stroke='%23fff' stroke-width='1.3'/%3E%3Crect x='2' y='4' width='6' height='6' fill='%232a5fce' stroke='%23fff' stroke-width='1.3'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(0, 0, 70, 0.28) 100%) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-winbtn[data-control='close'] {
   margin-left: 3px !important;
   border-color: #a52a18 !important;
   background-color: #e0512f !important;
@@ -889,7 +891,7 @@ body,
     url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath stroke='%23fff' stroke-width='1.9' d='M3 3l6 6M9 3l-6 6'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 45%, rgba(80, 0, 0, 0.3)) !important;
 }
-.ow-root[data-menu-style='luna']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='close']:active {
+.ow-root[data-menu-style='luna']:not([data-own-chrome]) .ow-winbtn[data-control='close']:active {
   background-color: #c23e22 !important;
 }
 
@@ -898,9 +900,9 @@ body,
  * from the OS window material (macOS vibrancy / Windows acrylic), toggled from
  * the renderer when this style is picked (window:setGlass); the CSS below is the
  * semi-transparent tint, diagonal highlight, glossy buttons + red close, and the
- * rounded glass frame — reproduced as original CSS. Same 10-theme exclusion
- * chain as win98/luna (the Mac-chrome themes keep their own caption). */
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) {
+ * rounded glass frame — reproduced as original CSS. Skipped on the same
+ * [data-own-chrome] themes as win98/luna (they keep their own caption). */
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) {
   /* Aero glass frame bevel: a bright outer highlight, a translucent light-blue
      glass border band, and a soft inner edge line — the characteristic Vista
      window bevel. Base forces the root background transparent, so on the (born-
@@ -911,7 +913,7 @@ body,
     inset 0 0 0 6px rgba(120, 146, 176, 0.34) !important;
   border-radius: 8px 8px 4px 4px !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-titlebar {
   position: relative !important;
   height: 30px !important;
   padding: 0 5px 0 8px !important;
@@ -945,10 +947,10 @@ body,
   -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
   backdrop-filter: blur(16px) saturate(1.3) !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar__icon {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-titlebar__icon {
   align-self: center !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-titlebar__text {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-titlebar__text {
   align-self: center !important;
   color: #0b0b0b !important;
   font-weight: 400 !important;
@@ -960,7 +962,7 @@ body,
 }
 /* Aero caption buttons: translucent glass min/max, a red gloss close; the group
    hangs from the top edge with rounded outer bottom corners. */
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-winbtn {
   width: 29px !important;
   min-width: 29px !important;
   height: 20px !important;
@@ -980,26 +982,26 @@ body,
   background-position: center !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn:hover {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-winbtn:hover {
   filter: brightness(1.08) !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='minimize'] {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-winbtn[data-control='minimize'] {
   border-radius: 0 0 0 4px !important;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8'%3E%3Crect x='1' y='6' width='8' height='1.6' fill='%232a2a2a'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(228, 238, 248, 0.55) 48%, rgba(198, 214, 230, 0.6) 52%, rgba(224, 234, 246, 0.62) 100%) !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='maximize'] {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-winbtn[data-control='maximize'] {
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9'%3E%3Crect x='1' y='1' width='8' height='7' fill='none' stroke='%232a2a2a'/%3E%3Crect x='1' y='1' width='8' height='2' fill='%232a2a2a'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(228, 238, 248, 0.55) 48%, rgba(198, 214, 230, 0.6) 52%, rgba(224, 234, 246, 0.62) 100%) !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='restore'] {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-winbtn[data-control='restore'] {
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='10'%3E%3Crect x='3' y='0' width='7' height='6' fill='none' stroke='%232a2a2a'/%3E%3Crect x='0' y='3' width='7' height='6' fill='%23eef4fb' stroke='%232a2a2a'/%3E%3C/svg%3E"),
     linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(228, 238, 248, 0.55) 48%, rgba(198, 214, 230, 0.6) 52%, rgba(224, 234, 246, 0.62) 100%) !important;
 }
-.ow-root[data-menu-style='vista']:not([data-theme='safari']):not([data-theme='ie4mac']):not([data-theme='mosaic']):not([data-theme='camino']):not([data-theme='omniweb']):not([data-theme='netscape4mac']):not([data-theme='ie45mac']):not([data-theme='ie45macmono']):not([data-theme='ns7modern']):not([data-theme='aol40mac']) .ow-winbtn[data-control='close'] {
+.ow-root[data-menu-style='vista']:not([data-own-chrome]) .ow-winbtn[data-control='close'] {
   width: 46px !important;
   min-width: 46px !important;
   border-color: rgba(150, 40, 25, 0.75) !important;
@@ -1253,11 +1255,13 @@ body,
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  /* Sit low in the footer/status-bar band: when idle the chrome is NOT floated
-     above the page, so anything reaching into the .ow-content region would be
-     covered (clipped) by the page view. The idle mark is sized to fit inside the
-     shortest theme footer (Safari's 20px status bar) so it is never clipped. */
-  bottom: 1px;
+  /* Sit in the footer band below .ow-content: when idle the chrome is NOT
+     floated above the page, so anything reaching into the content region is
+     covered (clipped) by the page view. --ow-footer is that band's real height,
+     measured and published by App's report(); the idle mark shrinks to fit it
+     and is centred in it, so no theme can cut it off. */
+  --fab-size: clamp(10px, calc(var(--ow-footer, 20px) - 2px), 18px);
+  bottom: max(1px, calc((var(--ow-footer, 20px) - var(--fab-size)) / 2));
   z-index: 9000;
   font-family: -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
 }
@@ -1267,8 +1271,8 @@ body,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: var(--fab-size, 18px);
+  height: var(--fab-size, 18px);
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -1288,6 +1292,11 @@ body,
   color: #fff;
   background: linear-gradient(160deg, #3a90e8, #2467c4);
   box-shadow: 0 0 0 1px rgba(47, 134, 224, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.ow-fab__mark--btn {
+  width: var(--fab-size, 18px);
+  height: var(--fab-size, 18px);
+  font-size: calc(var(--fab-size, 18px) * 0.56);
 }
 .ow-fab__mark i {
   position: absolute;
@@ -1729,6 +1738,45 @@ body,
   max-height: 300px;
   overflow-y: auto;
 }
+/* Windows / "Mac & misc" tabs beside the section heading: they decide what the
+   dropdown below them contains, so the list stays half as long. */
+.ow-fab__titlerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.ow-fab__titlerow .ow-fab__title {
+  margin: 0;
+}
+.ow-fab__ddtabs {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 7px;
+  background: #e8ebf0;
+}
+.ow-fab__ddtab {
+  padding: 3px 9px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 700;
+  color: #737884;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ow-fab__ddtab:hover {
+  color: #23272e;
+}
+.ow-fab__ddtab.is-active {
+  background: #fff;
+  border-color: #c9d4e4;
+  color: #173a72;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
 .ow-fab__ddrow {
   display: flex;
   align-items: center;
@@ -1748,6 +1796,9 @@ body,
   background: #dbe7fb;
   border-color: #aac7ef;
 }
+.ow-fab__ddrow.is-active .ow-fab__ddname {
+  font-weight: 800;
+}
 .ow-fab__ddrow .ow-fab__ddera {
   margin-left: auto;
   font-size: 11px;
@@ -1757,12 +1808,6 @@ body,
 }
 .ow-fab__ddrow.is-active .ow-fab__ddera {
   color: #5c7aa8;
-}
-.ow-fab__ddcheck {
-  margin-left: 8px;
-  font-size: 11px;
-  color: #1f5fc4;
-  width: 10px;
 }
 
 /* ---- Scrollbar (dropdown) -------------------------------------------- */

@@ -31,6 +31,7 @@ import { useShell } from './shell/useShell'
 import { stripWaybackDisplay, unwrapWayback, waybackDisplay, wrapWayback } from './shell/wayback'
 import type { WaybackTimeline } from '../shared/types'
 import { themeEngine, safeThemeId } from './theme/loader'
+import { MAC_THEMES, ownChrome } from './theme/types'
 import {
   DEFAULT_LABELS,
   DEFAULT_MENUS,
@@ -49,21 +50,6 @@ const SPEED_OPTS: { id: NonNullable<Settings['connectionSpeed']>; label: string 
   { id: '56k', label: '56K' },
   { id: '28.8k', label: '28.8K' }
 ]
-
-// Themes whose lineage is Mac/NeXT (vs. the Windows/PC themes). Drives which
-// dial-up GIF + backdrop the modem overlay shows.
-
-const MAC_THEMES = new Set([
-  'safari',
-  'ie4mac',
-  'ie45mac',
-  'ie45macmono',
-  'camino',
-  'omniweb',
-  'netscape4mac',
-  'ns7modern',
-  'aol40mac'
-])
 
 // AOL Desktop 4.0 channel directory — label + a fitting modern destination.
 // Used both by the Channels toolbar dropdown and the themed channels page.
@@ -570,11 +556,13 @@ export function App() {
   useEffect(() => {
     window.oldweb.setCrt(settings.crt ?? false)
   }, [settings.crt])
-  // Aero glass: turn the translucent window backdrop on only for the Vista
-  // title-bar style (macOS vibrancy / Windows acrylic); off restores opaque.
+  // Clear window backing: for the Vista title-bar style (macOS vibrancy /
+  // Windows acrylic), and for any theme asking for it because its chrome does
+  // not cover the whole window (NetPositive's BeOS tab). Off restores opaque.
   useEffect(() => {
-    window.oldweb.setGlass(settings.menuStyle === 'vista')
-  }, [settings.menuStyle])
+    const clear = manifest?.layout?.clearBacking === true
+    window.oldweb.setGlass(settings.menuStyle === 'vista' || clear)
+  }, [settings.menuStyle, manifest])
   // Retro "display" effect on page content: colour-depth reduction + dither, plus
   // the Classic Web Typography level. Both default OFF — pages render normally
   // unless the user opts in via Settings. `era` resolves against the theme's era
@@ -601,12 +589,18 @@ export function App() {
     const el = contentRef.current
     if (!el) return
     const r = el.getBoundingClientRect()
+    const bottom = Math.round(window.innerHeight - r.bottom)
     window.oldweb.setContentInsets({
       top: Math.round(r.top),
       left: Math.round(r.left),
       right: Math.round(window.innerWidth - r.right),
-      bottom: Math.round(window.innerHeight - r.bottom)
+      bottom
     })
+    // The flyout's idle mark has to stay inside this footer band: below it the
+    // page view covers — and so clips — the chrome. Hand the real band to CSS
+    // instead of each theme's status bar having to be tall enough for a fixed
+    // 18px mark (NetPositive's is 18px, IE5's is text-sized).
+    document.documentElement.style.setProperty('--ow-footer', bottom + 'px')
   }, [])
 
   // Measure now, then again shortly after — some chrome rows (e.g. a theme's
@@ -2093,6 +2087,7 @@ export function App() {
       className="ow-root"
       data-menu-style={settings.menuStyle || 'win98'}
       data-theme={themeId}
+      data-own-chrome={ownChrome(themeId) ? '' : undefined}
       data-loading={loading ? '' : undefined}
       data-toolbar-collapsed={toolbarHidden ? '' : undefined}
       data-menu-size={settings.menuFontSize || 'normal'}

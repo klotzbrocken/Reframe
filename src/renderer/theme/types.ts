@@ -123,6 +123,11 @@ export interface ThemeManifest {
      *  in-window menu bar (Camino had no in-window menus). macOS only; other
      *  platforms fall back to the in-window menu bar. */
     nativeMenus?: boolean
+    /** Leave the window's backing CLEAR instead of filling it opaque grey, for
+     *  chrome that deliberately does not paint the whole window: the Vista glass
+     *  caption, and NetPositive's BeOS tab, which leaves the rest of the top row
+     *  outside the window altogether. The theme's own bars stay opaque. */
+    clearBacking?: boolean
     /** IE7: render a command bar (Home / Feeds / Print / Page / Tools / Help) at
      *  the right of the tab strip, and a Favorites cluster (star + add) at its
      *  left — the Internet Explorer 7 tab-row layout. Only wired when true. */
@@ -243,3 +248,30 @@ export const DEFAULT_LABELS: Required<NonNullable<ThemeManifest['labels']>> = {
 export const DEFAULT_TOOLBAR: ToolbarItem[] = ['back', 'forward', 'refresh', 'home']
 
 export const DEFAULT_MENUS: string[] = ['File', 'Edit', 'View', 'Favorites', 'Tools', 'Help']
+
+/**
+ * The non-Windows themes: Mac/NeXT lineage plus the odd one out (BeOS), which
+ * is why the picker calls the group "Mac & misc". Drives the dial-up GIF +
+ * backdrop of the modem overlay, the Windows/Mac split in the theme pickers,
+ * and (together with Mosaic's X11 frame) which themes keep their own window
+ * caption instead of base.css's win98/luna/vista title bars.
+ */
+export const MAC_THEMES: ReadonlySet<string> = new Set([
+  'safari',
+  'ie4mac',
+  'ie45mac',
+  'ie45macmono',
+  'ie5macosx',
+  'camino',
+  'omniweb',
+  'netscape4mac',
+  'ns7modern',
+  'aol40mac',
+  'netpositive'
+])
+
+/** Themes that paint their own window caption — the Mac ones plus Mosaic's
+ *  X11 frame. base.css skips these when a Windows title-bar style is picked
+ *  (`.ow-root[data-own-chrome]`). */
+export const ownChrome = (themeId: string): boolean =>
+  MAC_THEMES.has(themeId) || themeId === 'mosaic'
