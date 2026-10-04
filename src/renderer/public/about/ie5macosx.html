@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About Internet Explorer 5.1 for Mac OS X</title>
+<style>
+:root{--a:#076270;--a2:#0d3338;--ink:#1b1e26}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.65 'Lucida Grande','Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--ink);
+  background:#eceff2 repeating-linear-gradient(to bottom,#fff 0 1px,#eee 1px 2px,#e6e6e6 2px 3px,#eee 3px 4px)}
+header{background:linear-gradient(to bottom,#3ebaca,var(--a) 55%,var(--a2));color:#fff;padding:40px 0 34px}
+.in{max-width:740px;margin:0 auto;padding:0 24px}
+h1{margin:0;font-size:36px;line-height:1.1;letter-spacing:-.5px}
+.tag{display:inline-block;margin-top:12px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,.22);font-size:13px;font-weight:700}
+.era{margin-top:12px;font-size:14px;opacity:.92}
+.lead{font-size:19px;color:#3a3f4a;margin:24px 0 0}
+h2{margin:34px 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--a);border-bottom:2px solid var(--a);padding-bottom:6px}
+p{margin:0 0 14px}
+ul{list-style:none;padding:0;margin:0}
+li{position:relative;padding:11px 0 11px 28px;border-bottom:1px solid #e0e0e0}
+li::before{content:'✦';position:absolute;left:2px;top:11px;color:var(--a)}
+li b{color:var(--ink)}
+code{font:13px 'Monaco','Courier New',monospace;background:#e7eef0;padding:1px 5px;border-radius:3px}
+footer{font-size:12px;color:#8b8f9a;border-top:1px solid #e0e0e0;margin-top:36px;padding-top:16px}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>Internet Explorer 5.1<br>for Mac OS X</h1>
+  <div class="tag">Developer Preview 4 · 2000</div>
+  <div class="era">The first browser to wear Aqua</div>
+</div></header>
+<div class="in">
+  <p class="lead">Mac OS X was still a developer preview, Aqua was brand new, and
+  this was the browser you saw it in first — pinstripes, a candy-striped title bar
+  and a teal address band, months before most people had ever run the system.</p>
+
+  <h2>About this recreation</h2>
+  <p>The toolbar buttons, the spinning mark and the small @ bullet are the original
+  bitmaps, placed at 1:1 and never rescaled. Everything around them — the
+  pinstripes, the teal band, the window frame — is CSS, so the window stays
+  resizable instead of being one fixed 860×671 screenshot. The page inside it is
+  the live modern web.</p>
+  <p>The traffic lights are measured row by row off Mac OS X 10.0's own pixels:
+  near-black at the top of the rim, a white gloss across the top third, the colour
+  deep beneath it and glowing back up from the foot. Safari 1.0 and Netscape 7.02
+  in Reframe draw the very same gems.</p>
+
+  <h2>Period details</h2>
+  <ul>
+    <li><b>Aqua pinstripes</b> — the four-row cycle
+    <code>#ffffff #eeeeee #e6e6e6 #eeeeee</code> under a 10.0 title bar.</li>
+    <li><b>Labelled toolbar cells</b> — 56×40 each, the label baked into the
+    artwork. Back, Forward, Stop, Refresh and Print dim when there is nothing to
+    do; Home and Mail are always live; AutoFill was greyed out in the original and
+    stays that way here.</li>
+    <li><b>The teal address band</b> — white &ldquo;Address :&rdquo; on the gradient,
+    a sunken field with the @ badge, and the small <code>›go</code> at its right.</li>
+    <li><b>Favorites bar</b> — @-bulleted links in Geneva, the row Apple shipped on
+    a fresh install.</li>
+    <li><b>The spinning mark</b> — 57 frames, about three seconds a turn, measured
+    against a recording of the real thing rather than guessed.</li>
+  </ul>
+
+  <h2>Not included</h2>
+  <p>The Explorer Bar — the side panel with Favorites, History, Search, Scrapbook
+  and Page Holder — is missing. Reframe's themes are pure data (a manifest, a
+  stylesheet and assets), and a docked panel needs application code rather than
+  CSS. The tab strip that opened it is not drawn either, rather than leave a
+  control that does nothing.</p>
+
+  <footer>Internet Explorer and the Windows logo are trademarks of Microsoft; Aqua,
+  Mac OS X and the Apple name are trademarks of Apple. Reframe is not affiliated
+  with, sponsored by or endorsed by either. This is a reconstruction made out of
+  admiration — no vendor interface assets are redistributed beyond what this
+  historical homage needs.</footer>
+</div>
+</body>
+</html>

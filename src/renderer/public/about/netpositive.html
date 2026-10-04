@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About NetPositive 2.2 for BeOS</title>
+<style>
+:root{--a:#8a6a00;--a2:#3d3000;--ink:#1b1e26}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.65 'Swis721 BT','Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--ink);background:#eceff2}
+header{background:linear-gradient(135deg,#ffcb00,#e0a800 60%,var(--a2));color:#241c00;padding:40px 0 34px}
+.in{max-width:740px;margin:0 auto;padding:0 24px}
+h1{margin:0;font-size:36px;line-height:1.1;letter-spacing:-.5px}
+.tag{display:inline-block;margin-top:12px;padding:4px 12px;border-radius:20px;background:rgba(0,0,0,.16);font-size:13px;font-weight:700}
+.era{margin-top:12px;font-size:14px;opacity:.86}
+.lead{font-size:19px;color:#3a3f4a;margin:24px 0 0}
+h2{margin:34px 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--a);border-bottom:2px solid #ffcb00;padding-bottom:6px}
+p{margin:0 0 14px}
+ul{list-style:none;padding:0;margin:0}
+li{position:relative;padding:11px 0 11px 28px;border-bottom:1px solid #e0e0e0}
+li::before{content:'▪';position:absolute;left:4px;top:11px;color:#d8a800}
+li b{color:var(--ink)}
+code{font:13px 'Monaco','Courier New',monospace;background:#f3eccd;padding:1px 5px;border-radius:3px}
+footer{font-size:12px;color:#8b8f9a;border-top:1px solid #e0e0e0;margin-top:36px;padding-top:16px}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>NetPositive 2.2</h1>
+  <div class="tag">BeOS R5.0.1 Personal Edition · 2000</div>
+  <div class="era">The browser from the operating system that almost was</div>
+</div></header>
+<div class="in">
+  <p class="lead">BeOS never got its chance, but it got its own browser — small,
+  quick, and hung from a yellow tab instead of a title bar.</p>
+
+  <h2>About this recreation</h2>
+  <p>BeOS had no title <em>bar</em> at all. A tab sits on the window's top edge,
+  only as wide as the window title needs, with the close box at one end and the
+  zoom widget at the other — and beside it, nothing. Reframe reproduces that
+  literally: the tab is the three window controls laid out in a line, so it grows
+  and shrinks with the page title, and the window is told to leave its backing
+  clear so the desktop really does show through next to it.</p>
+  <p>The six toolbar icons and the globe are the original bitmaps at 1:1. The tab,
+  the hard single-pixel bevels and the hairlines are CSS, so the window stays
+  resizable.</p>
+
+  <h2>Period details</h2>
+  <ul>
+    <li><b>The yellow tab</b> — <code>#ffcb00</code> with a lit top edge and a brown
+    foot, bold black title, no minimise widget because BeOS had none.</li>
+    <li><b>One flat row</b> — no button chrome at all: the globe, the address field
+    and six 28×24 icons sit straight on the <code>#d8d8d8</code> face.</li>
+    <li><b>Address field on the left</b> — NetPositive put it ahead of the buttons,
+    the reverse of almost everything else, and so does this.</li>
+    <li><b>Hard edges throughout</b> — one-pixel highlight top-left, one-pixel
+    shadow bottom-right, never a blur.</li>
+    <li><b>Rocket for Home</b> — the icon that took you back to the start page.</li>
+  </ul>
+
+  <h2>A note on the home page</h2>
+  <p>The original opened <code>netpositive:Startup.html</code>, a local page that
+  no longer exists anywhere. This theme points Home at the Haiku project instead —
+  the open-source successor that kept BeOS going after Be Inc. was gone.</p>
+
+  <footer>BeOS, NetPositive and the Be name are trademarks of their respective
+  owners. Reframe is not affiliated with, sponsored by or endorsed by any of them.
+  This is a reconstruction made out of admiration, built for use inside Reframe.</footer>
+</div>
+</body>
+</html>
