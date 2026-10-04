@@ -5,10 +5,10 @@
   "scrollbar": "aqua10",
   "toolbar": ["back", "forward", "stop", "refresh", "home", "|", "find", "print", "mail"],
   "menus": ["File", "Edit", "View", "Go", "Favorites", "Help"],
-  "personalBar": [{ "label": "Live Home Page", "url": "https://www.apple.com" }],
   "homeUrl": "https://www.apple.com",
   "oldWebDate": "20001001",
   "layout": {
+    "showBookmarkBar": true,
     "showMenuBar": true,
     "showStatusBar": true,
     "showTabs": false,

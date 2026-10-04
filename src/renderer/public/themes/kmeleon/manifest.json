@@ -8,17 +8,11 @@
   "homeUrl": "https://kmeleonbrowser.org",
   "oldWebDate": "20010601",
   "layout": {
+    "showBookmarkBar": true,
     "showStatusBar": true,
     "showMenuBar": true,
     "showTabs": false
   },
-  "personalBar": [
-    { "label": "K-Meleon", "url": "https://kmeleonbrowser.org" },
-    { "label": "Mozilla", "url": "https://www.mozilla.org" },
-    { "label": "SlashDot", "url": "https://slashdot.org" },
-    { "label": "WinAmp", "url": "https://www.winamp.com" },
-    { "label": "Google", "url": "https://www.google.com" }
-  ],
   "throbber": { "kind": "css", "label": "" },
   "labels": {
     "address": "Address",

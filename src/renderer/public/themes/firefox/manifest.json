@@ -5,14 +5,10 @@
   "scrollbar": "xp",
   "toolbar": ["back", "forward", "|", "refresh", "stop", "home"],
   "menus": ["File", "Edit", "View", "Go", "Bookmarks", "Tools", "Help"],
-  "personalBar": [
-    { "label": "Getting Started", "icon": "doc", "url": "https://www.mozilla.org/firefox/" },
-    { "label": "Latest Headlines", "icon": "doc", "url": "https://news.bbc.co.uk" },
-    { "label": "Weather", "icon": "doc", "url": "https://weather.com/retro/" }
-  ],
   "homeUrl": "https://www.google.com",
   "oldWebDate": "20041109",
   "layout": {
+    "showBookmarkBar": true,
     "tabsPosition": "top",
     "showStatusBar": true,
     "showMenuBar": true,

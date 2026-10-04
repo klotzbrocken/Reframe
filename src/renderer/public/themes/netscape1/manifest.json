@@ -31,38 +31,13 @@
   "homeUrl": "https://www.mozilla.org",
   "oldWebDate": "19941215",
   "layout": {
+    "showBookmarkBar": true,
     "tabsPosition": "top",
     "showMenuBar": true,
     "showStatusBar": true,
     "showTabs": false,
     "showFavicon": false
   },
-  "personalBar": [
-    {
-      "label": "What's New!",
-      "url": "https://www.mozilla.org/en-US/firefox/new/"
-    },
-    {
-      "label": "What's Cool!",
-      "url": "https://www.awwwards.com"
-    },
-    {
-      "label": "Handbook",
-      "url": "https://en.wikipedia.org/wiki/Netscape_Navigator"
-    },
-    {
-      "label": "Net Search",
-      "url": "https://duckduckgo.com"
-    },
-    {
-      "label": "Net Directory",
-      "url": "https://dmoztools.net"
-    },
-    {
-      "label": "Newsgroups",
-      "url": "https://groups.google.com"
-    }
-  ],
   "throbber": {
     "kind": "css",
     "label": "Netscape"

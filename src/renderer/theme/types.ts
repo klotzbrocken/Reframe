@@ -82,18 +82,6 @@ export interface ThemeManifest {
   menus?: string[]
   /** Home / Search target for this theme (era-appropriate; archived if needed). */
   homeUrl?: string
-  /** Whether this theme shows a personal / bookmark toolbar. NOTE: the bookmark
-   *  bar now renders the app-wide GLOBAL default links (see DEFAULT_LINKS in
-   *  App.tsx) for every theme; the entries listed here are NO LONGER rendered —
-   *  a non-empty `personalBar` only acts as the on/off gate for whether the bar
-   *  appears at all. (Kept as objects for backwards-compatible manifests.) An
-   *  entry with `children` would render as a folder if per-theme items return. */
-  personalBar?: {
-    label: string
-    icon?: string
-    url?: string
-    children?: { label: string; url?: string; icon?: string }[]
-  }[]
   /** Wayback Machine timestamp for the "Old Web" toggle — YYYY, YYYYMM or
    *  YYYYMMDD (theme era). Falls back to oldWebYear, then 2002. */
   oldWebDate?: string
@@ -108,6 +96,10 @@ export interface ThemeManifest {
     /** Put the address field (and a search box) on the nav-button row itself,
      *  instead of on its own line below — the Firefox 1.0 / early-2000s layout. */
     unifiedToolbar?: boolean
+    /** Whether this theme has a bookmark / personal toolbar at all. The bar
+     *  itself always renders the app-wide DEFAULT_LINKS plus the user's own
+     *  bookmarks (see barItems in App.tsx) — this only decides if it exists. */
+    showBookmarkBar?: boolean
     /** Show the live page favicon in the address field (over the dummy icon). */
     showFavicon?: boolean
     /** NCSA Mosaic: show a read-only "Document Title:" row above the URL row. */

@@ -24,20 +24,13 @@
   "homeUrl": "https://www.mozilla.org",
   "oldWebDate": "19970601",
   "layout": {
+    "showBookmarkBar": true,
     "tabsPosition": "top",
     "showMenuBar": true,
     "showStatusBar": true,
     "showTabs": false,
     "showFavicon": false
   },
-  "personalBar": [
-    { "label": "What's New?", "url": "https://www.mozilla.org/en-US/firefox/new/" },
-    { "label": "What's Cool?", "url": "https://www.awwwards.com" },
-    { "label": "Destinations", "url": "https://www.timeout.com" },
-    { "label": "Net Search", "url": "https://duckduckgo.com" },
-    { "label": "People", "url": "https://www.whitepages.com" },
-    { "label": "Software", "url": "https://download.cnet.com" }
-  ],
   "throbber": {
     "kind": "image",
     "label": "Netscape"

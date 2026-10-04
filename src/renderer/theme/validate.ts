@@ -76,26 +76,6 @@ export function sanitizeManifest(raw: unknown, fallbackId: string): ThemeManifes
   const id = typeof m.id === 'string' && m.id ? m.id : fallbackId
   const name = typeof m.name === 'string' && m.name ? m.name : id
 
-  const personalBar = Array.isArray(m.personalBar)
-    ? (m.personalBar as unknown[])
-        .filter((it): it is Record<string, unknown> => !!it && typeof it === 'object')
-        .map((it) => ({
-          label: typeof it.label === 'string' ? it.label : '',
-          icon: typeof it.icon === 'string' ? it.icon : undefined,
-          url: safeUrl(it.url),
-          // A folder entry: keep its child links (each validated the same way).
-          children: Array.isArray(it.children)
-            ? (it.children as unknown[])
-                .filter((c): c is Record<string, unknown> => !!c && typeof c === 'object')
-                .map((c) => ({
-                  label: typeof c.label === 'string' ? c.label : '',
-                  icon: typeof c.icon === 'string' ? c.icon : undefined,
-                  url: safeUrl(c.url)
-                }))
-            : undefined
-        }))
-    : undefined
-
   const scrollbar =
     typeof m.scrollbar === 'string' &&
     ['sys7', 'sys7mono', 'sys8', 'aqua10', 'xp', 'w95', 'vista'].includes(m.scrollbar)
@@ -112,7 +92,6 @@ export function sanitizeManifest(raw: unknown, fallbackId: string): ThemeManifes
     menus: sanitizeStringArray(m.menus),
     labels: sanitizeLabels(m.labels),
     layout: sanitizeLayout(m.layout),
-    personalBar,
     vars: sanitizeVars(m.vars)
   } as ThemeManifest
 }

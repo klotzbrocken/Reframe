@@ -8,6 +8,7 @@
   "homeUrl": "https://www.google.com",
   "oldWebDate": "20091101",
   "layout": {
+    "showBookmarkBar": true,
     "tabsPosition": "top",
     "showMenuBar": true,
     "showStatusBar": true,
@@ -16,29 +17,6 @@
     "unifiedToolbar": true,
     "nativeMenus": true
   },
-  "personalBar": [
-    {
-      "label": "Camino Info",
-      "icon": "folder",
-      "children": [
-        { "label": "Camino Project", "url": "https://caminobrowser.org" },
-        { "label": "Release Notes", "url": "https://caminobrowser.org/releases/" },
-        { "label": "The Mozilla Project", "url": "https://www.mozilla.org" }
-      ]
-    },
-    {
-      "label": "News",
-      "icon": "folder",
-      "children": [
-        { "label": "Google News", "url": "https://news.google.com" },
-        { "label": "MacRumors", "url": "https://www.macrumors.com" },
-        { "label": "Slashdot", "url": "https://slashdot.org" }
-      ]
-    },
-    { "label": "Google", "icon": "google", "url": "https://www.google.com" },
-    { "label": "Amazon.com", "icon": "amazon", "url": "https://www.amazon.com" },
-    { "label": "Translate this Page", "icon": "translate", "url": "https://translate.google.com" }
-  ],
   "throbber": {
     "kind": "css",
     "label": "Camino"

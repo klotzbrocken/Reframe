@@ -5,17 +5,10 @@
   "scrollbar": "aqua10",
   "toolbar": ["back", "forward", "refresh", "home"],
   "menus": ["View", "Help"],
-  "personalBar": [
-    { "label": "Apple", "url": "https://www.apple.com" },
-    { "label": "Mac", "url": "https://www.apple.com/mac/" },
-    { "label": "Amazon", "url": "https://www.amazon.com" },
-    { "label": "eBay", "url": "https://www.ebay.com" },
-    { "label": "Yahoo!", "url": "https://www.yahoo.com" },
-    { "label": "News", "url": "https://news.google.com" }
-  ],
   "homeUrl": "https://www.google.com",
   "oldWebDate": "20030623",
   "layout": {
+    "showBookmarkBar": true,
     "showMenuBar": true,
     "showStatusBar": true,
     "showTabs": false

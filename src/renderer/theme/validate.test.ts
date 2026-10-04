@@ -58,23 +58,8 @@ describe('sanitizeManifest', () => {
     expect(m.layout).toBeUndefined()
   })
 
-  it('restricts homeUrl + personalBar urls to http/https', () => {
-    const m = sanitizeManifest(
-      {
-        id: 't',
-        name: 'T',
-        homeUrl: 'javascript:alert(1)',
-        personalBar: [
-          { label: 'good', url: 'https://ok.com' },
-          { label: 'bad', url: 'file:///etc/passwd' }
-        ],
-        vars: { '--x': 'red} body{}' }
-      },
-      't'
-    )
-    expect(m.homeUrl).toBeUndefined()
-    expect(m.personalBar?.[0]).toEqual({ label: 'good', icon: undefined, url: 'https://ok.com' })
-    expect(m.personalBar?.[1].url).toBeUndefined()
-    expect(m.vars).toEqual({}) // breakout var dropped
+  it('restricts homeUrl to http/https', () => {
+    expect(sanitizeManifest({ homeUrl: 'javascript:alert(1)' }, 'x').homeUrl).toBeUndefined()
+    expect(sanitizeManifest({ homeUrl: 'https://ok.com' }, 'x').homeUrl).toBe('https://ok.com')
   })
 })

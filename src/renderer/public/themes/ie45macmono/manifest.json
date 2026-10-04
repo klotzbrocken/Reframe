@@ -20,18 +20,10 @@
     "preferences"
   ],
   "menus": ["File", "Edit", "View", "Go", "Favorites", "Help"],
-  "personalBar": [
-    { "label": "Live Home Page", "url": "https://www.apple.com" },
-    { "label": "Apple Computer", "url": "https://www.apple.com" },
-    { "label": "Apple Support", "url": "https://support.apple.com" },
-    { "label": "Apple Store", "url": "https://www.apple.com/shop" },
-    { "label": "Microsoft MacTopia", "url": "https://www.microsoft.com/mac" },
-    { "label": "MSN", "url": "https://www.msn.com" },
-    { "label": "Office for Macintosh", "url": "https://www.microsoft.com/mac" }
-  ],
   "homeUrl": "https://www.apple.com",
   "oldWebDate": "19990101",
   "layout": {
+    "showBookmarkBar": true,
     "showMenuBar": true,
     "showStatusBar": true,
     "showTabs": false,

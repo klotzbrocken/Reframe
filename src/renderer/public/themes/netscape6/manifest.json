@@ -5,14 +5,10 @@
   "scrollbar": "w95",
   "toolbar": ["back", "forward", "refresh", "stop", "search", "print"],
   "menus": ["File", "Edit", "View", "Search", "Go", "Bookmarks", "Tasks", "Help"],
-  "personalBar": [
-    { "label": "My Netscape", "icon": "doc", "url": "https://www.netscape.com" },
-    { "label": "Net2Phone", "icon": "doc", "url": "https://en.wikipedia.org/wiki/Net2Phone" },
-    { "label": "Search", "icon": "doc", "url": "https://duckduckgo.com" }
-  ],
   "homeUrl": "https://www.netscape.com",
   "oldWebDate": "20010401",
   "layout": {
+    "showBookmarkBar": true,
     "tabsPosition": "top",
     "showStatusBar": true,
     "showMenuBar": true,

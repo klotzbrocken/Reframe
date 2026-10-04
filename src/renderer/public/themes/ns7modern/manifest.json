@@ -19,31 +19,10 @@
     "Tools",
     "Help"
   ],
-  "personalBar": [
-    {
-      "label": "Home",
-      "url": "https://www.mozilla.org"
-    },
-    {
-      "label": "My Netscape",
-      "url": "https://www.netscape.com"
-    },
-    {
-      "label": "Net2Phone",
-      "url": "https://www.net2phone.com"
-    },
-    {
-      "label": "Search Netscape",
-      "url": "https://search.netscape.com"
-    },
-    {
-      "label": "Shop@Netscape",
-      "url": "https://www.netscape.com"
-    }
-  ],
   "homeUrl": "https://www.mozilla.org",
   "oldWebDate": "20030201",
   "layout": {
+    "showBookmarkBar": true,
     "showMenuBar": true,
     "showStatusBar": true,
     "showTabs": true,

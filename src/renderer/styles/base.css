@@ -160,7 +160,7 @@ body,
   font: inherit;
 }
 
-/* Personal / bookmark toolbar (opt-in per theme via manifest.personalBar) */
+/* Personal / bookmark toolbar (opt-in per theme via layout.showBookmarkBar) */
 .ow-personalbar {
   display: flex;
   align-items: center;

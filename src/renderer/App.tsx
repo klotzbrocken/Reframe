@@ -2084,9 +2084,8 @@ export function App() {
     }
   ).filter((x): x is PersonalBarItem => x !== null)
   const barItems: PersonalBarItem[] = [
-    // Every theme's bookmark bar shows the same global defaults only — the
-    // theme's own manifest personalBar entries (manifestItems) are intentionally
-    // NOT rendered here; the manifest still gates whether a bar shows at all.
+    // Every theme's bookmark bar shows the same global defaults; whether a bar
+    // exists at all is layout.showBookmarkBar.
     ...defaultBarItems,
     // The user's own top-level bookmarks and folders.
     ...barBookmarks
@@ -2108,11 +2107,6 @@ export function App() {
   const historyMap = new Map(history.map((h) => [h.url, h.last]))
   const hotlistEntries: HotListEntry[] = [
     ...bookmarks.map((b) => ({ title: b.title, url: b.url, last: historyMap.get(b.url) })),
-    ...(manifest?.personalBar ?? []).map((p) => ({
-      title: p.label,
-      url: p.url,
-      last: historyMap.get(p.url ?? '')
-    })),
     ...(barBookmarks.length > 0
       ? [
           {
@@ -2215,7 +2209,7 @@ export function App() {
             {searchBoxEl}
             {/* Bookmarks-bar toggle (Camino: sits right of the search field).
                 Hidden by default in base.css; themes opt in by styling it. */}
-            {manifest?.personalBar && (
+            {layout.showBookmarkBar && (
               <button
                 type="button"
                 className="ow-bmtoggle"
@@ -2240,7 +2234,7 @@ export function App() {
 
       {!unified && !addressAtBottom && addressBarEl}
 
-      {manifest?.personalBar && showBar && (
+      {layout.showBookmarkBar && showBar && (
         <PersonalBar
           items={barItems}
           onItem={actions.navigate}
