@@ -21,9 +21,11 @@ export interface ShellActions {
   stop: () => void
   print: () => void
   toggleOldWeb: () => void
-  /** Turn Wayback on/off explicitly (used by the floating controls) and
-   *  re-navigate the current page through (or out of) the Wayback Machine. */
-  setOldWebActive: (on: boolean) => void
+  /** Turn Wayback on/off explicitly (used by the floating controls). By default
+   *  it also re-navigates the current page through (or out of) the Wayback
+   *  Machine; pass `renavigate: false` when the caller is about to navigate
+   *  somewhere else itself and only needs the mode switched. */
+  setOldWebActive: (on: boolean, renavigate?: boolean) => void
   setOldWebDate: (date: string) => void
 }
 
@@ -108,10 +110,14 @@ export function useShell(onLoadStart?: () => void): {
         return next
       })
     },
-    setOldWebActive: (on: boolean) => {
+    setOldWebActive: (on: boolean, renavigate = true) => {
       const id = activeRef.current
+      // Update the ref eagerly, not just via the next render: a caller that
+      // navigates in the same tick must see the NEW mode, or navigate() would
+      // still wrap the destination into the archive it was just asked to leave.
+      oldWebRef.current = on
       setOldWeb(on)
-      if (id != null && currentUrlRef.current) {
+      if (renavigate && id != null && currentUrlRef.current) {
         const original = unwrapWayback(currentUrlRef.current)
         const target = on ? wrapWayback(original, oldWebDateRef.current) : original
         window.oldweb.navigate(id, target)

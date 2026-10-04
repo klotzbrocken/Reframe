@@ -7,6 +7,7 @@ import { TourOverlay, TOUR_STEPS, TOUR_VERSION } from './components/TourOverlay'
 import { ShareDialog } from './components/ShareDialog'
 import { CompareSlider } from './components/CompareSlider'
 import { SecurityInfoDialog } from './components/SecurityInfoDialog'
+import { normalizeInput, isWebSearchUrl } from '../shared/url'
 import { composeShare } from './shell/shareCompose'
 import { fetchThenAndNow } from './shell/thenAndNow'
 import { BookmarkEditDialog, type BookmarkDraft } from './components/BookmarkEditDialog'
@@ -208,9 +209,23 @@ export function App() {
       }
       return
     }
+    // No year prefix on a typed address means today. The field SHOWS the era as
+    // "1999://…", so deleting that prefix is the natural way back to the live
+    // web — the prefix is the one control, in both directions. Without this the
+    // address bar is a one-way door: once Old Web is on, navigate() wraps every
+    // destination into the archive, so nothing typed here could ever reach the
+    // live site again.
+    //
+    // Only for real addresses: free text is a search, which has no year either
+    // and must not silently end time travel.
+    const typed = stripWaybackDisplay(input.trim())
+    const normalized = normalizeInput(typed)
+    if (oldWeb && normalized && !isWebSearchUrl(normalized)) {
+      actions.setOldWebActive(false, false) // mode off; the navigation below is ours
+    }
     // The field may show the friendly "1999://…" wayback form — turn it back
     // into the real target before navigating (the engine re-wraps if Old Web is on).
-    const original = stripWaybackDisplay(input.trim())
+    const original = typed
     const shown = /^[a-z][a-z0-9+.-]*:\/\//i.test(original) ? original : 'https://' + original
     setAddrHistory((h) => [shown, ...h.filter((x) => x !== shown)].slice(0, 10))
     gatedNavigate(original)
