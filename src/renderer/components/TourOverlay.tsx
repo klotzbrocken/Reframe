@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import { requestChromeTop } from '../shell/chromeTop'
 
 /** Bump to re-show the tour after a future update (once per version). */
-export const TOUR_VERSION = '1.4.0'
+export const TOUR_VERSION = '1.5.0'
 
 export interface TourStep {
   /** CSS selector of the chrome element to point at. */
@@ -25,6 +25,12 @@ export const TOUR_STEPS: TourStep[] = [
     title: 'Time machine',
     body: 'Pick a year, then Time-Travel (Wayback) to it. You can also share a “Today vs {year}” image from here.',
     color: '#8b5cf6'
+  },
+  {
+    target: '[data-tour="timemachine"]',
+    title: 'Then and now (new)',
+    body: 'Once you’re time-travelling, a small button appears beside the modem down below. It lays the archived page over today’s and lets you drag a handle across to wipe between them.',
+    color: '#e8590c'
   },
   {
     target: '[data-tour="theme"]',
@@ -88,9 +94,6 @@ export function TourOverlay({ steps, onDone }: { steps: TourStep[]; onDone: () =
     }
   }, [step])
 
-  if (!step) return null
-
-  const last = i === steps.length - 1
   // Escape always ends the tour. Belt and braces: the card's own Skip button is
   // the normal way out, but the tour covers the whole window and force-opens the
   // flyout, so there must be a way out that does not depend on hitting a target.
@@ -101,6 +104,10 @@ export function TourOverlay({ steps, onDone }: { steps: TourStep[]; onDone: () =
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onDone])
+
+  if (!step) return null
+
+  const last = i === steps.length - 1
   const next = (): void => (last ? onDone() : setI((n) => n + 1))
 
   // Lay the arrow + label to the left of the target if there's room, else right.
