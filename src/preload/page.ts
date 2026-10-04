@@ -92,13 +92,32 @@ function posterBody(r: number, g: number, b: number, amp: number, dither: boolea
 }
 
 /** Build the `html{…}` rule for a display mode, or '' for no effect. */
+/**
+ * The colour-depth effect is painted by a fixed, click-through overlay that
+ * BACKDROP-filters the viewport — never by `filter` on <html>.
+ *
+ * Filtering the root element forces the whole document into one composited
+ * layer and makes that element the containing block for every position:fixed
+ * descendant — the same trap the CRT overlay above already documents. On big,
+ * layer-heavy pages (ebay.com, yahoo.com) Chromium gave up compositing it
+ * entirely: the page painted once and then went blank.
+ *
+ * A backdrop-filter on a fixed overlay only ever processes one viewport, no
+ * matter how tall or complex the page, and leaves the page's own layers alone.
+ * Chromium accepts an SVG `url()` filter there (verified), and the overlay goes
+ * into the top layer via the popover trick, exactly like the CRT one.
+ */
+const DISPLAY_ID = '__reframe_display'
+
 function displayCss(mode: { depth?: string; dither?: boolean } | null): string {
   const depth = mode?.depth ?? 'off'
   const dither = mode?.dither !== false
   let f: string
+  let extra = ''
   if (depth === '1bit') {
+    f = filterUrl(monoBody(dither))
     // 1-bit paper look: force a white backdrop so empty areas stay white.
-    return 'html{filter:' + filterUrl(monoBody(dither)) + ' !important;background:#fff !important}'
+    extra = 'html{background:#fff !important}'
   } else if (depth === '16bit') {
     f = filterUrl(posterBody(32, 64, 32, 1 / 32, dither)) // RGB 5-6-5
   } else if (depth === '216') {
@@ -109,7 +128,46 @@ function displayCss(mode: { depth?: string; dither?: boolean } | null): string {
   } else {
     return ''
   }
-  return 'html{filter:' + f + ' !important}'
+  return (
+    extra +
+    '#' +
+    DISPLAY_ID +
+    '{position:fixed!important;inset:0!important;margin:0!important;border:0!important;padding:0!important;' +
+    'width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;' +
+    'background:transparent!important;pointer-events:none!important;' +
+    'z-index:2147483646!important;outline:0!important;' +
+    '-webkit-backdrop-filter:' + f + '!important;backdrop-filter:' + f + '!important}' +
+    '#' + DISPLAY_ID + '::backdrop{background:transparent!important}'
+  )
+}
+
+/** The overlay the colour-depth backdrop-filter is painted on. Mirrors the CRT
+ *  one: a manual popover so it lands in the top layer above every page
+ *  stacking context, and click-through so the page stays usable. */
+let displayEl: HTMLDivElement | null = null
+function applyDisplayOverlay(on: boolean): void {
+  if (on) {
+    if (displayEl) return
+    try {
+      const el = document.createElement('div')
+      el.id = DISPLAY_ID
+      el.setAttribute('popover', 'manual')
+      el.setAttribute('aria-hidden', 'true')
+      ;(document.body || document.documentElement).appendChild(el)
+      ;(el as unknown as { showPopover?: () => void }).showPopover?.()
+      displayEl = el
+    } catch {
+      /* popover unsupported / not connectable yet — the z-index fallback helps */
+    }
+  } else if (displayEl) {
+    try {
+      ;(displayEl as unknown as { hidePopover?: () => void }).hidePopover?.()
+    } catch {
+      /* ignore */
+    }
+    displayEl.remove()
+    displayEl = null
+  }
 }
 
 // --- Classic Web Typography & Controls -------------------------------------
@@ -519,6 +577,7 @@ function applyDisplay(
   scrollKey = drop(scrollKey)
   crtKey = drop(crtKey)
   const fcss = displayCss(mode)
+  applyDisplayOverlay(!!fcss)
   if (fcss) {
     try {
       filterKey = webFrame.insertCSS(fcss)
