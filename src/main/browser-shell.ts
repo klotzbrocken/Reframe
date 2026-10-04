@@ -494,7 +494,7 @@ export class BrowserShell {
       if (Math.abs(Number(snap.year) - opts.year) > 1) {
         return { suggestYear: snap.year }
       }
-      const yearPng = await this.captureUrl(snap.url)
+      const yearPng = (await this.captureUrlFull(snap.url)).png
       const toUrl = (b: Buffer): string => 'data:image/png;base64,' + b.toString('base64')
       return { today: toUrl(todayPng), year: toUrl(yearPng), snapYear: snap.year }
     } catch (e) {
@@ -571,10 +571,6 @@ export class BrowserShell {
 
   /** Load a URL in a temporary view hidden BEHIND the active page (no flicker)
    *  and capture it, then tear the view down. */
-  private async captureUrl(url: string): Promise<Buffer> {
-    return (await this.captureUrlFull(url)).png
-  }
-
   /** Load `url` in a hidden off-screen view and return its screenshot plus the
    *  page's innerText and title (used for the live "Today" shot + AI prompt). */
   private async captureUrlFull(

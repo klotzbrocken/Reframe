@@ -75,7 +75,7 @@ export interface ThemeManifest {
   /** Period scrollbar look injected into page content (the web view's own
    *  scrollbars, styled via ::-webkit-scrollbar in the page preload). Omitted =
    *  the browser default. One of the shared OS looks in page.ts. */
-  scrollbar?: 'sys7' | 'sys7mono' | 'sys8' | 'aqua10' | 'xp' | 'w95' | 'vista'
+  scrollbar?: 'sys7mono' | 'sys8' | 'aqua10' | 'xp' | 'w95' | 'vista'
   /** The exact toolbar button row for this theme, in order. */
   toolbar?: ToolbarItem[]
   /** The exact menu-bar labels for this theme, in order. */
@@ -83,10 +83,8 @@ export interface ThemeManifest {
   /** Home / Search target for this theme (era-appropriate; archived if needed). */
   homeUrl?: string
   /** Wayback Machine timestamp for the "Old Web" toggle — YYYY, YYYYMM or
-   *  YYYYMMDD (theme era). Falls back to oldWebYear, then 2002. */
+   *  YYYYMMDD (theme era). Defaults to 2002. */
   oldWebDate?: string
-  /** @deprecated use oldWebDate */
-  oldWebYear?: number
   /** Layout hints the structural UI reads (visuals stay in theme.css). */
   layout?: {
     tabsPosition?: 'top' | 'bottom'
@@ -96,12 +94,12 @@ export interface ThemeManifest {
     /** Put the address field (and a search box) on the nav-button row itself,
      *  instead of on its own line below — the Firefox 1.0 / early-2000s layout. */
     unifiedToolbar?: boolean
+    /** Show the live page favicon in the address field (over the dummy icon). */
+    showFavicon?: boolean
     /** Whether this theme has a bookmark / personal toolbar at all. The bar
      *  itself always renders the app-wide DEFAULT_LINKS plus the user's own
      *  bookmarks (see barItems in App.tsx) — this only decides if it exists. */
     showBookmarkBar?: boolean
-    /** Show the live page favicon in the address field (over the dummy icon). */
-    showFavicon?: boolean
     /** NCSA Mosaic: show a read-only "Document Title:" row above the URL row. */
     documentTitle?: boolean
     /** Where the address bar sits: 'top' (default) or 'bottom' (Opera 3.x, the

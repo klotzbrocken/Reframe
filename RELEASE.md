@@ -60,3 +60,34 @@ gh release edit vX.Y.Z -R klotzbrocken/Reframe --notes-file dist/RELEASE_NOTES_X
 - `spctl -a -vvv /path/to/Reframe.app` (macOS Gatekeeper) → "accepted".
 - Install the previous version, launch, and confirm it offers the new one
   (menu **Reframe → Check for Updates…** on macOS).
+
+## How the update reaches users
+
+electron-updater, fed from GitHub Releases — **no Sparkle**, and no EdDSA key to
+manage (unlike RetroMac). The trust anchor is the Developer ID signature plus the
+`latest-mac.yml` / `latest.yml` that electron-builder writes into the release.
+The check runs in `src/main/index.ts`: on launch when packaged, plus the
+**Check for Updates…** menu item. In dev it is a no-op.
+
+## Traps
+
+- **Don't drop the `zip` target.** macOS updates go through Squirrel.Mac, which
+  needs `*-mac.zip`; the dmg is only for first install.
+- **The version has to really increase.** electron-updater compares semver from
+  `package.json`; a rebuilt same version is never offered.
+- **Publish the draft.** electron-builder leaves the release as a draft, and
+  clients do not see drafts.
+- **Unsigned means no auto-update on macOS.** Squirrel.Mac verifies the
+  signature and discards the update if it fails. Check before the first real
+  update release: `codesign -dv --verbose=4 <Reframe.app>` must say
+  "Developer ID Application", and `spctl -a -vvv -t exec <app>` must say
+  "accepted / Notarized Developer ID".
+- **A broken electron install.** If `electron --version` fails with
+  "failed to install correctly" / ENOENT, the installer downloaded but did not
+  unpack: extract the cached zip yourself and write the path file (no trailing
+  newline).
+
+  ```bash
+  ditto -x -k ~/Library/Caches/electron/*/electron-v<version>-darwin-arm64.zip node_modules/electron/dist
+  printf 'Electron.app/Contents/MacOS/Electron' > node_modules/electron/path.txt
+  ```

@@ -234,7 +234,7 @@ export function App() {
   const waybackMonth = settings.waybackMonth || 6
   const waybackDate = settings.waybackYear
     ? `${settings.waybackYear}${String(waybackMonth).padStart(2, '0')}15`
-    : manifest?.oldWebDate ?? (manifest?.oldWebYear ? String(manifest.oldWebYear) : '2002')
+    : manifest?.oldWebDate ?? '2002'
 
   // --- bookmarks & browsing history (persisted in localStorage) ---
   const loadStore = (key: string): PanelEntry[] => {
