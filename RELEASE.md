@@ -6,8 +6,24 @@ the release, so installed copies auto-update.
 
 ## Versioning
 
-1. Bump `version` in `package.json` (e.g. `1.1.2`).
-2. Commit, then tag `vX.Y.Z` and push the tag.
+1. Bump `version` in `package.json` (e.g. `1.1.2`), and run `npm install
+   --package-lock-only` so the lockfile's root version follows. `npm ci` on CI
+   fails on a lockfile that does not match `package.json`.
+2. Commit.
+3. **Create the draft release, before the tag is pushed:**
+
+   ```bash
+   GH_TOKEN=$(gh auth token) npm run release:prepare
+   ```
+
+   This is the step that keeps the three platform builds from each creating
+   their own release object — see the duplicate-draft trap below for why. It is
+   idempotent, and it does not return until the new draft is visible in the
+   release listing, so pushing the tag straight afterwards is safe.
+4. Tag `vX.Y.Z` and push the tag. The Windows and Linux builds start here, and
+   each one checks the draft is there before it builds — `npm run release`,
+   `release:win` and `release:linux` all run `build/ensure-release.cjs` first and
+   refuse to go on if the draft is missing, duplicated, or already published.
 
 ## macOS (built locally — needs the Developer ID keychain)
 
@@ -78,8 +94,10 @@ The check runs in `src/main/index.ts`: on launch when packaged, plus the
 
 ## Traps
 
-- **electron-builder can create TWO drafts for one tag.** The dmg and the zip
-  publisher run concurrently. Each looks for a release for `vX.Y.Z`, neither
+- **electron-builder can create TWO drafts for one tag.** Guarded since 1.15.0
+  by `build/ensure-release.cjs` (step 3 under Versioning) — this is what that
+  step is for, and the rest of this entry is how to recognise it if it ever gets
+  through anyway. The dmg and the zip publisher run concurrently. Each looks for a release for `vX.Y.Z`, neither
   finds one, and both create a draft — GitHub allows the duplicate, because a
   draft carries no real tag yet. The assets then split across the two objects,
   and every later job (the Windows and Linux CI runs) uploads into whichever one
@@ -99,6 +117,13 @@ The check runs in `src/main/index.ts`: on launch when packaged, plus the
   sha512 in each `latest-*.yml` against the file you moved, and only then delete
   the extra draft. This bit v1.15.0: the Linux AppImage and `latest-linux.yml`
   sat on an invisible second draft while the release looked complete.
+
+  Creating the draft is deliberately its own step and not part of the build
+  scripts. GitHub's release listing is not read-after-write consistent — a draft
+  created a second earlier can still be missing from `GET /releases`, measured
+  while building 1.15.0 — so three build scripts each allowed to create would
+  race the same way the two publishers do. `npm run release:prepare` creates it
+  once and waits for it to show up; the builds only ever check.
 - **Don't drop the `zip` target.** macOS updates go through Squirrel.Mac, which
   needs `*-mac.zip`; the dmg is only for first install.
 - **The version has to really increase.** electron-updater compares semver from

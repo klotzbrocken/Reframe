@@ -12,10 +12,11 @@
     "preview": "electron-vite preview",
     "package": "electron-vite build && electron-builder --mac",
     "package:win": "electron-vite build && electron-builder --win",
-    "release": "electron-vite build && electron-builder --mac --publish always",
-    "release:win": "electron-vite build && electron-builder --win --publish always",
+    "release:prepare": "node build/ensure-release.cjs --create",
+    "release": "node build/ensure-release.cjs && electron-vite build && electron-builder --mac --publish always",
+    "release:win": "node build/ensure-release.cjs && electron-vite build && electron-builder --win --publish always",
     "package:linux": "electron-vite build && electron-builder --linux",
-    "release:linux": "electron-vite build && electron-builder --linux --publish always",
+    "release:linux": "node build/ensure-release.cjs && electron-vite build && electron-builder --linux --publish always",
     "test": "vitest run"
   },
   "build": {
