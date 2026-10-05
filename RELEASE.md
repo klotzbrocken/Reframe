@@ -48,12 +48,19 @@ Authenticode certificate as a CI secret and the matching electron-builder env
 ## Publish the release
 
 electron-builder creates the GitHub release as a **draft**. After both platforms
-have uploaded, publish it:
+have uploaded, first make sure there is exactly **one** release object for the
+tag (see the duplicate-draft trap below), then publish that one by its id:
 
 ```bash
-gh release edit vX.Y.Z -R klotzbrocken/Reframe --draft=false --latest
-gh release edit vX.Y.Z -R klotzbrocken/Reframe --notes-file dist/RELEASE_NOTES_X.Y.Z.md
+ID=$(gh api repos/klotzbrocken/Reframe/releases --jq '.[] | select(.tag_name=="vX.Y.Z" and .draft) | .id')
+gh api --method PATCH repos/klotzbrocken/Reframe/releases/$ID \
+  -F draft=false -F make_latest=true -f name="X.Y.Z" \
+  --field body=@dist/RELEASE_NOTES_X.Y.Z.md
 ```
+
+`gh release edit vX.Y.Z --draft=false --latest` is shorter and does the same
+thing — but only while the tag maps to a single release object. If it maps to
+two, `gh` silently picks one of them, which is how half a release gets shipped.
 
 ## Verify
 
@@ -71,6 +78,27 @@ The check runs in `src/main/index.ts`: on launch when packaged, plus the
 
 ## Traps
 
+- **electron-builder can create TWO drafts for one tag.** The dmg and the zip
+  publisher run concurrently. Each looks for a release for `vX.Y.Z`, neither
+  finds one, and both create a draft — GitHub allows the duplicate, because a
+  draft carries no real tag yet. The assets then split across the two objects,
+  and every later job (the Windows and Linux CI runs) uploads into whichever one
+  its own publisher resolves to, which is not necessarily the one
+  `gh release view` shows you. The symptom is contradictory: a job logs
+  `uploading file=… provider=github`, even `overwrite published file … reason=already
+  exists on GitHub`, while that asset is nowhere on the release. Count the
+  objects before publishing:
+
+  ```bash
+  gh api repos/klotzbrocken/Reframe/releases \
+    --jq '.[] | select(.tag_name=="vX.Y.Z") | "id=\(.id) draft=\(.draft) assets=\(.assets|length)"'
+  ```
+
+  More than one line: pick the object you intend to ship, move the missing
+  assets into it (download by asset id, re-upload to the keeper's id), check the
+  sha512 in each `latest-*.yml` against the file you moved, and only then delete
+  the extra draft. This bit v1.15.0: the Linux AppImage and `latest-linux.yml`
+  sat on an invisible second draft while the release looked complete.
 - **Don't drop the `zip` target.** macOS updates go through Squirrel.Mac, which
   needs `*-mac.zip`; the dmg is only for first install.
 - **The version has to really increase.** electron-updater compares semver from
