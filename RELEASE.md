@@ -144,3 +144,20 @@ The check runs in `src/main/index.ts`: on launch when packaged, plus the
   ditto -x -k ~/Library/Caches/electron/*/electron-v<version>-darwin-arm64.zip node_modules/electron/dist
   printf 'Electron.app/Contents/MacOS/Electron' > node_modules/electron/path.txt
   ```
+- **There is nothing left to trim off the bundle.** The .app is 258 MB, of which
+  230 MB is Electron Framework — Chromium itself. `app.asar` is 23 MB and that is
+  mostly theme bitmaps. Measured on the 1.15.0 build, both arches.
+
+  In particular, do not re-add an `afterPack` hook to strip Chromium locales.
+  There was one (`build/trim-locales.cjs`, deleted in 1c79b36) whose comment
+  claimed `electronLanguages` only prunes the app-level `.lproj` markers and that
+  ~40 MB of locale data in the framework needed the hook. That is no longer true:
+  with `electronLanguages` set, electron-builder 26.15.3 prunes
+  `Electron Framework.framework/.../Resources` as well. The built app contains
+  exactly `de.lproj`, `en.lproj` and `en_GB.lproj`, 1.7 MB in total — precisely
+  the set the hook would have kept. It would remove nothing.
+
+  So the download size is not a knob. It is either shipping Chromium or not
+  shipping it, which is the whole of the Tauri question — an OS webview is
+  smaller because the engine is the OS's, and so is control over how pages
+  render. For a browser that is the wrong side of the trade.
